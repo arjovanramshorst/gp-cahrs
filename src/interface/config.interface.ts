@@ -21,8 +21,9 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
 
     public prepare(problemInstance: ProblemInstance) {
         this.processor = this.processorFactory()
-        this.processor.prepare(problemInstance, this.config)
         this.input.forEach(it => it.prepare(problemInstance))
+
+        this.processor.prepare(problemInstance, this.config)
         return this
     }
 

@@ -4,10 +4,12 @@ import {ProblemInstance} from "./problem.interface.ts";
 
 export interface ProcessNodeDTO {
     scores: Record<number, number>
+
+    metadata?: any
 }
 
 export abstract class NodeProcessor<C> {
-    abstract prepare(problemInstance: ProblemInstance, config: C): any
+    abstract prepare(problemInstance: ProblemInstance, config: C): void
 
     abstract process(input: ProcessNodeDTO[], params: ProcessParams): ProcessNodeDTO
 }

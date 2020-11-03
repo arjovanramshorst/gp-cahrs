@@ -13,8 +13,9 @@ const main = async () => {
     // Generate random config for now.
     rs.init(problem.defaultConfig.generate(instance))
 
-    console.log(rs.recommend(1))
+    const output = rs.recommend(1)
 
+    console.log(output.metadata)
     // Run CF on verification
 }
 

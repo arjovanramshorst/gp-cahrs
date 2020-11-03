@@ -2,6 +2,8 @@ import {NodeConfig} from "../interface/config.interface.ts";
 import {RandomNodeConfig} from "./random.node.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
+import {Entities} from "../interface/entity.interface.ts";
+import {ProcessTreeNotInitializedError} from "../errors.ts";
 
 interface ConfigInterface {
     interactionType: string
@@ -12,7 +14,9 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
 
     constructor(
         protected readonly config: ConfigInterface
-    ) { super() }
+    ) {
+        super()
+    }
 
     generateInput(problemInstance: ProblemInstance): RandomNodeConfig[] {
         return [
@@ -28,13 +32,25 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
 }
 
 export class RootNodeProcessor extends NodeProcessor<ConfigInterface> {
+    private entityMap?: Entities<any>
 
     prepare(problemInstance: ProblemInstance, config: ConfigInterface): any {
-
+        const toRecommendType = problemInstance.interactionMap[config.interactionType].toType
+        this.entityMap = problemInstance.entityMap[toRecommendType]
     }
 
     process(input: ProcessNodeDTO[], params: ProcessParams): ProcessNodeDTO {
-        return input[0]
+        return {
+            scores: input[0].scores,
+            metadata: Object.entries(input[0].scores)
+                .sort((a, b) => b[1] - a[1])
+                .splice(0, 10)
+                .map(([key, val]) => ({
+                    score: val,
+                    entity: this.entityMap?.entityMatrix[Number(key)] ?? "unknown"
+                }))
+        }
+
     }
 }
 

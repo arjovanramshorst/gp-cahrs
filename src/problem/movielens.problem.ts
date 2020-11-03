@@ -61,7 +61,7 @@ export class MovielensProblem extends Problem {
                         it => ({
                             id: it[0],
                             title: it[1],
-                            genres: it[2]
+                            genres: it[2].split("|")
                         })), {})
                 }
             }

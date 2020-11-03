@@ -13,8 +13,7 @@ export class Recommender {
     private config?: RootNodeConfig
 
     init(config: RootNodeConfig) {
-        this.config = config
-            .prepare(this.problemInstance)
+        this.config = config.prepare(this.problemInstance)
     }
 
     recommend(entityId: EntityId) {
