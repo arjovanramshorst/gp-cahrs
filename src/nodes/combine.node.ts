@@ -4,12 +4,13 @@ import {toMap} from "../functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 
 interface ConfigInterface {
+    type: "CFMatrix" | "Similarity"
     entityType: string
 }
 
 
-export class RandomNodeConfig extends NodeConfig<RandomNodeProcessor> {
-    configType = "random-node"
+export class CombineNodeConfig extends NodeConfig<CombineNodeProcessor> {
+    configType = "combine-node"
 
     constructor(
         protected readonly config: ConfigInterface,
@@ -22,11 +23,11 @@ export class RandomNodeConfig extends NodeConfig<RandomNodeProcessor> {
     }
 
     protected processorFactory() {
-        return new RandomNodeProcessor()
+        return new CombineNodeProcessor()
     }
 }
 
-export class RandomNodeProcessor extends NodeProcessor<ConfigInterface> {
+export class CombineNodeProcessor extends NodeProcessor<ConfigInterface> {
     private scores?: Record<number, number>
 
     prepare({entityMap}: ProblemInstance, config: ConfigInterface): any {

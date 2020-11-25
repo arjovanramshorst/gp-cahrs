@@ -8,8 +8,8 @@ interface ConfigInterface {
 }
 
 
-export class RandomNodeConfig extends NodeConfig<RandomNodeProcessor> {
-    configType = "random-node"
+export class CFNodeConfig extends NodeConfig<CFNodeProcessor> {
+    configType = "cf-node"
 
     constructor(
         protected readonly config: ConfigInterface,
@@ -22,11 +22,11 @@ export class RandomNodeConfig extends NodeConfig<RandomNodeProcessor> {
     }
 
     protected processorFactory() {
-        return new RandomNodeProcessor()
+        return new CFNodeProcessor()
     }
 }
 
-export class RandomNodeProcessor extends NodeProcessor<ConfigInterface> {
+export class CFNodeProcessor extends NodeProcessor<ConfigInterface> {
     private scores?: Record<number, number>
 
     prepare({entityMap}: ProblemInstance, config: ConfigInterface): any {

@@ -12,19 +12,27 @@ export class Recommender {
 
     private config?: RootNodeConfig
 
-    init(config: RootNodeConfig) {
+    public init(config: RootNodeConfig) {
         this.config = config.prepare(this.problemInstance)
+        return this
     }
 
-    recommend(entityId: EntityId) {
+    public recommend(entityId: EntityId) {
+        return this.getConfig().process({
+            entityId,
+        })
+    }
+
+    public print() {
+        this.getConfig().print()
+    }
+
+    private getConfig() {
         if (!this.config) {
             throw new ProcessTreeNotInitializedError()
         }
 
-        return this.config.process({
-            entityId,
-        })
-
+        return this.config
     }
 }
 

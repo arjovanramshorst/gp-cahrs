@@ -1,22 +1,36 @@
-import {Recommender} from "./recommender.ts";
 import {MovielensProblem} from "./problem/movielens.problem.ts";
+import {Generation} from "./generation.ts";
+import {defaultConfig} from "./default.config.ts";
+import {ConfigInterface} from "./interface/config.interface.ts";
+import {RandomEvaluate} from "./evaluate/random.evaluate.ts";
 
-const main = async () => {
+const main = async (config: ConfigInterface = defaultConfig) => {
     // Read data
     const problem = new MovielensProblem()
 
+    // Preprocess data
     const instance = await problem.read()
 
-    // Split train/verify
-    const rs = new Recommender(instance)
+    const evaluator = new RandomEvaluate()
 
-    // Generate random config for now.
-    rs.init(problem.defaultConfig.generate(instance))
+    // Generate initial generation
+    let generation = Generation
+        .initialGeneration(config, instance)
+        .evaluate(evaluator)
 
-    const output = rs.recommend(1)
+    while (!generation.isFinished()) {
+        generation = generation
+            .nextGeneration()
+            .evaluate(evaluator)
+    }
 
-    console.log(output.metadata)
-    // Run CF on verification
+    const best = generation.best()
+
+    console.log(`Score of best found RS: ${best.score}`)
+
+    const output = best.recommender.recommend(1)
+
+    // console.log(output)
 }
 
 await main()

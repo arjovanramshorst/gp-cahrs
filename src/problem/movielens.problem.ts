@@ -6,15 +6,18 @@ import {RootNodeConfig} from "../nodes/root.node.ts";
 
 export class MovielensProblem extends Problem {
     defaultConfig =  new RootNodeConfig({
-        interactionType: "rating"
+        interactionType: "rating",
+        type: "maximize",
+        property: "rating"
     })
 
     async read() {
         const movies = (await readCsv("ml-latest-small/movies.csv"))
         const ratings = (await readCsv("ml-latest-small/ratings.csv"))
-        // const tags = (await readCsv("ml-latest-small/tags.csv"))
+        const tags = (await readCsv("ml-latest-small/tags.csv"))
 
         return {
+            defaultConfig: this.defaultConfig,
             interactionMap: {
                 rating: {
                     fromType: "user",
@@ -35,8 +38,27 @@ export class MovielensProblem extends Problem {
                                 timestamp: Number(it[3])
                             })),
                             {})
+                },
+                tag: {
+                    fromType: "user",
+                    toType: "movie",
+                    type: "tag",
+                    properties: {
+                        tag: PropertyType.string,
+                        timestamp: PropertyType.timestamp
+                    },
+                    interactionMatrix: tags
+                        .reduce(toMatrix(
+                            it => Number(it[0]),
+                            it => Number(it[1]),
+                            it => ({
+                                fromId: Number(it[0]),
+                                toId: Number(it[1]),
+                                tag: it[2],
+                                timestamp: Number(it[3])
+                            })
+                        ), {})
                 }
-
             },
             entityMap: {
                 user: {
