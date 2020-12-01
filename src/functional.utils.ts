@@ -21,6 +21,8 @@ export const groupBy = <A>(getIdentifier: (c: A) => number) => (agg: Record<numb
 
 export const sumBy = <A>(getSumBy: (c: A) => number) => (agg: number, curr: A) => agg + getSumBy(curr)
 
+export const countBy = <A>(predicate: (c: A) => boolean) => (agg: number, curr: A) => agg + (predicate(curr) ? 1 : 0)
+
 export const toMatrix = <A, T>(
     getFromIdentifier: (c: A) => number,
     getToIdentifier: (c: A) => number,

@@ -1,7 +1,7 @@
-import {Evaluate} from "./evaluate.ts";
+import {Evaluator} from "./evaluator.ts";
 import {Recommender} from "../recommender.ts";
 
-export class RandomEvaluate extends Evaluate {
+export class RandomEvaluator extends Evaluator {
     evaluate(recommender: Recommender): number {
         return Math.random();
     }

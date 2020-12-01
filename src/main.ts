@@ -1,17 +1,16 @@
-import {MovielensProblem} from "./problem/movielens.problem.ts";
 import {Generation} from "./generation.ts";
 import {defaultConfig} from "./default.config.ts";
 import {ConfigInterface} from "./interface/config.interface.ts";
-import {RandomEvaluate} from "./evaluate/random.evaluate.ts";
 
 const main = async (config: ConfigInterface = defaultConfig) => {
+
     // Read data
-    const problem = new MovielensProblem()
+    const problem = config.makeProblem()
 
     // Preprocess data
     const instance = await problem.read()
 
-    const evaluator = new RandomEvaluate()
+    const evaluator = config.makeEvaluator(instance)
 
     // Generate initial generation
     let generation = Generation

@@ -1,7 +1,7 @@
 import {Recommender} from "./recommender.ts";
 import {ProblemInstance} from "./interface/problem.interface.ts";
 import {ConfigInterface} from "./interface/config.interface.ts";
-import {Evaluate} from "./evaluate/evaluate.ts";
+import {Evaluator} from "./evaluate/evaluator.ts";
 
 export interface EvaluatedRecommender {
     score: number
@@ -19,22 +19,18 @@ export class Generation {
     ) { }
 
     public nextGeneration(): Generation {
-        // TODO: Implement crossover/mutation
-        const offspring = this.config.reproduce().produceOffspring(this.evaluated)
+        // TODO: make sure prepare is called for every generated node here?
+        const offspring = this.config.makeReproduce().produceOffspring(this.evaluated)
 
         return new Generation(this.config, offspring, this.gen + 1)
     }
 
-    public evaluate(evaluator: Evaluate) {
+    public evaluate(evaluator: Evaluator) {
         console.log(`Evaluating Generation #${this.gen}...`)
         this.recommenders
             .forEach((it, idx)=> {
                 console.log(`Evaluating RS G${this.gen}R${idx}:`)
                 it.print()
-                // train parameters?
-                // split dataset?
-                // evaluate performance
-                // store performance in generation next to RS
                 const performance = evaluator.evaluate(it)
 
                 console.log(`Score: ${performance}`)

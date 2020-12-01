@@ -5,6 +5,10 @@ export interface ProcessNodeDTO {
 }
 
 export abstract class NodeProcessor<C> {
+    constructor(
+        protected readonly config: C,
+    ) { }
+
     abstract prepare(problemInstance: ProblemInstance, config: C): void
 
     abstract process(input: ProcessNodeDTO[], params: ProcessParams): ProcessNodeDTO

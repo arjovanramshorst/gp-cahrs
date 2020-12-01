@@ -2,6 +2,7 @@ import {ProcessTreeNotInitializedError} from "./errors.ts";
 import {EntityId} from "./interface/entity.interface.ts";
 import {ProblemInstance} from "./interface/problem.interface.ts";
 import {RootNodeConfig} from "./nodes/root.node.ts";
+import {Recommendations} from "./interface/dto.interface.ts";
 
 
 export class Recommender {
@@ -17,10 +18,10 @@ export class Recommender {
         return this
     }
 
-    public recommend(entityId: EntityId) {
+    public recommend(entityId: EntityId): Recommendations {
         return this.getConfig().process({
             entityId,
-        })
+        }) as Recommendations
     }
 
     public print() {

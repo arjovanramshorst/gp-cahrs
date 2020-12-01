@@ -7,12 +7,14 @@ interface BaseInteraction {
     toId: EntityId,
 }
 
-interface Interactions<T extends BaseInteraction> {
+export interface Interactions<T extends BaseInteraction> {
     fromType: EntityType
     toType: EntityType
     type: InteractionType
     properties: Record<keyof T, PropertyType>
-    interactionMatrix: Record<EntityId, Record<EntityId, T>>
+    interactionMatrix: InteractionMatrix<T>
 }
+
+export type InteractionMatrix<T> = Record<EntityId, Record<EntityId, T>>
 
 export type InteractionMap = Record<InteractionType, Interactions<any>>
