@@ -11,7 +11,6 @@ export class RankEvaluator extends Evaluator {
                 const testInteractions = this.problemInstance.testInteractions[Number(fromId)]
                 const recommendations = recommender.recommend(Number(fromId))
 
-
                 const found = recommendations.recommendations
                     .reduce(countBy(it => testInteractions[it.entity.id]!!), 0)
                 const total = Object.keys(testInteractions).length
@@ -20,12 +19,15 @@ export class RankEvaluator extends Evaluator {
                 return {
                     fromId,
                     recommendations,
-                    recall: found / total
+                    recall: found / total,
+                    precision: found / Math.min(recommendations.recommendations.length, total)
                 }
             })
 
         const averageRecall = recommendations.reduce(sumBy(it => it.recall), 0) / recommendations.length
+        const averagePrecision = recommendations.reduce(sumBy(it => it.precision), 0) / recommendations.length
 
-        return averageRecall
+        // TODO: Do this? Or max? min? randomly select 1? :p
+        return (averageRecall + averagePrecision) / 2
     }
 }

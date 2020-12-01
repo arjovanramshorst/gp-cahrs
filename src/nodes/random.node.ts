@@ -29,7 +29,7 @@ export class RandomNodeConfig extends NodeConfig<RandomNodeProcessor> {
 }
 
 export class RandomNodeProcessor extends NodeProcessor<ConfigInterface> {
-    private scores?: ValueMatrix
+    private scores?: ValueMatrix<number>
 
     prepare({entityMap}: ProblemInstance): any {
         const toKeys = Object.keys(entityMap[this.config.toEntityType].entityMatrix)
@@ -47,6 +47,4 @@ export class RandomNodeProcessor extends NodeProcessor<ConfigInterface> {
             matrix: this.scores!
         }
     }
-
-    protected input: NodeProcessor<any>[] = [];
 }

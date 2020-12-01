@@ -21,7 +21,8 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
      * @param problemInstance
      */
     public generate(problemInstance: ProblemInstance) {
-        this.input = this.generateInput(problemInstance)
+        this.input = NodeConfig.selectRandom(this.generateInput(problemInstance))
+        // TODO: Implement combiner here if there is more than one input generated
         this.input.forEach(it => it.generate(problemInstance))
         return this
     }
@@ -59,5 +60,14 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
     }
 
     protected abstract processorFactory(): NodeProcessor<any>
+
+    private static selectRandom(input: NodeConfig<any>[]) {
+        if (input.length <= 1) {
+            return input
+        }
+
+        return [input[Math.floor(Math.random() * input.length)]]
+        // TODO: Add combine node here if selected.length > 1 and this node is not a combiner
+    }
 }
 

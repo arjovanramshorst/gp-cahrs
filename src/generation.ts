@@ -2,6 +2,7 @@ import {Recommender} from "./recommender.ts";
 import {ProblemInstance} from "./interface/problem.interface.ts";
 import {ConfigInterface} from "./interface/config.interface.ts";
 import {Evaluator} from "./evaluate/evaluator.ts";
+import {RootNodeConfig} from "./nodes/root.node.ts";
 
 export interface EvaluatedRecommender {
     score: number
@@ -62,6 +63,6 @@ export class Generation {
 
     private static generateRandomRS(problem: ProblemInstance) {
         return new Recommender(problem)
-            .init(problem.defaultConfig.generate(problem))
+            .init(RootNodeConfig.fromDefaultConfig(problem.defaultConfig).generate(problem))
     }
 }

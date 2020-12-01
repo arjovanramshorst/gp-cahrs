@@ -1,6 +1,6 @@
 export type EntityType = string
 
-export type EntityId = number
+export type EntityId = number | string
 
 export enum PropertyType{
     array,

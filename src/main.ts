@@ -27,8 +27,6 @@ const main = async (config: ConfigInterface = defaultConfig) => {
 
     console.log(`Score of best found RS: ${best.score}`)
 
-    const output = best.recommender.recommend(1)
-
     // console.log(output)
 }
 

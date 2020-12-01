@@ -1,8 +1,15 @@
 import {PropertyType} from "../interface/entity.interface.ts";
 import {readCsv} from "../csv.utils.ts";
-import {toMap, toMatrix} from "../functional.utils.ts";
+import {groupBy, toMap, toMatrix} from "../functional.utils.ts";
 import {Problem} from "./problem.ts";
 import {RootNodeConfig} from "../nodes/root.node.ts";
+
+interface Rating {
+    fromId: number,
+    toId: number,
+    rating: number,
+    timestamp: number
+}
 
 export class MovielensProblem extends Problem {
     defaultConfig = new RootNodeConfig({
@@ -15,14 +22,24 @@ export class MovielensProblem extends Problem {
         const movies = await this.readMovies()
         const ratings = await this.readRatings()
         const tags = await this.readTags()
-        const ninetypercentRatingTimestamp = ratings
-            .map(it => it.timestamp)
-            .sort()
-            [Math.floor(ratings.length * 0.9)]
 
-        const testRatings = ratings.filter(it => it.timestamp > ninetypercentRatingTimestamp)
-            .filter(it => it.rating >= 4)
-        const trainRatings = ratings.filter(it => it.timestamp <= ninetypercentRatingTimestamp)
+        const trainRatings: Rating[] = []
+        const testRatings: Rating[] = []
+
+        const grouped = ratings.reduce(groupBy(it => it.fromId), {})
+        Object.keys(grouped).forEach(fromRef => {
+            const ratings = grouped[fromRef]
+            // Assume ratings are sorted on time
+            // .sort(...)
+            ratings.forEach((it, index) => {
+                if (index < 0.9 * ratings.length) {
+                    trainRatings.push(it)
+                } else if (it.rating >= 4) {
+                    testRatings.push(it)
+                }
+            })
+
+        })
 
         return {
             defaultConfig: this.defaultConfig,
@@ -93,6 +110,7 @@ export class MovielensProblem extends Problem {
 
     async readRatings() {
         return (await readCsv("ml-latest-small/ratings.csv"))
+            .slice(1)
             .map(it => ({
                 fromId: Number(it[0]),
                 toId: Number(it[1]),
@@ -103,6 +121,7 @@ export class MovielensProblem extends Problem {
 
     async readMovies() {
         return (await readCsv("ml-latest-small/movies.csv"))
+            .slice(1)
             .map(it => ({
                 id: Number(it[0]),
                 title: it[1],
@@ -112,6 +131,7 @@ export class MovielensProblem extends Problem {
 
     async readTags() {
         return (await readCsv("ml-latest-small/tags.csv"))
+            .slice(1)
             .map(it => ({
                 fromId: Number(it[0]),
                 toId: Number(it[1]),

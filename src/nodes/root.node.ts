@@ -4,6 +4,7 @@ import {ProblemInstance} from "../interface/problem.interface.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {Entities} from "../interface/entity.interface.ts";
 import {Recommendations, SimilarityScores} from "../interface/dto.interface.ts";
+import {NearestNeighbourConfig} from "./nearest-neighbour.node.ts";
 
 interface ConfigInterface {
     interactionType: string,
@@ -20,17 +21,27 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
         super()
     }
 
-    generateInput(problemInstance: ProblemInstance): RandomNodeConfig[] {
+    generateInput(problemInstance: ProblemInstance): NodeConfig<any>[] {
         return [
             new RandomNodeConfig({
                 toEntityType: problemInstance.interactionMap[this.config.interactionType].toType,
                 fromEntityType: problemInstance.interactionMap[this.config.interactionType].fromType
+            }),
+            new NearestNeighbourConfig({
+                interactionType: this.config.interactionType,
+                toEntityType: problemInstance.interactionMap[this.config.interactionType].toType,
+                fromEntityType: problemInstance.interactionMap[this.config.interactionType].fromType,
+                compareValueKey: this.config.property
             })
         ]
     }
 
     protected processorFactory(): RootNodeProcessor {
         return new RootNodeProcessor(this.config);
+    }
+
+    public static fromDefaultConfig(config: RootNodeConfig) {
+        return new RootNodeConfig(config.config)
     }
 }
 
