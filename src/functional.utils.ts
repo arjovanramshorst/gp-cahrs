@@ -22,7 +22,7 @@ export const groupBy = <A>(getIdentifier: (c: A) => EntityId) => (agg: Record<En
     return agg
 }
 
-export const sumBy = <A>(getSumBy: (c: A) => number) => (agg: number, curr: A) => agg + getSumBy(curr)
+export const sumBy = <A>(getSumBy: (c: A) => number) => (agg: number, curr: A) => agg + (getSumBy(curr) ?? 0)
 
 export const countBy = <A>(predicate: (c: A) => boolean) => (agg: number, curr: A) => agg + (predicate(curr) ? 1 : 0)
 
@@ -85,4 +85,39 @@ export const matrixToList = <T>(matrix: ValueMatrix<T>): MatrixListItem<T>[] => 
         })
 
     return values
+}
+
+export const reduceMatrix = <T, A>(reduce: (agg: T, curr: A) => T, init: T) => (matrixes: ValueMatrix<A>[]): ValueMatrix<T> => {
+    const res: ValueMatrix<T> = {}
+    matrixes.forEach(matrix => {
+        Object.keys(matrix).forEach(fromRef => {
+            if (!res[fromRef]) {
+                res[fromRef] = {}
+            }
+            const scores = matrix[fromRef]
+            Object.keys(scores).forEach(toRef => {
+                if (!res[fromRef][toRef]) {
+                    res[fromRef][toRef] = init
+                }
+                res[fromRef][toRef] = reduce(res[fromRef][toRef], scores[toRef])
+            })
+        })
+    })
+
+    return res
+}
+
+export const powerset = <T>(l: T[]): T[][] => {
+    // stolen from https://codereview.stackexchange.com/questions/139095/generate-powerset-in-js
+    return (function ps(list): any[][] {
+        if (list.length === 0) {
+            return [[]];
+        }
+        var head = list.pop();
+        var tailPS = ps(list);
+
+        return tailPS.concat(tailPS.map(function (e) {
+            return [head].concat(e);
+        }));
+    })(l.slice());
 }

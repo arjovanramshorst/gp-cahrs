@@ -12,6 +12,7 @@ interface Rating {
 }
 
 export class MovielensProblem extends Problem {
+    name = "Movielens Problem"
     defaultConfig = new RootNodeConfig({
         interactionType: "rating",
         type: "maximize",

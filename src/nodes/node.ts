@@ -1,6 +1,8 @@
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {ProcessTreeNotInitializedError} from "../errors.ts";
+import {CombineNodeConfig} from "./combine.node.ts";
+import {powerset} from "../functional.utils.ts";
 
 export abstract class NodeConfig<C extends NodeProcessor<any>> {
     protected abstract readonly configType: string
@@ -21,9 +23,18 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
      * @param problemInstance
      */
     public generate(problemInstance: ProblemInstance) {
-        this.input = NodeConfig.selectRandom(this.generateInput(problemInstance))
+        const input = NodeConfig.selectRandom(this.generateInput(problemInstance))
+        input.forEach(it => it.generate(problemInstance))
+
         // TODO: Implement combiner here if there is more than one input generated
-        this.input.forEach(it => it.generate(problemInstance))
+        // if (input.length > 1) {
+        //     const combine = new CombineNodeConfig({})
+        //     combine.setInput(input)
+        //     this.input = [combine]
+        // } else {
+            this.input = input
+        // }
+
         return this
     }
 
@@ -61,12 +72,14 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
 
     protected abstract processorFactory(): NodeProcessor<any>
 
-    private static selectRandom(input: NodeConfig<any>[]) {
+    private static selectRandom(input: NodeConfig<any>[]): NodeConfig<any>[] {
         if (input.length <= 1) {
             return input
         }
 
-        return [input[Math.floor(Math.random() * input.length)]]
+        const ps = powerset(input)
+
+        return ps[Math.floor(Math.random() * ps.length)]
         // TODO: Add combine node here if selected.length > 1 and this node is not a combiner
     }
 }

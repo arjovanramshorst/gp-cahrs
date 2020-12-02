@@ -8,19 +8,23 @@ export class RankEvaluator extends Evaluator {
     evaluate(recommender: Recommender): number {
         const recommendations = Object.keys(this.problemInstance.testInteractions)
             .map(fromId => {
-                const testInteractions = this.problemInstance.testInteractions[Number(fromId)]
-                const recommendations = recommender.recommend(Number(fromId))
+                const testInteractions = this.problemInstance.testInteractions[fromId]
+                const recommendations = recommender.recommend(fromId)
 
                 const found = recommendations.recommendations
                     .reduce(countBy(it => testInteractions[it.entity.id]!!), 0)
+
                 const total = Object.keys(testInteractions).length
                 // console.log(`recommendations: ${recommendations}`)
                 // console.log(`found ${found} of total ${total}`)
+                const nrRecommendations = recommendations.recommendations.length
+
                 return {
                     fromId,
                     recommendations,
                     recall: found / total,
-                    precision: found / Math.min(recommendations.recommendations.length, total)
+                    // Divide by 0 error if there are no recommendations for a certain user, TODO: Figure out what to do in this situation
+                    precision: nrRecommendations ? found / Math.min(nrRecommendations, total) : 0
                 }
             })
 

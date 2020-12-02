@@ -1,11 +1,12 @@
 import {NodeConfig} from "./node.ts";
-import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
-import {toMap} from "../functional.utils.ts";
+import {NodeProcessor, ProcessParams} from "../interface/processor.interface.ts";
+import {mapMatrixValues, reduceMatrix } from "../functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
+import {SimilarityScores} from "../interface/dto.interface.ts";
 
 interface ConfigInterface {
-    type: "CFMatrix" | "Similarity"
-    entityType: string
+    // type: "Similarity" // | "CFMatrix"
+    // entityType: string
 }
 
 
@@ -22,25 +23,39 @@ export class CombineNodeConfig extends NodeConfig<CombineNodeProcessor> {
         return []
     }
 
+    public setInput(input: NodeConfig<any>[]) {
+        this.input = input
+    }
+
     protected processorFactory() {
-        return new CombineNodeProcessor()
+        return new CombineNodeProcessor(this.config)
     }
 }
 
 export class CombineNodeProcessor extends NodeProcessor<ConfigInterface> {
-    private scores?: Record<number, number>
 
-    prepare({entityMap}: ProblemInstance, config: ConfigInterface): any {
-        this.scores = Object
-            .keys(entityMap[config.entityType].entityMatrix)
-            .reduce(toMap(c => Number(c), () => Math.random()), {})
+    prepare(instance: ProblemInstance, config: ConfigInterface): any {
+
     }
 
-    process(input: ProcessNodeDTO[], params: ProcessParams): ProcessNodeDTO {
+    process(input: SimilarityScores[], params: ProcessParams): SimilarityScores {
+        // TODO: check inputs from/to are the same
+        // start with avg only
+        const sumFunc = (agg: Sum, curr: number) => ({
+            sum: agg.sum + curr,
+            count: agg.count + 1,
+        })
+        const combineValues = reduceMatrix(sumFunc, {sum: 0, count: 0})(input.map(it => it.matrix))
+
         return {
-            scores: this.scores!
+            fromEntityType: input[0].fromEntityType,
+            toEntityType: input[0].toEntityType,
+            matrix: mapMatrixValues((it: Sum) => it.sum / it.count)(combineValues)
         }
     }
+}
 
-    protected input: NodeProcessor<any>[] = [];
+interface Sum {
+    sum: number
+    count: number
 }

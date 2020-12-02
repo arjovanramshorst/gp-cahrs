@@ -6,6 +6,7 @@ import {InteractionMatrix} from "../interface/interaction.interface.ts";
 import {mapMatrixValues, valuesOf} from "../functional.utils.ts";
 import {EntityId} from "../interface/entity.interface.ts";
 import { RandomNodeConfig } from "./random.node.ts";
+import {CFNodeConfig} from "./cf.node.ts";
 
 interface ConfigInterface {
     interactionType: string
@@ -33,6 +34,11 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
             new RandomNodeConfig({
                 fromEntityType: this.config.fromEntityType,
                 toEntityType: this.config.fromEntityType
+            }),
+            new CFNodeConfig({
+                entityType: this.config.fromEntityType,
+                interactionType: this.config.interactionType,
+                comparisonKey: this.config.compareValueKey
             })
         ]
     }

@@ -14,6 +14,7 @@ export class Recommender {
     private config?: RootNodeConfig
 
     public init(config: RootNodeConfig) {
+        console.log("Preprocessing")
         this.config = config.prepare(this.problemInstance)
         return this
     }
