@@ -3,6 +3,8 @@ import {ProblemInstance} from "./interface/problem.interface.ts";
 import {ConfigInterface} from "./interface/config.interface.ts";
 import {Evaluator} from "./evaluate/evaluator.ts";
 import {RootNodeConfig} from "./nodes/root.node.ts";
+import {NodeConfig} from "./nodes/node.ts";
+import {CombineNodeConfig} from "./nodes/combine.node.ts";
 
 export interface EvaluatedRecommender {
     score: number
@@ -64,6 +66,17 @@ export class Generation {
 
     private static generateRandomRS(problem: ProblemInstance) {
         return new Recommender(problem)
-            .init(RootNodeConfig.fromDefaultConfig(problem.defaultConfig).generate(problem))
+            .init(RootNodeConfig.fromDefaultConfig(problem.defaultConfig).generate(problem, combineInputs))
     }
+
+    // TODO: Check if this should be here
+}
+
+const combineInputs = (input: NodeConfig<any>[]) => {
+    const config = new CombineNodeConfig({
+        type: "Similarity",
+        entityType: "any"
+    })
+    config.setInput(input)
+    return config
 }

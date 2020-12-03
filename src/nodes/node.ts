@@ -1,8 +1,7 @@
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {ProcessTreeNotInitializedError} from "../errors.ts";
-import {mapMatrixValues, powerset, reduceMatrix} from "../functional.utils.ts";
-import {SimilarityScores} from "../interface/dto.interface.ts";
+import {powerset} from "../functional.utils.ts";
 
 export abstract class NodeConfig<C extends NodeProcessor<any>> {
     protected abstract readonly configType: string
@@ -21,18 +20,14 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
      * Generates a random valid input configuration.
      *
      * @param problemInstance
+     * @param combine is necessary to remove circular dependencies
      */
-    public generate(problemInstance: ProblemInstance) {
+    public generate(problemInstance: ProblemInstance, combine: (input: NodeConfig<any>[]) => NodeConfig<any>) {
         const input = NodeConfig.selectRandom(this.generateInput(problemInstance))
-        input.forEach(it => it.generate(problemInstance))
+        input.forEach(it => it.generate(problemInstance, combine))
 
         if (input.length > 1) {
-            const combine = new CombineNodeConfig({
-                type: "Similarity",
-                entityType: "any"
-            })
-            combine.setInput(input)
-            this.input = [combine]
+            this.input = [combine(input)]
         } else {
             this.input = input
         }
@@ -83,67 +78,4 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
 
         return ps[Math.floor(Math.random() * ps.length)]
     }
-}
-
-/**
- * Everything below this part is only here (and not in its own file) due to the fact that singular dependencies don't work
- * in ts/deno/node.
- *
- * TODO: Figure out a cleaner way to handle this
- */
-
-interface ConfigInterface {
-    type: "Similarity" // | "CFMatrix"
-    entityType: string
-}
-
-
-export class CombineNodeConfig extends NodeConfig<CombineNodeProcessor> {
-    configType = "combine-node"
-
-    constructor(
-        protected readonly config: ConfigInterface,
-    ) {
-        super()
-    }
-
-    protected generateInput() {
-        return []
-    }
-
-    public setInput(input: NodeConfig<any>[]) {
-        this.input = input
-    }
-
-    protected processorFactory() {
-        return new CombineNodeProcessor(this.config)
-    }
-}
-
-export class CombineNodeProcessor extends NodeProcessor<ConfigInterface> {
-
-    prepare(instance: ProblemInstance, config: ConfigInterface): any {
-
-    }
-
-    process(input: SimilarityScores[], params: ProcessParams): SimilarityScores {
-        // TODO: check inputs from/to are the same
-        // start with avg only
-        const sumFunc = (agg: Sum, curr: number) => ({
-            sum: agg.sum + curr,
-            count: agg.count + 1,
-        })
-        const combineValues = reduceMatrix(sumFunc, {sum: 0, count: 0})(input.map(it => it.matrix))
-
-        return {
-            fromEntityType: input[0].fromEntityType,
-            toEntityType: input[0].toEntityType,
-            matrix: mapMatrixValues((it: Sum) => it.sum / it.count)(combineValues)
-        }
-    }
-}
-
-interface Sum {
-    sum: number
-    count: number
 }
