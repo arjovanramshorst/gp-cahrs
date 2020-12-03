@@ -17,7 +17,8 @@ export class Generation {
         private readonly config: ConfigInterface,
         private readonly recommenders: Recommender[],
         private readonly gen: number = 0
-    ) { }
+    ) {
+    }
 
     public nextGeneration(): Generation {
         // TODO: make sure prepare is called for every generated node here?
@@ -29,7 +30,7 @@ export class Generation {
     public evaluate(evaluator: Evaluator) {
         console.log(`Evaluating Generation #${this.gen}...`)
         this.recommenders
-            .forEach((it, idx)=> {
+            .forEach((it, idx) => {
                 console.log(`Evaluating RS G${this.gen}R${idx}:`)
                 it.print()
                 const performance = evaluator.evaluate(it)
@@ -40,7 +41,7 @@ export class Generation {
                     recommender: it
                 })
             })
-        this.evaluated.sort((a,b) => b.score - a.score)
+        this.evaluated.sort((a, b) => b.score - a.score)
 
         return this
     }

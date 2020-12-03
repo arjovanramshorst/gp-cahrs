@@ -41,10 +41,16 @@ export class RandomNodeProcessor extends NodeProcessor<ConfigInterface> {
     }
 
     process(input: ProcessNodeDTO[], params: ProcessParams): SimilarityScores {
+        if (!this.scores) {
+            throw Error("prepare not called")
+        }
         return {
             fromEntityType: this.config.fromEntityType,
             toEntityType: this.config.toEntityType,
-            matrix: this.scores!
+            matrix: {
+                // Reduce size of objects passed between components
+                [params.entityId]: this.scores[params.entityId]
+            }
         }
     }
 }

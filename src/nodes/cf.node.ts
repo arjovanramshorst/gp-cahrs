@@ -67,7 +67,9 @@ export class CFNodeProcessor extends NodeProcessor<ConfigInterface> {
         return {
             fromEntityType: this.config.entityType,
             toEntityType: this.config.entityType,
-            matrix: this.similarities
+            matrix: {
+                [params.entityId]: this.similarities[params.entityId]
+            }
         }
     }
 

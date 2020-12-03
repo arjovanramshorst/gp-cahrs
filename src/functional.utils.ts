@@ -119,5 +119,7 @@ export const powerset = <T>(l: T[]): T[][] => {
         return tailPS.concat(tailPS.map(function (e) {
             return [head].concat(e);
         }));
-    })(l.slice());
+    })(l.slice())
+        // Skip empty list
+        .slice(1);
 }

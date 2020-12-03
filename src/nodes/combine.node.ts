@@ -5,8 +5,8 @@ import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores} from "../interface/dto.interface.ts";
 
 interface ConfigInterface {
-    // type: "Similarity" // | "CFMatrix"
-    // entityType: string
+    type: "Similarity" // | "CFMatrix"
+    entityType: string
 }
 
 
