@@ -1,6 +1,7 @@
 import {Generation} from "./generation.ts";
 import {defaultConfig} from "./default.config.ts";
 import {ConfigInterface} from "./interface/config.interface.ts";
+import {getRenderer} from "./renderer.ts";
 
 const main = async (config: ConfigInterface = defaultConfig) => {
 
@@ -18,11 +19,20 @@ const main = async (config: ConfigInterface = defaultConfig) => {
     // Generate initial generation
     let generation = Generation
         .initialGeneration(config, instance)
+
+    getRenderer().setActive(generation)
+
+    generation
+        .prepare()
         .evaluate(evaluator)
 
     while (!generation.isFinished()) {
         generation = generation
             .nextGeneration()
+        getRenderer().setActive(generation)
+
+        generation
+            .prepare()
             .evaluate(evaluator)
     }
 

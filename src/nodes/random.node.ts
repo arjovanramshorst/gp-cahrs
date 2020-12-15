@@ -3,6 +3,7 @@ import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/process
 import {toMap} from "../utils/functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
+import {getRenderer} from "../renderer.ts";
 
 interface ConfigInterface {
     fromEntityType: string
@@ -32,6 +33,7 @@ export class RandomNodeProcessor extends NodeProcessor<ConfigInterface> {
     private scores?: ValueMatrix<number>
 
     prepare({entityMap}: ProblemInstance): any {
+        getRenderer().updated("Generating random values..")
         const toKeys = Object.keys(entityMap[this.config.toEntityType].entityMatrix)
         this.scores = Object
             .keys(entityMap[this.config.fromEntityType].entityMatrix)

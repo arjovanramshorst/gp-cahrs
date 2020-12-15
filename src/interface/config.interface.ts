@@ -10,3 +10,8 @@ export interface ConfigInterface {
     makeReproduce: () => Reproduce
     makeEvaluator: (instance: ProblemInstance) => Evaluator
 }
+
+export function printConfig(config: ConfigInterface) {
+    console.log(`Max # of generations: ${config.maxGeneration}`)
+    console.log(`Generation size: ${config.generationSize}`)
+}

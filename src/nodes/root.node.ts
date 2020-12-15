@@ -37,6 +37,12 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
                 fromEntityType: fromType,
                 compareValueKey: this.config.property
             }),
+            new NearestNeighbourConfig({
+                interactionType: this.config.interactionType,
+                toEntityType: fromType,
+                fromEntityType: toType,
+                compareValueKey: this.config.property
+            }),
             new PopularNodeConfig({
                 interactionType: this.config.interactionType
             }),

@@ -1,6 +1,6 @@
 import {Recommender} from "./recommender.ts";
 import {ProblemInstance} from "./interface/problem.interface.ts";
-import {ConfigInterface} from "./interface/config.interface.ts";
+import {ConfigInterface, printConfig} from "./interface/config.interface.ts";
 import {Evaluator} from "./evaluate/evaluator.ts";
 import {RootNodeConfig} from "./nodes/root.node.ts";
 import {NodeConfig} from "./nodes/node.ts";
@@ -14,6 +14,8 @@ export interface EvaluatedRecommender {
 export class Generation {
 
     private evaluated: EvaluatedRecommender[] = []
+    private state: string = ""
+    private activeRs: Recommender | null = null
 
     private constructor(
         private readonly config: ConfigInterface,
@@ -29,15 +31,25 @@ export class Generation {
         return new Generation(this.config, offspring, this.gen + 1)
     }
 
+    public prepare() {
+        this.recommenders.forEach((it, idx) => {
+            this.state = `Preparing Generation ${this.gen} - ${idx + 1} out of ${this.recommenders.length}`
+            this.activeRs = it
+            it.prepare()
+        })
+
+        return this
+    }
+
     public evaluate(evaluator: Evaluator) {
-        console.log(`Evaluating Generation #${this.gen}...`)
         this.recommenders
             .forEach((it, idx) => {
-                console.log(`Evaluating RS G${this.gen}R${idx}:`)
-                it.print()
+                this.state = `Evaluating Generation ${this.gen} - ${idx + 1} out of ${this.recommenders.length}`
+
+                this.activeRs = it
                 const performance = evaluator.evaluate(it)
 
-                console.log(`Score: ${performance}`)
+                // console.log(`Score: ${performance}`)
                 this.evaluated.push({
                     score: performance,
                     recommender: it
@@ -59,17 +71,29 @@ export class Generation {
 
     public static initialGeneration(config: ConfigInterface, problem: ProblemInstance) {
         const rs = [...Array(config.generationSize)]
-            .map(_ => Generation.generateRandomRS(problem))
+            .map(index => Generation.generateRandomRS(problem))
 
         return new Generation(config, rs)
     }
 
     private static generateRandomRS(problem: ProblemInstance) {
         return new Recommender(problem)
-            .init(RootNodeConfig.fromDefaultConfig(problem.defaultConfig).generate(problem, combineInputs))
+            .init(
+                RootNodeConfig
+                    .fromDefaultConfig(problem.defaultConfig)
+                    .generate(problem, combineInputs)
+            )
     }
 
-    // TODO: Check if this should be here
+    public print() {
+        console.log("Running software related to thesis by Arjo van Ramshorst")
+        printConfig(this.config)
+        console.log()
+        console.log(`Current state: ${this.state}`)
+        console.log("")
+        console.log("")
+        this.activeRs?.print()
+    }
 }
 
 const combineInputs = (input: NodeConfig<any>[]) => {

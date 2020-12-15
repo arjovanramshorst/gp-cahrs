@@ -2,6 +2,8 @@ import {ProblemInstance} from "../interface/problem.interface.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {ProcessTreeNotInitializedError} from "../errors.ts";
 import {powerset} from "../utils/functional.utils.ts";
+import {getRenderer} from "../renderer.ts";
+import {blue, gray, green} from "../deps.ts";
 
 export abstract class NodeConfig<C extends NodeProcessor<any>> {
     protected abstract readonly configType: string
@@ -11,6 +13,8 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
     protected input: NodeConfig<any>[] = []
 
     protected processor?: NodeProcessor<any>
+
+    private state: string = STATE.PENDING
 
     protected abstract generateInput(problemInstance: ProblemInstance): NodeConfig<any>[]
 
@@ -44,7 +48,9 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
         this.processor = this.processorFactory()
         this.input.forEach(it => it.prepare(problemInstance))
 
+        this.setState(STATE.WORKING)
         this.processor.prepare(problemInstance)
+        this.setState(STATE.READY)
         return this
     }
 
@@ -63,8 +69,14 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
     }
 
     public print(indent: number = 0): void {
-        console.log(`${[...Array(indent)].map(_ => "| ").join("")}${this.configType}`)
+        const stateString = `${this.state}   `
+        console.log(`${stateString}${[...Array(indent)].map(_ => "| ").join("")}${this.configType}`)
         this.input.forEach(it => it.print(indent + 1))
+    }
+
+    private setState(state: string) {
+        this.state = state
+        getRenderer().updated()
     }
 
     protected abstract processorFactory(): NodeProcessor<any>
@@ -78,4 +90,10 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
 
         return ps[Math.floor(Math.random() * ps.length)]
     }
+}
+
+const STATE = {
+    PENDING: gray("[PENDING]"),
+    WORKING: blue("[WORKING]"),
+    READY: green("[-READY-]")
 }

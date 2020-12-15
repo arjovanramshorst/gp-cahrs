@@ -6,20 +6,30 @@ import {Recommendations} from "./interface/dto.interface.ts";
 
 
 export class Recommender {
+    private state = "        "
     constructor(
-        private readonly problemInstance: ProblemInstance,
+        private readonly problemInstance: ProblemInstance
     ) {
     }
 
     private config?: RootNodeConfig
 
     public init(config: RootNodeConfig) {
-        console.log("Preprocessing:")
+        this.state = "INIT    "
+
         this.config = config
         this.print()
 
+        return this
+    }
+
+    public prepare() {
+        if (!this.config) {
+            throw Error("Not yet initialized")
+        }
+        this.state = "PREPARE "
         this.config.prepare(this.problemInstance)
-        console.log('..done')
+
         return this
     }
 
