@@ -4,6 +4,7 @@ import {ProblemInstance} from "../interface/problem.interface.ts";
 import {CFMatrix, SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
 import {EntityId} from "../interface/entity.interface.ts";
 import {mapMatrixValues} from "../utils/functional.utils.ts";
+import {getRenderer} from "../renderer.ts";
 
 interface ConfigInterface {
     entityType: string
@@ -37,6 +38,8 @@ export class CFNodeProcessor extends NodeProcessor<ConfigInterface> {
     prepare(instance: ProblemInstance): any {
         // TODO: Normalize values in matrix here
 
+        getRenderer().updated("Generating similarity matrix..")
+
         const mapFunction = this.config.comparisonKey ? (it: any) => it[this.config.comparisonKey ?? ""] : (it: any) => 1
 
         const interactionMatrix = mapMatrixValues(mapFunction)(instance.interactionMap[this.config.interactionType].interactionMatrix)
@@ -47,6 +50,8 @@ export class CFNodeProcessor extends NodeProcessor<ConfigInterface> {
 
         // Traditional for loop for performance, figure out if necessary, although pretty readable anyway
         for(let p1 = 0; p1 < fromRefs.length - 1; p1++) {
+            getRenderer().setProgress(p1, fromRefs.length)
+
             const fromRef = fromRefs[p1]
             const fromVector = interactionMatrix[fromRef]
             for (let p2 = (p1 + 1); p2 < fromRefs.length; p2++) {

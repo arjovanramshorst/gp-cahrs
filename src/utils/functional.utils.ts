@@ -1,5 +1,6 @@
 import {ValueMatrix} from "../interface/dto.interface.ts";
 import {EntityId} from "../interface/entity.interface.ts";
+import {getRenderer} from "../renderer.ts";
 
 export const toMap = <A, T>(
     getIdentifier: (c: A) => EntityId,
@@ -88,8 +89,12 @@ export const matrixToList = <T>(matrix: ValueMatrix<T>): MatrixListItem<T>[] => 
 }
 
 export const listToMatrix = <T>(input: MatrixListItem<T>[], symmetric = false): ValueMatrix<T> => {
+    getRenderer().updated("Transforming list to matrix")
     const res: ValueMatrix<T> = {}
-    input.forEach(it => {
+    input.forEach((it, idx) => {
+
+        getRenderer().setProgress(idx, input.length)
+
         if (!res[it.fromRef]) {
             res[it.fromRef] = {}
         }
@@ -154,9 +159,11 @@ export const compareRecord = <T>(
 ) => (
     record: Record<EntityId, T>
 ): ValueMatrix<number> => {
+    getRenderer().updated("Comparing record with itself")
     const keys = Object.keys(record)
     const items = []
     for (let i = 0; i < keys.length - 1; i++) {
+        getRenderer().setProgress(i, keys.length)
         const fromRef = keys[i]
         const fromValue = preprocess ? preprocess(record[fromRef]) : record[fromRef]
         for (let j = i + 1; j < keys.length; j++) {
@@ -170,6 +177,7 @@ export const compareRecord = <T>(
         }
     }
     if (postProcess) {
+        getRenderer().updated("Post processing")
         const func = postProcess(items.map(it => it.value))
         return listToMatrix(items.map(it => ({
             ...it,
@@ -191,8 +199,13 @@ export const compareRecords = <T>(
     if (!toRecord) {
         return compareRecord(compare, preprocess)(fromRecord)
     }
+
+    getRenderer().updated("Comparing two value records")
+
+    const fromKeys = Object.keys(fromRecord)
     const items: MatrixListItem<number>[] = []
-    Object.keys(fromRecord).forEach(fromRef => {
+    fromKeys.forEach((fromRef, idx) => {
+        getRenderer().setProgress(idx, fromKeys.length)
         const fromValue = preprocess ? preprocess(fromRecord[fromRef]) : fromRecord[fromRef]
         Object.keys(toRecord).forEach(toRef => {
             const toValue = preprocess ? preprocess(toRecord[toRef]) : toRecord[toRef]
@@ -206,6 +219,7 @@ export const compareRecords = <T>(
 
     // TODO: Combine in to one function with above,
     if (postProcess) {
+        getRenderer().updated("Post processing...")
         const func = postProcess(items.map(it => it.value))
         return listToMatrix(items.map(it => ({
             ...it,

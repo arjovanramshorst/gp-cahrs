@@ -1,6 +1,6 @@
 import {NodeConfig} from "./node.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
-import {toMap} from "../utils/functional.utils.ts";
+import {efficientForEach, toMap} from "../utils/functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
 import {getRenderer} from "../renderer.ts";
@@ -12,7 +12,7 @@ interface ConfigInterface {
 
 
 export class RandomNodeConfig extends NodeConfig<RandomNodeProcessor> {
-    configType = "random-node"
+    configType = `random-node `
 
     constructor(
         protected readonly config: ConfigInterface,

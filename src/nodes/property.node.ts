@@ -22,7 +22,7 @@ interface ConfigInterface {
 }
 
 export class PropertyNodeConfig extends NodeConfig<PropertyNodeProcessor> {
-    protected readonly configType = "property-node"
+    protected readonly configType = `property-node (${this.config.comparisonType})`
 
     constructor(
         protected readonly config: ConfigInterface,
