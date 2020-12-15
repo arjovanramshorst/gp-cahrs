@@ -1,7 +1,7 @@
 import {Reproduce} from "./reproduce.ts";
 import {EvaluatedRecommender} from "../generation.ts";
 import {Recommender} from "../recommender.ts";
-import {sumBy} from "../functional.utils.ts";
+import {sumBy} from "../utils/functional.utils.ts";
 
 export class RandomReproduce extends Reproduce {
     produceOffspring(parents: EvaluatedRecommender[]): Recommender[] {

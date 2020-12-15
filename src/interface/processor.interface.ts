@@ -9,7 +9,7 @@ export abstract class NodeProcessor<C> {
         protected readonly config: C,
     ) { }
 
-    abstract prepare(problemInstance: ProblemInstance, config: C): void
+    abstract prepare(problemInstance: ProblemInstance): void
 
     abstract process(input: ProcessNodeDTO[], params: ProcessParams): ProcessNodeDTO
 }

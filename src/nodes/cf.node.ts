@@ -3,7 +3,7 @@ import {NodeProcessor, ProcessParams} from "../interface/processor.interface.ts"
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {CFMatrix, SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
 import {EntityId} from "../interface/entity.interface.ts";
-import {mapMatrixValues} from "../functional.utils.ts";
+import {mapMatrixValues} from "../utils/functional.utils.ts";
 
 interface ConfigInterface {
     entityType: string
@@ -34,12 +34,12 @@ export class CFNodeConfig extends NodeConfig<CFNodeProcessor> {
 export class CFNodeProcessor extends NodeProcessor<ConfigInterface> {
     private similarities: ValueMatrix<any> = {}
 
-    prepare(instance: ProblemInstance, config: ConfigInterface): any {
+    prepare(instance: ProblemInstance): any {
         // TODO: Normalize values in matrix here
 
         const mapFunction = this.config.comparisonKey ? (it: any) => it[this.config.comparisonKey ?? ""] : (it: any) => 1
 
-        const interactionMatrix = mapMatrixValues(mapFunction)(instance.interactionMap[config.interactionType].interactionMatrix)
+        const interactionMatrix = mapMatrixValues(mapFunction)(instance.interactionMap[this.config.interactionType].interactionMatrix)
         const fromRefs = Object.keys(interactionMatrix)
 
         // Prepare similarities matrix for performance reasons.

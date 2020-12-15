@@ -3,10 +3,11 @@ import {NodeProcessor, ProcessParams} from "../interface/processor.interface.ts"
 import {SimilarityScores} from "../interface/dto.interface.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {InteractionMatrix} from "../interface/interaction.interface.ts";
-import {mapMatrixValues, valuesOf} from "../functional.utils.ts";
+import {mapMatrixValues, valuesOf} from "../utils/functional.utils.ts";
 import {EntityId} from "../interface/entity.interface.ts";
 import { RandomNodeConfig } from "./random.node.ts";
 import {CFNodeConfig} from "./cf.node.ts";
+import {PropertyNodeConfig} from "./property.node.ts";
 
 interface ConfigInterface {
     interactionType: string
@@ -29,7 +30,7 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
         super()
     }
 
-    protected generateInput() {
+    protected generateInput(problemInstance: ProblemInstance) {
         return [
             new RandomNodeConfig({
                 fromEntityType: this.config.fromEntityType,
@@ -39,7 +40,8 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
                 entityType: this.config.fromEntityType,
                 interactionType: this.config.interactionType,
                 comparisonKey: this.config.compareValueKey
-            })
+            }),
+            ...PropertyNodeConfig.PotentialConfigs(problemInstance.entityMap[this.config.fromEntityType], problemInstance.entityMap[this.config.fromEntityType])
         ]
     }
 
@@ -56,7 +58,7 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
      *
      * @param instance
      */
-    prepare(instance: ProblemInstance): any {
+    prepare(instance: ProblemInstance): void {
         const matrix = instance.interactionMap[this.config.interactionType].interactionMatrix
         let mapFunction = (it: any) => 1
         if (this.config.compareValueKey) {

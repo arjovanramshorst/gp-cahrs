@@ -1,6 +1,6 @@
 import {PropertyType} from "../interface/entity.interface.ts";
-import {readCsv} from "../csv.utils.ts";
-import {groupBy, toMap, toMatrix} from "../functional.utils.ts";
+import {readCsv} from "../utils/csv.utils.ts";
+import {groupBy, toMap, toMatrix} from "../utils/functional.utils.ts";
 import {Problem} from "./problem.ts";
 import {RootNodeConfig} from "../nodes/root.node.ts";
 

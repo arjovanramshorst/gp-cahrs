@@ -5,6 +5,8 @@ import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/process
 import {Entities} from "../interface/entity.interface.ts";
 import {Recommendations, SimilarityScores} from "../interface/dto.interface.ts";
 import {NearestNeighbourConfig} from "./nearest-neighbour.node.ts";
+import {PopularNodeConfig} from "./popular.node.ts";
+import {PropertyNodeConfig} from "./property.node.ts";
 
 interface ConfigInterface {
     interactionType: string,
@@ -22,17 +24,23 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
     }
 
     generateInput(problemInstance: ProblemInstance): NodeConfig<any>[] {
+        const fromType = problemInstance.interactionMap[this.config.interactionType].fromType
+        const toType = problemInstance.interactionMap[this.config.interactionType].toType
         return [
             new RandomNodeConfig({
-                toEntityType: problemInstance.interactionMap[this.config.interactionType].toType,
-                fromEntityType: problemInstance.interactionMap[this.config.interactionType].fromType
+                toEntityType: toType,
+                fromEntityType: fromType
             }),
             new NearestNeighbourConfig({
                 interactionType: this.config.interactionType,
-                toEntityType: problemInstance.interactionMap[this.config.interactionType].toType,
-                fromEntityType: problemInstance.interactionMap[this.config.interactionType].fromType,
+                toEntityType: toType,
+                fromEntityType: fromType,
                 compareValueKey: this.config.property
-            })
+            }),
+            new PopularNodeConfig({
+                interactionType: this.config.interactionType
+            }),
+            ...PropertyNodeConfig.PotentialConfigs(problemInstance.entityMap[fromType], problemInstance.entityMap[toType])
         ]
     }
 
@@ -49,9 +57,9 @@ export class RootNodeProcessor extends NodeProcessor<ConfigInterface> {
     private entityMap?: Entities<any>
     private interactionType?: string
 
-    prepare(problemInstance: ProblemInstance, config: ConfigInterface): any {
-        this.interactionType = config.interactionType
-        const toRecommendType = problemInstance.interactionMap[config.interactionType].toType
+    prepare(problemInstance: ProblemInstance): any {
+        this.interactionType = this.config.interactionType
+        const toRecommendType = problemInstance.interactionMap[this.config.interactionType].toType
         this.entityMap = problemInstance.entityMap[toRecommendType]
     }
 

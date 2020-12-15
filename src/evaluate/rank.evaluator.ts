@@ -1,6 +1,6 @@
 import {Evaluator} from "./evaluator.ts";
 import {Recommender} from "../recommender.ts";
-import {countBy, sumBy} from "../functional.utils.ts";
+import {countBy, sumBy} from "../utils/functional.utils.ts";
 
 // https://link-springer-com.tudelft.idm.oclc.org/referenceworkentry/10.1007/978-1-4939-7131-2_110162
 export class RankEvaluator extends Evaluator {

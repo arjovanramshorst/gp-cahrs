@@ -1,6 +1,7 @@
 import {ProcessNodeDTO} from "./processor.interface.ts";
+import {EntityId} from "./entity.interface.ts";
 
-export type ValueMatrix<T> = Record<string, Record<string, T>>
+export type ValueMatrix<T> = Record<EntityId, Record<EntityId, T>>
 
 export interface SimilarityScores extends ProcessNodeDTO {
     fromEntityType: string

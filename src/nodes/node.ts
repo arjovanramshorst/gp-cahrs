@@ -1,7 +1,7 @@
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {ProcessTreeNotInitializedError} from "../errors.ts";
-import {powerset} from "../functional.utils.ts";
+import {powerset} from "../utils/functional.utils.ts";
 
 export abstract class NodeConfig<C extends NodeProcessor<any>> {
     protected abstract readonly configType: string
@@ -44,7 +44,7 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
         this.processor = this.processorFactory()
         this.input.forEach(it => it.prepare(problemInstance))
 
-        this.processor.prepare(problemInstance, this.config)
+        this.processor.prepare(problemInstance)
         return this
     }
 

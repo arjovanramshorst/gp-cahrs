@@ -1,6 +1,6 @@
 import {NodeConfig} from "./node.ts";
 import {NodeProcessor, ProcessParams} from "../interface/processor.interface.ts";
-import {mapMatrixValues, reduceMatrix } from "../functional.utils.ts";
+import {mapMatrixValues, reduceMatrix } from "../utils/functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores} from "../interface/dto.interface.ts";
 
@@ -34,7 +34,7 @@ export class CombineNodeConfig extends NodeConfig<CombineNodeProcessor> {
 
 export class CombineNodeProcessor extends NodeProcessor<ConfigInterface> {
 
-    prepare(instance: ProblemInstance, config: ConfigInterface): any {
+    prepare(instance: ProblemInstance): void {
 
     }
 
