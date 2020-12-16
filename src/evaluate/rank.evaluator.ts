@@ -1,13 +1,17 @@
 import {Evaluator} from "./evaluator.ts";
 import {Recommender} from "../recommender.ts";
 import {countBy, sumBy} from "../utils/functional.utils.ts";
+import {getRenderer} from "../renderer.ts";
 
 // https://link-springer-com.tudelft.idm.oclc.org/referenceworkentry/10.1007/978-1-4939-7131-2_110162
 export class RankEvaluator extends Evaluator {
 
     evaluate(recommender: Recommender): number {
-        const recommendations = Object.keys(this.problemInstance.testInteractions)
-            .map(fromId => {
+        const keys = Object.keys(this.problemInstance.testInteractions)
+        const recommendations = keys
+            .map((fromId, idx) => {
+                getRenderer().setProgress(idx, keys.length)
+
                 const testInteractions = this.problemInstance.testInteractions[fromId]
                 const recommendations = recommender.recommend(fromId)
 

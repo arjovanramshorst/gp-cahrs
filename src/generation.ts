@@ -5,6 +5,7 @@ import {Evaluator} from "./evaluate/evaluator.ts";
 import {RootNodeConfig} from "./nodes/root.node.ts";
 import {NodeConfig} from "./nodes/node.ts";
 import {CombineNodeConfig} from "./nodes/combine.node.ts";
+import {getRenderer} from "./renderer.ts";
 
 export interface EvaluatedRecommender {
     score: number
@@ -45,6 +46,7 @@ export class Generation {
         this.recommenders
             .forEach((it, idx) => {
                 this.state = `Evaluating Generation ${this.gen} - ${idx + 1} out of ${this.recommenders.length}`
+                getRenderer().updated("Evaluating..")
 
                 this.activeRs = it
                 const performance = evaluator.evaluate(it)
@@ -86,7 +88,6 @@ export class Generation {
     }
 
     public print() {
-        console.log("Running software related to thesis by Arjo van Ramshorst")
         printConfig(this.config)
         console.log()
         console.log(`Current state: ${this.state}`)

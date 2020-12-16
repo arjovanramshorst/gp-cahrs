@@ -2,12 +2,14 @@ import {NodeConfig} from "./node.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
-import {Entities, PropertyType} from "../interface/entity.interface.ts";
+import {Entities, EntityId, PropertyType} from "../interface/entity.interface.ts";
 import {efficientForEach, mapMatrixValues, mapRecord} from "../utils/functional.utils.ts";
 import STRING_COMPARISON from "./properties/string.property.ts";
 import NUMBER_COMPARISON from "./properties/number.property.ts";
 import ARRAY_COMPARISON from "./properties/array.property.ts";
 import {compare, ComparisonType} from "./properties/property.ts";
+import {getRenderer} from "../renderer.ts";
+import {Matrix} from "../utils/matrix.utils.ts";
 
 
 interface ConfigInterface {
@@ -71,26 +73,32 @@ export class PropertyNodeConfig extends NodeConfig<PropertyNodeProcessor> {
 
 export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
 
-    private scores: ValueMatrix<number> = {}
+    private scores: Matrix<number> = new Matrix([],[])
+    private oldScores = {}
 
-    prepare(problemInstance: ProblemInstance): void {
+    prepare({entityMap} : ProblemInstance): void {
+
         const compareFunction = compare(this.config.comparisonType)
 
-        const symmetric = this.config.fromEntityType === this.config.toEntityType
+        const fromEntities = entityMap[this.config.fromEntityType].entityMatrix
+        const fromKeys = Object.keys(fromEntities)
 
-        const fromInput = mapRecord(
-            (v: any) => v[this.config.fromKey]
-        )(problemInstance.entityMap[this.config.fromEntityType].entityMatrix)
+        const toEntities = entityMap[this.config.toEntityType].entityMatrix
+        const toKeys = Object.keys(toEntities)
 
-        const toInput = mapRecord(
-            (v: any) => v[this.config.toKey]
-        )(problemInstance.entityMap[this.config.toEntityType].entityMatrix)
+        this.scores = new Matrix(fromKeys, toKeys)
+        const fromInput = fromKeys.map(key => fromEntities[key][this.config.fromKey])
+        const toInput = toKeys.map(key => toEntities[key][this.config.toKey])
 
-        // TODO: Add symmetric here (or create a params object that contains that info)
-        this.scores = compareFunction(
-            fromInput,
-            toInput
-        )
+        for(let i = 0; i < fromKeys.length; i++) {
+            getRenderer().setProgress(i, fromKeys.length)
+
+            for (let j = 0; j < toKeys.length; j++) {
+                // this.scores[i][j] = fromInput[i] === toInput[j] ? 1 : 0
+                this.scores.setByIndex(i, j, compareFunction(fromInput[i], toInput[j]))
+            }
+        }
+        this.oldScores = this.scores.getMatrixAsObject()
     }
 
     process(input: ProcessNodeDTO[], params: ProcessParams): SimilarityScores {
@@ -101,9 +109,8 @@ export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
         return {
             fromEntityType: this.config.fromEntityType,
             toEntityType: this.config.toEntityType,
-            matrix: {
-                [params.entityId]: this.scores[params.entityId]
-            }
+            matrix: this.oldScores,
+            newMatrix: this.scores
         }
     }
 }
@@ -111,7 +118,7 @@ export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
 function getComparisons(type: PropertyType): ComparisonType[] {
     switch (type) {
         case PropertyType.array:
-            return Object.keys(ARRAY_COMPARISON) as ComparisonType[]
+            return [] //Object.keys(ARRAY_COMPARISON) as ComparisonType[]
         case PropertyType.number:
             return Object.keys(NUMBER_COMPARISON) as ComparisonType[]
         case PropertyType.string:

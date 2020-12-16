@@ -1,4 +1,6 @@
 import {Generation} from "./generation.ts";
+import { red } from "./deps.ts";
+import {NodeConfig} from "./nodes/node.ts";
 
 const LOADING_BAR_LENGTH = 50
 
@@ -15,6 +17,8 @@ export function getRenderer() {
 class Renderer {
     private generation: Generation | null = null
 
+    private performanceTest: NodeConfig<any> | null = null
+
     private recentStatus = ""
 
     private progress: number | null = null
@@ -27,13 +31,17 @@ class Renderer {
 
     public setProgress(progress: number, maxProgress: number) {
         if (maxProgress != this.maxProgress && maxProgress > LOADING_BAR_LENGTH) {
-            this.deltaProgress = Math.floor(maxProgress / LOADING_BAR_LENGTH )
+            this.deltaProgress = Math.floor(maxProgress / LOADING_BAR_LENGTH)
         }
         if (progress % this.deltaProgress === 0) {
             this.progress = progress
             this.maxProgress = maxProgress
             this.updated()
         }
+    }
+
+    public setPerformanceTest(config: NodeConfig<any> | null) {
+        this.performanceTest = config
     }
 
     public finishProgress() {
@@ -49,7 +57,7 @@ class Renderer {
         if (this.generation) {
             this.renderGeneration()
         } else {
-            this.renderInitializing()
+            this.renderPerformanceTesting()
         }
 
         console.log("Output:")
@@ -57,15 +65,22 @@ class Renderer {
         this.renderProgress()
     }
 
-    private renderInitializing() {
-        console.clear()
-        console.log("loading..")
+    private renderPerformanceTesting() {
+        this.clear()
+        console.log("Testing performance of: ")
+        console.log(`${this.performanceTest?.print(0) ?? ""}`)
     }
 
     private renderGeneration() {
-        console.clear()
+        this.clear()
 
         this.generation?.print()
+    }
+
+    private clear() {
+        console.log("!clear!")
+        console.clear()
+        this.renderHeader()
     }
 
     private renderProgress() {
@@ -74,5 +89,15 @@ class Renderer {
             const bar = [...Array(LOADING_BAR_LENGTH).keys()].map(i => i < loadingBars ? "-" : " ").join("")
             console.log(`[${bar}] ${this.progress}/${this.maxProgress}`)
         }
+    }
+
+    private renderHeader() {
+        console.log(red("   ____    _    _   _ ____  ____         ____ ____  "))
+        console.log(red("  / ___|  / \\  | | | |  _ \\/ ___|       / ___|  _ \\ "))
+        console.log(red(" | |     / _ \\ | |_| | |_) \\___ \\ _____| |  _| |_) |"))
+        console.log(red(" | |___ / ___ \\|  _  |  _ < ___) |_____| |_| |  __/ "))
+        console.log(red("  \\____/_/   \\_\\_| |_|_| \\_\\____/       \\____|_|    "))
+        console.log("Created by Arjo van Ramshorst as Thesis Research Tool")
+        console.log()
     }
 }

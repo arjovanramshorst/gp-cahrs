@@ -4,6 +4,7 @@ import {matrixToList, toMap} from "../utils/functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
 import {EntityId} from "../interface/entity.interface.ts";
+import {Matrix} from "../utils/matrix.utils.ts";
 
 interface ConfigInterface {
     interactionType: string
@@ -34,7 +35,7 @@ export class PopularNodeProcessor extends NodeProcessor<ConfigInterface> {
     private fromType?: string
     private toType?: string
 
-    prepare({interactionMap}: ProblemInstance): any {
+    prepare({entityMap, interactionMap}: ProblemInstance): any {
         const interaction = interactionMap[this.config.interactionType]
         this.fromType = interaction.fromType
         this.toType = interaction.toType

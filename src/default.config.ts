@@ -5,8 +5,8 @@ import {RankEvaluator} from "./evaluate/rank.evaluator.ts";
 import {MovielensProblem} from "./problem/movielens.problem.ts";
 
 export const defaultConfig: ConfigInterface = {
-    maxGeneration: 5,
-    generationSize: 5,
+    maxGeneration: 1,
+    generationSize: 3,
     makeProblem: () => new MovielensProblem(),
     makeReproduce: () => new RandomReproduce(),
     makeEvaluator: (instance: ProblemInstance) => new RankEvaluator(instance)

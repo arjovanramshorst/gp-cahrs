@@ -12,16 +12,11 @@ const NUMBER_COMPARISON = {
 
 export default NUMBER_COMPARISON
 
-function numberDistance(input: Input, compare?: Input) {
-    return compareRecords<number>(
-        (a, b) => Math.abs(a - b),
-        undefined,
-        res => {
-            // normalize and invert!
-            const max = Math.max(...res)
-            const min = Math.min(...res)
-            return val => normalize(max, min, val) * -1
-        }
-    )(input, compare)
+function numberDistance(a: number, b: number) {
+    return Math.abs(a - b)
+    // normalize and invert!
+    // const max = Math.max(...res)
+    // const min = Math.min(...res)
+    // return val => normalize(max, min, val) * -1
 }
 

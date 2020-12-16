@@ -3,10 +3,10 @@ import {EntityId} from "../interface/entity.interface.ts";
 import {getRenderer} from "../renderer.ts";
 
 export const toMap = <A, T>(
-    getIdentifier: (c: A) => EntityId,
+    getIdentifier: (c: A, idx?: number) => EntityId,
     mapper: (c: A) => T,
-) => (agg: Record<EntityId, T>, curr: A) => {
-    const id = getIdentifier(curr)
+) => (agg: Record<EntityId, T>, curr: A, idx: number) => {
+    const id = getIdentifier(curr, idx)
     if (!agg[id]) {
         agg[id] = mapper(curr)
     }
@@ -50,6 +50,22 @@ export const mapMatrixValues = <T>(map: (t: T) => number) => (matrix: ValueMatri
             Object.keys(matrix[fromRef])
                 .forEach(toRef => {
                     values[fromRef][toRef] = map(matrix[fromRef][toRef])
+                })
+        })
+
+    return values
+}
+
+export const invertMatrix = <T>(matrix: ValueMatrix<T>): ValueMatrix<T> => {
+    const values: ValueMatrix<T> = {}
+    Object.keys(matrix)
+        .forEach(fromRef => {
+            Object.keys(matrix[fromRef])
+                .forEach(toRef => {
+                    if (!values[toRef]) {
+                        values[toRef] = {}
+                    }
+                    values[toRef][fromRef] = matrix[fromRef][toRef]
                 })
         })
 
@@ -209,11 +225,14 @@ export const compareRecords = <T>(
         const fromValue = preprocess ? preprocess(fromRecord[fromRef]) : fromRecord[fromRef]
         Object.keys(toRecord).forEach(toRef => {
             const toValue = preprocess ? preprocess(toRecord[toRef]) : toRecord[toRef]
-            items.push({
-                fromRef,
-                toRef,
-                value: compare(fromValue, toValue)
-            })
+            const value = compare(fromValue, toValue)
+            if (value !==  0) {
+                items.push({
+                    fromRef,
+                    toRef,
+                    value,
+                })
+            }
         })
     })
 

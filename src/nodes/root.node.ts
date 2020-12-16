@@ -35,13 +35,15 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
                 interactionType: this.config.interactionType,
                 toEntityType: toType,
                 fromEntityType: fromType,
-                compareValueKey: this.config.property
+                compareValueKey: this.config.property,
+                inverted: false
             }),
             new NearestNeighbourConfig({
                 interactionType: this.config.interactionType,
-                toEntityType: fromType,
-                fromEntityType: toType,
-                compareValueKey: this.config.property
+                toEntityType: toType,
+                fromEntityType: fromType,
+                compareValueKey: this.config.property,
+                inverted: true
             }),
             new PopularNodeConfig({
                 interactionType: this.config.interactionType
@@ -89,7 +91,7 @@ export class RootNodeProcessor extends NodeProcessor<ConfigInterface> {
         // Combine both approaches
         // Return top N list
         return {
-            interactionType: this.interactionType!,
+            interactionType: this.interactionType ?? "",
             recommendations: result
         }
     }

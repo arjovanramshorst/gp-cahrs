@@ -3,11 +3,12 @@ import {NodeProcessor, ProcessParams} from "../interface/processor.interface.ts"
 import {SimilarityScores} from "../interface/dto.interface.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {InteractionMatrix} from "../interface/interaction.interface.ts";
-import {mapMatrixValues, valuesOf} from "../utils/functional.utils.ts";
+import {invertMatrix, mapMatrixValues, valuesOf} from "../utils/functional.utils.ts";
 import {EntityId} from "../interface/entity.interface.ts";
-import { RandomNodeConfig } from "./random.node.ts";
+import {RandomNodeConfig} from "./random.node.ts";
 import {CFNodeConfig} from "./cf.node.ts";
 import {PropertyNodeConfig} from "./property.node.ts";
+import {Matrix} from "../utils/matrix.utils.ts";
 
 interface ConfigInterface {
     interactionType: string
@@ -15,6 +16,7 @@ interface ConfigInterface {
     toEntityType: string
     // Key to recommend for, otherwise recommend for existence of interaction
     compareValueKey?: string
+    inverted: boolean
 }
 
 // TODO: optimize? add to config?
@@ -22,7 +24,7 @@ const N = 20
 const THRESHOLD = 0.5
 
 export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor> {
-    configType = "NN-node"
+    configType = `NN-node (${this.config.inverted ? this.config.fromEntityType : this.config.toEntityType} - ${this.config.interactionType})`
 
     constructor(
         protected readonly config: ConfigInterface,
@@ -36,11 +38,11 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
                 fromEntityType: this.config.fromEntityType,
                 toEntityType: this.config.fromEntityType
             }),
-            new CFNodeConfig({
+            ...(this.config.inverted ? [] : [new CFNodeConfig({
                 entityType: this.config.fromEntityType,
                 interactionType: this.config.interactionType,
                 comparisonKey: this.config.compareValueKey
-            }),
+            })]),
             ...PropertyNodeConfig.PotentialConfigs(problemInstance.entityMap[this.config.fromEntityType], problemInstance.entityMap[this.config.fromEntityType])
         ]
     }
@@ -52,7 +54,6 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
 
 export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
     private interactionMatrix: InteractionMatrix<number> = {}
-
     /**
      * Normalizes the scores for interaction to be recommended by this processor
      *
@@ -71,10 +72,24 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
             mapFunction = (it: any) => (it[this.config.compareValueKey ?? ""] - min) / (max - min) // TODO: AGAIN, WHY ISN'T DENO @#$#$ SMART ENOUGH TO KNOW IT IS NOT UNDEFINED HERE
         }
 
-        this.interactionMatrix = mapMatrixValues<any>(mapFunction)(matrix)
+        const interactionMatrix = mapMatrixValues<any>(mapFunction)(matrix)
+        if (this.config.inverted) {
+            this.interactionMatrix = invertMatrix(interactionMatrix)
+        } else {
+            this.interactionMatrix = interactionMatrix
+        }
     }
 
+
     process(input: SimilarityScores[], params: ProcessParams): SimilarityScores {
+        if (this.config.inverted) {
+            return this.processInverted(input, params)
+        } else {
+            return this.processUser(input, params)
+        }
+    }
+
+    processUser(input: SimilarityScores[], params: ProcessParams): SimilarityScores {
         if (input.length !== 1) {
             throw new Error("Invalid input length")
         }
@@ -86,10 +101,10 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
         if (input[0].fromEntityType !== this.config.fromEntityType) {
             throw new Error("Config and input should be the same")
         }
-        
+
         const similarRefs = this.getMostSimilar(input[0].matrix[params.entityId])
 
-        const ownerInteractions = this.interactionMatrix[params.entityId] ?? []
+        const ownerInteractions = this.interactionMatrix[params.entityId] ?? {}
 
         // sum (weight * score)
         const scores: Record<EntityId, number> = {}
@@ -117,7 +132,7 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
         const normalizedScores = Object.keys(scores).map(toRef => ({
             toRef,
             score: scores[toRef] * weights[toRef] / counts[toRef],
-        })).reduce((agg, { toRef, score }) => {
+        })).reduce((agg, {toRef, score}) => {
             agg[toRef] = score
 
             return agg
@@ -128,6 +143,58 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
             toEntityType: this.config.toEntityType,
             matrix: {
                 [params.entityId]: normalizedScores,
+            }
+        }
+    }
+
+    processInverted(input: SimilarityScores[], params: ProcessParams): SimilarityScores {
+        // Get all (positive) ratings by params.entityId
+        const ownerInteractions = this.interactionMatrix[params.entityId] ?? {}
+        const toRefs = Object.keys(ownerInteractions)
+        const positiveToRefs = toRefs.filter(toRef => ownerInteractions[toRef] > 0)
+
+
+        // sum (weight * score)
+        const scores: Record<EntityId, number> = {}
+        // sum weight
+        const weights: Record<EntityId, number> = {}
+        // counts for each entity
+        const counts: Record<EntityId, number> = {}
+
+        // find for each rating N most similar entities
+        positiveToRefs.forEach(positiveRef => {
+            const mostSimilar = this.getMostSimilar(input[0].matrix[positiveRef])
+            const score = this.interactionMatrix[params.entityId][positiveRef]
+            Object.keys(mostSimilar).forEach(similarRef => {
+                const similarity = mostSimilar[similarRef]
+
+                scores[similarRef] = (scores[positiveRef] || 0) + (score * similarity)
+                weights[similarRef] = (weights[positiveRef] || 0) + similarity
+                counts[similarRef] = (counts[positiveRef] || 0) + 1
+
+            })
+        })
+
+        Object.keys(ownerInteractions).forEach(toRef => {
+            delete scores[toRef]
+        })
+
+        // Normalize scores
+        const normalizedScores = Object.keys(scores).map(toRef => ({
+            toRef,
+            score: scores[toRef] * weights[toRef] / counts[toRef],
+        })).reduce((agg, {toRef, score}) => {
+            agg[toRef] = score
+
+            return agg
+        }, {} as Record<EntityId, number>)
+
+        // output result
+        return {
+            fromEntityType: this.config.fromEntityType,
+            toEntityType: this.config.toEntityType,
+            matrix: {
+                [params.entityId]: normalizedScores
             }
         }
     }
