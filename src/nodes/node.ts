@@ -4,6 +4,7 @@ import {ProcessTreeNotInitializedError} from "../errors.ts";
 import {powerset} from "../utils/functional.utils.ts";
 import {getRenderer} from "../renderer.ts";
 import {blue, gray, green} from "../deps.ts";
+import {JsonConfig} from "./node.interface.ts";
 
 export abstract class NodeConfig<C extends NodeProcessor<any>> {
     protected abstract readonly configType: string
@@ -19,7 +20,6 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
     protected abstract generateInput(problemInstance: ProblemInstance): NodeConfig<any>[]
 
     /**
-     * TODO: Possibly generate all possible input configurations and randomly select one?
      *
      * Generates a random valid input configuration.
      *
@@ -74,12 +74,31 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
         this.input.forEach(it => it.print(indent + 1))
     }
 
+    public static parse(config: JsonConfig, factory: (type: string, config: any) => NodeConfig<any>): NodeConfig<any>{
+        const node = factory(config.type, config.config)
+        const input = config.input.map(input => NodeConfig.parse(input, factory))
+        node.setInput(input)
+        return node
+    }
+
+    public stringify(): JsonConfig {
+        return {
+            type: this.constructor.name,
+            config: this.config,
+            input: this.input.map(it => it.stringify())
+        }
+    }
+
+    protected abstract processorFactory(): NodeProcessor<any>
+
     private setState(state: string) {
         this.state = state
         getRenderer().updated()
     }
 
-    protected abstract processorFactory(): NodeProcessor<any>
+    private setInput(input: NodeConfig<any>[]) {
+        this.input = input
+    }
 
     private static selectRandom(input: NodeConfig<any>[]): NodeConfig<any>[] {
         if (input.length <= 1) {

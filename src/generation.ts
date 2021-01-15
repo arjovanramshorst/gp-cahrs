@@ -78,6 +78,10 @@ export class Generation {
         return new Generation(config, rs)
     }
 
+    public static fromConfig(config: ConfigInterface, problem: ProblemInstance, nodeConfig: RootNodeConfig) {
+        return new Generation(config, [new Recommender(problem).init(nodeConfig)])
+    }
+
     private static generateRandomRS(problem: ProblemInstance) {
         return new Recommender(problem)
             .init(
@@ -102,6 +106,6 @@ const combineInputs = (input: NodeConfig<any>[]) => {
         type: "Similarity",
         entityType: "any"
     })
-    config.setInput(input)
+    config.setCombineInput(input)
     return config
 }

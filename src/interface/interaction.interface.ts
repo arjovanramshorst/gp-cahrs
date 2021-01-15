@@ -1,4 +1,5 @@
 import {EntityId, EntityType, PropertyType} from "./entity.interface.ts";
+import {Matrix} from "../utils/matrix.utils.ts";
 
 export type InteractionType = string
 
@@ -12,9 +13,7 @@ export interface Interactions<T extends BaseInteraction> {
     toType: EntityType
     type: InteractionType
     properties: Record<keyof T, PropertyType>
-    interactionMatrix: InteractionMatrix<T>
+    interactionMatrix: Matrix<T>
 }
-
-export type InteractionMatrix<T> = Record<EntityId, Record<EntityId, T>>
 
 export type InteractionMap = Record<InteractionType, Interactions<any>>

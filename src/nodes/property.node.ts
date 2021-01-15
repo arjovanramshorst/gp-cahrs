@@ -1,15 +1,15 @@
 import {NodeConfig} from "./node.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
-import {SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
-import {Entities, EntityId, PropertyType} from "../interface/entity.interface.ts";
-import {efficientForEach, mapMatrixValues, mapRecord} from "../utils/functional.utils.ts";
+import {SimilarityScores} from "../interface/dto.interface.ts";
+import {Entities, PropertyType} from "../interface/entity.interface.ts";
+import {efficientForEach} from "../utils/functional.utils.ts";
 import STRING_COMPARISON from "./properties/string.property.ts";
 import NUMBER_COMPARISON from "./properties/number.property.ts";
 import ARRAY_COMPARISON from "./properties/array.property.ts";
 import {compare, ComparisonType} from "./properties/property.ts";
 import {getRenderer} from "../renderer.ts";
-import {Matrix} from "../utils/matrix.utils.ts";
+import {DenseMatrix, Matrix} from "../utils/matrix.utils.ts";
 
 
 interface ConfigInterface {
@@ -73,8 +73,7 @@ export class PropertyNodeConfig extends NodeConfig<PropertyNodeProcessor> {
 
 export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
 
-    private scores: Matrix<number> = new Matrix([],[])
-    private oldScores = {}
+    private scores: Matrix<number> = new DenseMatrix()
 
     prepare({entityMap} : ProblemInstance): void {
 
@@ -86,19 +85,22 @@ export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
         const toEntities = entityMap[this.config.toEntityType].entityMatrix
         const toKeys = Object.keys(toEntities)
 
-        this.scores = new Matrix(fromKeys, toKeys)
+        this.scores = new DenseMatrix(fromKeys, toKeys)
         const fromInput = fromKeys.map(key => fromEntities[key][this.config.fromKey])
         const toInput = toKeys.map(key => toEntities[key][this.config.toKey])
 
+        getRenderer().updated("Calculating property scores")
         for(let i = 0; i < fromKeys.length; i++) {
             getRenderer().setProgress(i, fromKeys.length)
 
             for (let j = 0; j < toKeys.length; j++) {
-                // this.scores[i][j] = fromInput[i] === toInput[j] ? 1 : 0
-                this.scores.setByIndex(i, j, compareFunction(fromInput[i], toInput[j]))
+                const res = compareFunction(fromInput[i], toInput[j])
+                if (res > 0) {
+                    this.scores.set(fromKeys[i], fromKeys[j], res)
+                }
             }
         }
-        this.oldScores = this.scores.getMatrixAsObject()
+
     }
 
     process(input: ProcessNodeDTO[], params: ProcessParams): SimilarityScores {
@@ -109,8 +111,7 @@ export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
         return {
             fromEntityType: this.config.fromEntityType,
             toEntityType: this.config.toEntityType,
-            matrix: this.oldScores,
-            newMatrix: this.scores
+            matrix: this.scores
         }
     }
 }
@@ -118,7 +119,7 @@ export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
 function getComparisons(type: PropertyType): ComparisonType[] {
     switch (type) {
         case PropertyType.array:
-            return [] //Object.keys(ARRAY_COMPARISON) as ComparisonType[]
+            return Object.keys(ARRAY_COMPARISON) as ComparisonType[]
         case PropertyType.number:
             return Object.keys(NUMBER_COMPARISON) as ComparisonType[]
         case PropertyType.string:
