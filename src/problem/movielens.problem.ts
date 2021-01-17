@@ -3,6 +3,7 @@ import {readCsv} from "../utils/csv.utils.ts";
 import {groupBy, toMap, toMatrix} from "../utils/functional.utils.ts";
 import {Problem} from "./problem.ts";
 import {RootNodeConfig} from "../nodes/root.node.ts";
+import {SparseMatrix} from "../utils/matrix.utils.ts";
 
 interface Rating {
     fromId: number,
@@ -44,12 +45,7 @@ export class MovielensProblem extends Problem {
 
         return {
             defaultConfig: this.defaultConfig,
-            testInteractions: testRatings
-                .reduce(toMatrix(
-                    it => it.fromId,
-                    it => it.toId,
-                    it => it
-                ), {}),
+            testInteractions: SparseMatrix.fromArray(it => it.fromId, it => it.toId, it => it, testRatings),
             interactionMap: {
                 rating: {
                     fromType: "user",
@@ -59,12 +55,12 @@ export class MovielensProblem extends Problem {
                         rating: PropertyType.number,
                         timestamp: PropertyType.timestamp
                     },
-                    interactionMatrix: trainRatings
-                        .reduce(toMatrix(
-                            it => it.fromId,
-                            it => it.toId,
-                            it => it
-                        ), {})
+                    interactionMatrix: SparseMatrix.fromArray(
+                        it => it.fromId,
+                        it => it.toId,
+                        it => it,
+                        trainRatings
+                    )
                 },
                 tag: {
                     fromType: "user",
@@ -74,12 +70,12 @@ export class MovielensProblem extends Problem {
                         tag: PropertyType.string,
                         timestamp: PropertyType.timestamp
                     },
-                    interactionMatrix: tags
-                        .reduce(toMatrix(
-                            it => it.fromId,
-                            it => it.toId,
-                            it => it
-                        ), {})
+                    interactionMatrix: SparseMatrix.fromArray(
+                        it => it.fromId,
+                        it => it.toId,
+                        it => it,
+                        tags
+                    )
                 }
             },
             entityMap: {

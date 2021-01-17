@@ -7,12 +7,12 @@ import {getRenderer} from "../renderer.ts";
 export class RankEvaluator extends Evaluator {
 
     evaluate(recommender: Recommender): number {
-        const keys = Object.keys(this.problemInstance.testInteractions)
+        const keys = this.problemInstance.testInteractions.getFromRefs()
         const recommendations = keys
             .map((fromId, idx) => {
                 getRenderer().setProgress(idx, keys.length)
 
-                const testInteractions = this.problemInstance.testInteractions[fromId]
+                const testInteractions = this.problemInstance.testInteractions.getRow(fromId)
                 const recommendations = recommender.recommend(fromId)
 
                 const found = recommendations.recommendations

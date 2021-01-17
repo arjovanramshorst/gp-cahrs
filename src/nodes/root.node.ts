@@ -77,7 +77,7 @@ export class RootNodeProcessor extends NodeProcessor<ConfigInterface> {
             throw Error("Invalid input length")
         }
 
-        const result = Object.entries(input[0].matrix[params.entityId])
+        const result = Object.entries(input[0].matrix.getRow(params.entityId))
             .sort((a, b) => b[1] - a[1])
             .splice(0, 10)
             .map(([key, val]) => ({

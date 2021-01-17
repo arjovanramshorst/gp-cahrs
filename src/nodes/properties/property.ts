@@ -1,5 +1,3 @@
-import {ValueMatrix} from "../../interface/dto.interface.ts";
-import {EntityId} from "../../interface/entity.interface.ts";
 import NUMBER_COMPARISON, {NumberComparisonType} from "./number.property.ts";
 import ARRAY_COMPARISON, {ArrayComparisonType} from "./array.property.ts";
 import STRING_COMPARISON, {StringComparisonType} from "./string.property.ts";

@@ -4,12 +4,21 @@ import {RandomNodeConfig} from "./nodes/random.node.ts";
 import {getRenderer} from "./renderer.ts";
 import {PropertyNodeConfig} from "./nodes/property.node.ts";
 import {NodeConfig} from "./nodes/node.ts";
-
-const users = 610
-const movies = 9742
-const items = users * movies
+import {CombineNodeConfig} from "./nodes/combine.node.ts";
+import {CFNodeConfig} from "./nodes/cf.node.ts";
+import {NearestNeighbourConfig} from "./nodes/nearest-neighbour.node.ts";
 
 const main = async (config: ConfigInterface = defaultConfig) => {
+
+    if (Deno.args.length === 0 ) {
+        console.log("This command should be called with one or two arguments:")
+        console.log("{node} {nRuns?}")
+        console.log("example: ./run.sh perf arrayDistance 2")
+    }
+    const configType = Deno.args[0]
+    const runs = Deno.args.length > 1 ? Deno.args[1] : 1
+
+    console.log(`Running test for ${configType}, ${runs} run(s)`)
 
     // Read data
     const problem = config.makeProblem()
@@ -19,12 +28,12 @@ const main = async (config: ConfigInterface = defaultConfig) => {
     const instance = await problem.read()
     console.log(`...Done!`)
 
-    const testConfig = getConfig("arrayDistance")
+    const testConfig = getConfig(configType)
 
     getRenderer().setPerformanceTest(testConfig)
 
     const t = performance.now()
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < runs; i++) {
         testConfig.prepare(instance)
     }
     const tFinished = performance.now()
@@ -48,6 +57,20 @@ function getConfig(type: string): NodeConfig<any> {
                 fromKey: "genres",
                 toEntityType: "movie",
                 toKey: "genres"
+            })
+        case "cf":
+            return new CFNodeConfig({
+                comparisonKey: "rating",
+                entityType: "user",
+                interactionType: "rating"
+            })
+        case "nn":
+            return new NearestNeighbourConfig({
+                compareValueKey: "rating",
+                fromEntityType: "user",
+                toEntityType: "movie",
+                interactionType: "rating",
+                inverted: false
             })
         default:
             throw Error()
