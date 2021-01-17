@@ -1,6 +1,7 @@
 import {ValueMatrix} from "../interface/dto.interface.ts";
 import {EntityId} from "../interface/entity.interface.ts";
 import {getRenderer} from "../renderer.ts";
+import {SparseMatrix} from "./matrix.utils.ts";
 
 export const toMap = <A, T>(
     getIdentifier: (c: A, idx?: number) => EntityId,
@@ -125,19 +126,13 @@ export const listToMatrix = <T>(input: MatrixListItem<T>[], symmetric = false): 
     return res
 }
 
-export const reduceMatrix = <T, A>(reduce: (agg: T, curr: A) => T, init: T) => (matrixes: ValueMatrix<A>[]): ValueMatrix<T> => {
-    const res: ValueMatrix<T> = {}
+export const reduceMatrix = <T, A>(reduce: (agg: T, curr: A) => T, init: T) => (matrixes: SparseMatrix<A>[]): SparseMatrix<T> => {
+    const res: SparseMatrix<T> = new SparseMatrix()
     matrixes.forEach(matrix => {
         Object.keys(matrix).forEach(fromRef => {
-            if (!res[fromRef]) {
-                res[fromRef] = {}
-            }
-            const scores = matrix[fromRef]
+            const scores = matrix.getRow(fromRef)
             Object.keys(scores).forEach(toRef => {
-                if (!res[fromRef][toRef]) {
-                    res[fromRef][toRef] = init
-                }
-                res[fromRef][toRef] = reduce(res[fromRef][toRef], scores[toRef])
+                res.set(fromRef, toRef, reduce(res.get(fromRef, toRef) ?? init, scores[toRef]))
             })
         })
     })

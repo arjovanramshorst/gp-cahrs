@@ -1,8 +1,8 @@
 import {NodeConfig} from "./node.ts";
 import {NodeProcessor, ProcessParams} from "../interface/processor.interface.ts";
-import {mapMatrixValues, reduceMatrix } from "../utils/functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores} from "../interface/dto.interface.ts";
+import {SparseMatrix} from "../utils/matrix.utils.ts";
 
 interface ConfigInterface {
     type: "Similarity" // | "CFMatrix"
@@ -23,7 +23,7 @@ export class CombineNodeConfig extends NodeConfig<CombineNodeProcessor> {
         return []
     }
 
-    public setInput(input: NodeConfig<any>[]) {
+    public setCombineInput(input: NodeConfig<any>[]) {
         this.input = input
     }
 
@@ -41,16 +41,12 @@ export class CombineNodeProcessor extends NodeProcessor<ConfigInterface> {
     process(input: SimilarityScores[], params: ProcessParams): SimilarityScores {
         // TODO: check inputs from/to are the same
         // start with avg only
-        const sumFunc = (agg: Sum, curr: number) => ({
-            sum: agg.sum + curr,
-            count: agg.count + 1,
-        })
-        const combineValues = reduceMatrix(sumFunc, {sum: 0, count: 0})(input.map(it => it.matrix))
+        const avg = (arr: number[]) => arr.reduce((agg, curr) => agg + curr, 0) / arr.length
 
         return {
             fromEntityType: input[0].fromEntityType,
             toEntityType: input[0].toEntityType,
-            matrix: mapMatrixValues((it: Sum) => it.sum / it.count)(combineValues)
+            matrix: SparseMatrix.combine(input.map(it => it.matrix), avg)
         }
     }
 }

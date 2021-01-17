@@ -1,10 +1,9 @@
 import {NodeConfig} from "./node.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
-import {matrixToList, toMap} from "../utils/functional.utils.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
-import {SimilarityScores, ValueMatrix} from "../interface/dto.interface.ts";
+import {SimilarityScores} from "../interface/dto.interface.ts";
+import {SparseMatrix} from "../utils/matrix.utils.ts";
 import {EntityId} from "../interface/entity.interface.ts";
-import {Matrix} from "../utils/matrix.utils.ts";
 
 interface ConfigInterface {
     interactionType: string
@@ -31,7 +30,7 @@ export class PopularNodeConfig extends NodeConfig<PopularNodeProcessor> {
 }
 
 export class PopularNodeProcessor extends NodeProcessor<ConfigInterface> {
-    private scores: Record<EntityId, number> = {}
+    private popularity: Record<EntityId, number> = {}
     private fromType?: string
     private toType?: string
 
@@ -39,28 +38,22 @@ export class PopularNodeProcessor extends NodeProcessor<ConfigInterface> {
         const interaction = interactionMap[this.config.interactionType]
         this.fromType = interaction.fromType
         this.toType = interaction.toType
-        this.scores = {}
-
-        matrixToList(interaction.interactionMatrix)
-            .forEach(it => {
-                if (!this.scores[it.toRef]) {
-                    this.scores[it.toRef] = 0
-                }
-                this.scores[it.toRef]++
+        interaction.interactionMatrix.getToRefs()
+            .forEach(toRef => {
+                this.popularity[toRef] = Object.keys(interaction.interactionMatrix.getColumn(toRef)).length
             })
+
     }
 
     process(input: ProcessNodeDTO[], params: ProcessParams): SimilarityScores {
-        if (!this.scores || !this.fromType || !this.toType) {
+        if (!this.popularity || !this.fromType || !this.toType) {
             throw Error("prepare not called")
         }
 
         return {
             fromEntityType: this.fromType ?? "",
             toEntityType: this.toType ?? "",
-            matrix: {
-                [params.entityId]: this.scores
-            }
+            matrix: SparseMatrix.fromToVector(params.entityId, this.popularity)
         }
     }
 }
