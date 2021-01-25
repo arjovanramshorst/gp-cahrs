@@ -3,7 +3,8 @@ import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/process
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores} from "../interface/dto.interface.ts";
 import {getRenderer} from "../renderer.ts";
-import {DenseMatrix} from "../utils/matrix.utils.ts";
+import {DenseMatrix, VectorMatrix} from "../utils/matrix.utils.ts";
+import {EntityId} from "../interface/entity.interface.ts";
 
 interface ConfigInterface {
     fromEntityType: string
@@ -30,28 +31,25 @@ export class RandomNodeConfig extends NodeConfig<RandomNodeProcessor> {
 }
 
 export class RandomNodeProcessor extends NodeProcessor<ConfigInterface> {
-    private scores: DenseMatrix<number> = new DenseMatrix()
+    private scores: Record<EntityId, number> = {}
 
     prepare({entityMap}: ProblemInstance): any {
         getRenderer().updated("Generating random values..")
-        const fromKeys = Object.keys(entityMap[this.config.fromEntityType].entityMatrix)
         const toKeys = Object.keys(entityMap[this.config.toEntityType].entityMatrix)
 
-        this.scores = new DenseMatrix(fromKeys, toKeys)
+        const randomValues = toKeys.reduce((agg, key) => {
+            agg[key] = Math.random()
+            return agg
+        }, {} as Record<EntityId, number>)
 
-        for(let i = 0; i < fromKeys.length; i++) {
-            getRenderer().setProgress(i, fromKeys.length)
-            for(let j = 0; j < toKeys.length; j++) {
-                this.scores.setByIndex(i,j, Math.random())
-            }
-        }
+        this.scores = randomValues
     }
 
     process(input: ProcessNodeDTO[], params: ProcessParams): SimilarityScores {
         return {
             fromEntityType: this.config.fromEntityType,
             toEntityType: this.config.toEntityType,
-            matrix: this.scores
+            matrix: new VectorMatrix(params.entityId, this.scores)
         }
     }
 }

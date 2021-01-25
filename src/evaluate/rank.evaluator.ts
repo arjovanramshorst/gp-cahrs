@@ -1,4 +1,4 @@
-import {Evaluator} from "./evaluator.ts";
+import {Evaluator, Result} from "./evaluator.ts";
 import {Recommender} from "../recommender.ts";
 import {countBy, sumBy} from "../utils/functional.utils.ts";
 import {getRenderer} from "../renderer.ts";
@@ -6,7 +6,7 @@ import {getRenderer} from "../renderer.ts";
 // https://link-springer-com.tudelft.idm.oclc.org/referenceworkentry/10.1007/978-1-4939-7131-2_110162
 export class RankEvaluator extends Evaluator {
 
-    evaluate(recommender: Recommender): number {
+    evaluate(recommender: Recommender): Result {
         const keys = this.problemInstance.testInteractions.getFromRefs()
         const recommendations = keys
             .map((fromId, idx) => {
@@ -35,7 +35,15 @@ export class RankEvaluator extends Evaluator {
         const averageRecall = recommendations.reduce(sumBy(it => it.recall), 0) / recommendations.length
         const averagePrecision = recommendations.reduce(sumBy(it => it.precision), 0) / recommendations.length
 
-        // TODO: Do this? Or max? min? randomly select 1? :p
-        return (averageRecall + averagePrecision) / 2
+        const fScore = 2 * (averagePrecision * averageRecall) / (averagePrecision + averageRecall)
+
+        const result = {
+            recall: averageRecall,
+            precision: averagePrecision,
+            fScore,
+            performance: (Number.isNaN(fScore) || fScore < 0) ? 0 : fScore
+        }
+
+        return result
     }
 }

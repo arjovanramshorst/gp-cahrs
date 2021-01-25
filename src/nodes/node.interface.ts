@@ -34,3 +34,11 @@ export const NodeFactory = (className: string, config: any): NodeConfig<any> => 
             throw Error(`invalid classname: ${className}`)
     }
 }
+
+export interface Generateable<G> {
+    generated?: G
+}
+
+export type WithGenerated<T extends Generateable<T["generated"]>> = T & {
+    generated: NonNullable<T["generated"]>
+}

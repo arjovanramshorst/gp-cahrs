@@ -25,6 +25,6 @@ then
   echo "Evaluation specific version"
   deno run --allow-read --v8-flags=--max-old-space-size=8192 test.ts $2
 else
-  deno run --allow-read --v8-flags=--max-old-space-size=8192 main.ts
+  deno run --allow-read --allow-write --v8-flags=--max-old-space-size=8192 main.ts
 fi
 

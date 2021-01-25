@@ -7,8 +7,9 @@ export interface ConfigInterface {
     maxGeneration: number
     generationSize: number
     makeProblem: () => Problem
-    makeReproduce: () => Reproduce
+    makeReproduce: (instance: ProblemInstance) => Reproduce
     makeEvaluator: (instance: ProblemInstance) => Evaluator
+    outputFilename: string
 }
 
 export function printConfig(config: ConfigInterface) {

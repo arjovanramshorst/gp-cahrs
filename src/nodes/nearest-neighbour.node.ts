@@ -6,9 +6,15 @@ import {EntityId} from "../interface/entity.interface.ts";
 import {RandomNodeConfig} from "./random.node.ts";
 import {CFNodeConfig} from "./cf.node.ts";
 import {PropertyNodeConfig} from "./property.node.ts";
-import {Matrix, SparseMatrix} from "../utils/matrix.utils.ts";
+import {Matrix, SparseMatrix, VectorMatrix} from "../utils/matrix.utils.ts";
+import {Generateable, WithGenerated} from "./node.interface.ts";
 
-interface ConfigInterface {
+interface Generate {
+    N: number
+    THRESHOLD: number
+}
+
+interface ConfigInterface extends Generateable<Generate> {
     interactionType: string
     fromEntityType: string
     toEntityType: string
@@ -17,9 +23,7 @@ interface ConfigInterface {
     inverted: boolean
 }
 
-// TODO: optimize? add to config?
-const N = 20
-const THRESHOLD = 0.5
+const MAX_N = 40
 
 export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor> {
     configType = `NN-node (${this.config.inverted ? this.config.toEntityType : this.config.fromEntityType} - ${this.config.interactionType})`
@@ -28,6 +32,12 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
         protected readonly config: ConfigInterface,
     ) {
         super()
+        if (!this.config.generated) {
+            this.config.generated = {
+                N: Math.floor(Math.random() * MAX_N),
+                THRESHOLD: Math.random()
+            }
+        }
     }
 
     protected generateInput(problemInstance: ProblemInstance) {
@@ -50,11 +60,11 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
     }
 
     protected processorFactory() {
-        return new NearestNeighbourProcessor(this.config)
+        return new NearestNeighbourProcessor(this.config as WithGenerated<ConfigInterface>)
     }
 }
 
-export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
+export class NearestNeighbourProcessor extends NodeProcessor<WithGenerated<ConfigInterface>> {
     private interactionMatrix: Matrix<number> = new SparseMatrix()
 
     private mostSimilar: Record<EntityId, Record<EntityId, number>> = {}
@@ -135,7 +145,7 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
         return {
             fromEntityType: this.config.fromEntityType,
             toEntityType: this.config.toEntityType,
-            matrix: SparseMatrix.fromToVector(params.entityId, normalizedScores)
+            matrix: new VectorMatrix(params.entityId, normalizedScores)
         }
     }
 
@@ -184,7 +194,7 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
         return {
             fromEntityType: this.config.fromEntityType,
             toEntityType: this.config.toEntityType,
-            matrix: SparseMatrix.fromToVector(params.entityId, normalizedScores)
+            matrix: new VectorMatrix(params.entityId, normalizedScores)
         }
     }
 
@@ -206,9 +216,9 @@ export class NearestNeighbourProcessor extends NodeProcessor<ConfigInterface> {
         }
 
         const mostSimilar = Object.keys(scores)
-            .filter(ref => scores[ref] > THRESHOLD)
+            .filter(ref => scores[ref] > this.config.generated.THRESHOLD)
             .sort((refA, refB) => scores[refB] - scores[refA])
-            .slice(0, N)
+            .slice(0, this.config.generated.N)
             .reduce((agg, ref) => {
                 agg[ref] = scores[ref]
 

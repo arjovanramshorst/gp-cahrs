@@ -28,7 +28,7 @@ const main = async (config: ConfigInterface = defaultConfig) => {
 
     while (!generation.isFinished()) {
         generation = generation
-            .nextGeneration()
+            .nextGeneration(instance)
         getRenderer().setActive(generation)
 
         generation

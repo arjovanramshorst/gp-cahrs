@@ -215,4 +215,48 @@ export class SparseMatrix<T extends any> extends Matrix<T> {
     }
 }
 
+export class VectorMatrix<T extends any> extends Matrix<T>{
+    constructor(
+        private readonly fromRef: EntityId,
+        private readonly items : Record<EntityId, T> = {},
+    ) {
+        super()
+    }
+
+    get(fromRef: EntityId, toRef: EntityId): T | undefined {
+        if (fromRef !== this.fromRef) {
+            return undefined
+        }
+        return this.items[toRef]
+    }
+
+    getColumn(toRef: EntityId): Record<EntityId, T> {
+        throw Error("Can not be called on a vector")
+    }
+
+    getFromRefs(): EntityId[] {
+        return [this.fromRef];
+    }
+
+    getRow(fromRef: EntityId): Record<EntityId, T> {
+        return this.items
+    }
+
+    getToRefs(): EntityId[] {
+        return Object.keys(this.items)
+    }
+
+    map<K>(mapper: (items: T[]) => K[]): Matrix<K> {
+        throw Error("Can not be called on a vector?")
+    }
+
+    set(fromRef: EntityId, toRef: EntityId, value: T): void {
+        if (this.fromRef !== fromRef) {
+            throw Error("Invalid fromRef")
+        }
+        this.items[toRef] = value
+    }
+
+}
+
 type RefFunc<T> = (f: T) => EntityId

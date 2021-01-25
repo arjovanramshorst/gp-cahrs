@@ -52,6 +52,41 @@ await main()
 
 function getConfig(type: string): JsonConfig {
     switch (type) {
+        case "combine":
+
+            return {
+                type: "RootNodeConfig",
+                config: {
+                    interactionType: "rating",
+                    type: "maximize",
+                    property: "rating"
+                },
+                input: [
+                    {
+                        type: "CombineNodeConfig",
+                        config: {},
+                        input: [
+                            {
+                                type: "PopularNodeConfig",
+                                config: {
+                                    interactionType: "rating",
+                                    compareValueKey: "rating"
+                                },
+                                input: []
+                            },
+                            {
+                                type: "RandomNodeConfig",
+                                config: {
+                                    fromEntityType: "user",
+                                    toEntityType: "movie"
+                                },
+                                input: []
+
+                            }
+                        ]
+                    }
+                ]
+            }
         case "popular":
             return {
                 type: "RootNodeConfig",

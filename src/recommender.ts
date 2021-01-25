@@ -43,7 +43,7 @@ export class Recommender {
         this.getConfig().print()
     }
 
-    private getConfig() {
+    public getConfig() {
         if (!this.config) {
             throw new ProcessTreeNotInitializedError()
         }
