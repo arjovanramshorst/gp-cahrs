@@ -4,7 +4,6 @@ import {RandomNodeConfig} from "./nodes/random.node.ts";
 import {getRenderer} from "./renderer.ts";
 import {PropertyNodeConfig} from "./nodes/property.node.ts";
 import {NodeConfig} from "./nodes/node.ts";
-import {CombineNodeConfig} from "./nodes/combine.node.ts";
 import {CFNodeConfig} from "./nodes/cf.node.ts";
 import {NearestNeighbourConfig} from "./nodes/nearest-neighbour.node.ts";
 

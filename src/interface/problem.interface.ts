@@ -8,5 +8,6 @@ export interface ProblemInstance {
     entityMap: EntityMap,
     interactionMap: InteractionMap,
 
-    testInteractions: Matrix<any>
+    testInteractions: Matrix<any>,
+    validateInteractions: Matrix<any>
 }

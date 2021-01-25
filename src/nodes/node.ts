@@ -40,6 +40,19 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
     }
 
     /**
+     * Handles mutation for this configuration
+     */
+    public mutate(problemInstance: ProblemInstance, combine: (input: NodeConfig<any>[]) => NodeConfig<any>, mutationChance: number) {
+        if (this.generateInput(problemInstance).length > 0 && Math.random() < mutationChance) {
+            this.generate(problemInstance, combine)
+        } else {
+            this.input.forEach(it => it.mutate(problemInstance, combine, mutationChance))
+        }
+
+        return this
+    }
+
+    /**
      * Recursively prepares the input nodes, and finally the current one.
      *
      * @param problemInstance
@@ -74,7 +87,7 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
         this.input.forEach(it => it.print(indent + 1))
     }
 
-    public static parse(config: JsonConfig, factory: (type: string, config: any) => NodeConfig<any>): NodeConfig<any>{
+    public static parse(config: JsonConfig, factory: (type: string, config: any) => NodeConfig<any>): NodeConfig<any> {
         const node = factory(config.type, config.config)
         const input = config.input.map(input => NodeConfig.parse(input, factory))
         node.setInput(input)

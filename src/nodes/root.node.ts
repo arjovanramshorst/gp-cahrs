@@ -1,5 +1,4 @@
 import {NodeConfig} from "./node.ts";
-import {RandomNodeConfig} from "./random.node.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {Entities} from "../interface/entity.interface.ts";
@@ -27,10 +26,6 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
         const fromType = problemInstance.interactionMap[this.config.interactionType].fromType
         const toType = problemInstance.interactionMap[this.config.interactionType].toType
         return [
-            new RandomNodeConfig({
-                toEntityType: toType,
-                fromEntityType: fromType
-            }),
             new NearestNeighbourConfig({
                 interactionType: this.config.interactionType,
                 toEntityType: toType,

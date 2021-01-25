@@ -10,30 +10,22 @@ const main = async (config: ConfigInterface = defaultConfig) => {
 
     // Preprocess data
     console.log(`Reading ${problem.name}...`)
-    const instance = await problem.read()
+    let instance = await problem.read(0.1)
     console.log(`...Done!`)
 
-    const evaluator = config.makeEvaluator(instance)
+    let evaluator = config.makeEvaluator(instance)
 
     console.log("Generating initial generation...")
     // Generate initial generation
     let generation = Generation
         .initialGeneration(config, instance)
 
-    getRenderer().setActive(generation)
-
-    generation
-        .prepare()
-        .evaluate(evaluator)
-
     while (!generation.isFinished()) {
-        generation = generation
-            .nextGeneration()
         getRenderer().setActive(generation)
-
-        generation
-            .prepare()
-            .evaluate(evaluator)
+        generation.evaluate(evaluator)
+        instance = await problem.read(config.interleavedTrainingSize)
+        evaluator = config.makeEvaluator(instance)
+        generation = generation.nextGeneration(instance)
     }
 
     const best = generation.best()

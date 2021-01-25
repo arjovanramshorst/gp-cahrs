@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Run latest recommendation",
+            "program": "${workspaceFolder}/src/test.ts",
+            "cwd": "${workspaceFolder}/src",
+            "runtimeExecutable": "deno",
+            "runtimeArgs": [
+                "run",
+                "--inspect-brk=127.0.0.1:9229",
+                "--allow-all",
+                "--v8-flags=--max-old-space-size=8192"
+            ],
+            "args": [
+                "recent"
+            ],
+            "attachSimplePort": 9229
+        },
+        {
+            "name": "Run GP-CAHRS",
+            "request": "launch",
+            "type": "pwa-node",
+            "program": "src/main.ts",
+            "cwd": "${workspaceFolder}/src",
+            "runtimeExecutable": "deno",
+            "runtimeArgs": [
+                "run",
+                "--inspect-brk",
+                "--allow-all",
+                "--v8-flags=--max-old-space-size=8192"
+            ],
+            "attachSimplePort": 9229
+        }
+    ]
+}

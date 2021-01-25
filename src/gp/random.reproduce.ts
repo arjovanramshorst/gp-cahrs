@@ -1,7 +1,12 @@
 import {Reproduce} from "./reproduce.ts";
-import {EvaluatedRecommender} from "../generation.ts";
+import {combineInputs, EvaluatedRecommender} from "../generation.ts";
 import {Recommender} from "../recommender.ts";
 import {sumBy} from "../utils/functional.utils.ts";
+import {NodeConfig} from "../nodes/node.ts";
+import {NodeFactory} from "../nodes/node.interface.ts";
+import {RootNodeConfig} from "../nodes/root.node.ts";
+
+const MUTATION_CHANCE = 0.007 // 0.7%
 
 export class RandomReproduce extends Reproduce {
     produceOffspring(parents: EvaluatedRecommender[]): Recommender[] {
@@ -17,11 +22,28 @@ export class RandomReproduce extends Reproduce {
 
         const offspring = []
         while (offspring.length < parents.length) {
-            const index = Math.random() * totalScore
-            const foundIndex = aggregatedParents.findIndex(it => it.score > index)
-            offspring.push(parents[foundIndex].recommender)
+            let foundIndex
+
+            if (totalScore > 0) {
+                const index = Math.random() * totalScore
+                foundIndex = aggregatedParents.findIndex(it => it.score > index)
+            } else {
+                // Handles the case when an entire generation is f*d
+                foundIndex = Math.floor(Math.random() * parents.length)
+            }
+
+            const childConfigObject = parents[foundIndex].recommender.getConfig().stringify()
+
+            const newConfig = NodeConfig.parse(childConfigObject, NodeFactory)
+                .mutate(this.problemInstance, combineInputs, MUTATION_CHANCE) as RootNodeConfig
+
+            const child = new Recommender(this.problemInstance)
+                .init(newConfig)
+
+            offspring.push(child)
         }
 
         return offspring;
     }
 }
+

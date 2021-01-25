@@ -5,9 +5,11 @@ import {RankEvaluator} from "./evaluate/rank.evaluator.ts";
 import {MovielensProblem} from "./problem/movielens.problem.ts";
 
 export const defaultConfig: ConfigInterface = {
-    maxGeneration: 1,
-    generationSize: 3,
+    maxGeneration: 30,
+    generationSize: 20,
     makeProblem: () => new MovielensProblem(),
-    makeReproduce: () => new RandomReproduce(),
-    makeEvaluator: (instance: ProblemInstance) => new RankEvaluator(instance)
+    makeReproduce: (instance: ProblemInstance) => new RandomReproduce(instance),
+    makeEvaluator: (instance: ProblemInstance) => new RankEvaluator(instance),
+    outputFilename: `Run_${new Date().toISOString()}`,
+    interleavedTrainingSize: 0.1
 }

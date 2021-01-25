@@ -20,32 +20,51 @@ export class MovielensProblem extends Problem {
         property: "rating"
     })
 
-    async read() {
+    async read(trainingRatio = 1) {
         const movies = await this.readMovies()
         const ratings = await this.readRatings()
         const tags = await this.readTags()
 
         const trainRatings: Rating[] = []
         const testRatings: Rating[] = []
+        const validationRatings: Rating[] = []
 
         const grouped = ratings.reduce(groupBy(it => it.fromId), {})
+
+        const selectedIds = trainingRatio === 1 
+        ? Object.keys(grouped).reduce(toMap(it => it, it => it), {}) 
+        : Object.keys(grouped).filter(it => Math.random() < trainingRatio).reduce(toMap(it => it, it => it), {})
+
         Object.keys(grouped).forEach(fromRef => {
-            const ratings = grouped[fromRef]
-            // Assume ratings are sorted on time
-            // .sort(...)
-            ratings.forEach((it, index) => {
-                if (index < 0.9 * ratings.length) {
-                    trainRatings.push(it)
-                } else if (it.rating >= 4) {
-                    testRatings.push(it)
-                }
-            })
+            if (selectedIds[fromRef]) {
+                const ratings = grouped[fromRef]
+                // Assume ratings are sorted on time
+                // .sort(...)
+                ratings.forEach((it, index) => {
+                    if (index < 0.8 * ratings.length) {
+                        trainRatings.push(it)
+                    } else if (index < 0.9 * ratings.length && it.rating >= 3.5) {
+                        testRatings.push(it)
+                    } else if (it.rating >= 3.5) {
+                        validationRatings.push(it)
+                    }
+                })
+            }
 
         })
+        const movieMatrix = movies.reduce(toMap(
+            it => it.id,
+            it => ({
+                ...it,
+                tags: [] as string[]
+           })), {})
+
+        tags.forEach(tag => movieMatrix[tag.toId].tags.push(tag.tag))
 
         return {
             defaultConfig: this.defaultConfig,
             testInteractions: SparseMatrix.fromArray(it => it.fromId, it => it.toId, it => it, testRatings),
+            validateInteractions: SparseMatrix.fromArray(it => it.fromId, it => it.toId, it => it, validationRatings),
             interactionMap: {
                 rating: {
                     fromType: "user",
@@ -74,7 +93,7 @@ export class MovielensProblem extends Problem {
                         it => it.fromId,
                         it => it.toId,
                         it => it,
-                        tags
+                        tags.filter(it => selectedIds[it.fromId])
                     )
                 }
             },
@@ -82,24 +101,19 @@ export class MovielensProblem extends Problem {
                 user: {
                     type: "user",
                     properties: {},
-                    entityMatrix: ratings.reduce(toMap(
-                        it => it.fromId,
-                        it => ({
-                            id: it.fromId
-                        })), {})
-
+                    entityMatrix: Object.keys(grouped).reduce((agg, id) => ({
+                        ...agg,
+                         [id]: { id }
+                        }), {})
                 },
                 movie: {
                     type: "movie",
                     properties: {
                         title: PropertyType.string,
-                        genres: PropertyType.array
+                        genres: PropertyType.array,
+                        tags: PropertyType.array
                     },
-                    entityMatrix: movies.reduce(toMap(
-                        it => it.id,
-                        it => it
-                    ), {})
-                }
+                    entityMatrix: movieMatrix               }
             }
         }
     }

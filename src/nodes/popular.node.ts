@@ -2,7 +2,7 @@ import {NodeConfig} from "./node.ts";
 import {NodeProcessor, ProcessNodeDTO, ProcessParams} from "../interface/processor.interface.ts";
 import {ProblemInstance} from "../interface/problem.interface.ts";
 import {SimilarityScores} from "../interface/dto.interface.ts";
-import {SparseMatrix} from "../utils/matrix.utils.ts";
+import {SparseMatrix, VectorMatrix} from "../utils/matrix.utils.ts";
 import {EntityId} from "../interface/entity.interface.ts";
 
 interface ConfigInterface {
@@ -42,7 +42,6 @@ export class PopularNodeProcessor extends NodeProcessor<ConfigInterface> {
             .forEach(toRef => {
                 this.popularity[toRef] = Object.keys(interaction.interactionMatrix.getColumn(toRef)).length
             })
-
     }
 
     process(input: ProcessNodeDTO[], params: ProcessParams): SimilarityScores {
@@ -53,7 +52,7 @@ export class PopularNodeProcessor extends NodeProcessor<ConfigInterface> {
         return {
             fromEntityType: this.fromType ?? "",
             toEntityType: this.toType ?? "",
-            matrix: SparseMatrix.fromToVector(params.entityId, this.popularity)
+            matrix: new VectorMatrix(params.entityId, this.popularity)
         }
     }
 }

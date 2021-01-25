@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SEMI_SPACE_SIZE=2630
+OLD_SPACE_SIZE=4096
+
 cd $(dirname $0)/src
 
 # Check for deno installation, and install if not found
@@ -23,8 +26,8 @@ then
 elif [[ $1 = "test" ]];
 then
   echo "Evaluation specific version"
-  deno run --allow-read --v8-flags=--max-old-space-size=8192 test.ts $2
+  deno run --allow-read --allow-write --v8-flags=--max-old-space-size=$OLD_SPACE_SIZE,--initial-old-space-size=$OLD_SPACE_SIZE test.ts $2
 else
-  deno run --allow-read --v8-flags=--max-old-space-size=8192 main.ts
+  deno run --allow-read --allow-write --v8-flags=--max-old-space-size=8192 main.ts
 fi
-
+#,--max-semi-space-size=$SEMI_SPACE_SIZE,--min-semi-space-size=$SEMI_SPACE_SIZE

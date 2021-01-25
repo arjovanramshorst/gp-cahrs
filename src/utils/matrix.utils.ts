@@ -15,6 +15,86 @@ export abstract class Matrix<T> {
     public abstract getToRefs(): EntityId[]
 
     public abstract map<K>(mapper: (items: T[]) => K[]): Matrix<K>
+
+    // TODO: Move this to Matrix class, and let that one decide which type of matrix it returns
+    static combine<T, K = T>(input: Matrix<T>[], func: (input: T[]) => K, fromRef?: EntityId) {
+        const fromRefs = fromRef ? [fromRef] : [...new Set([...input.flatMap(it => it.getFromRefs())])]
+        const toRefs = [...new Set([...input.flatMap(it => it.getToRefs())])]
+
+        const matrix = new SparseMatrix<K>()
+        for (let i = 0; i < fromRefs.length; i++) {
+            for (let j = 0; j < toRefs.length; j++) {
+                const res = input.map(it => it.get(fromRefs[i], toRefs[j])).filter(isDefined) as T[]
+                matrix.set(fromRefs[i], toRefs[j], func(res))
+            }
+        }
+        return matrix
+    }
+}
+
+export class CombinedMatrix<T extends any, K = T> extends Matrix<K> {
+    private fromRefs: EntityId[]
+    private toRefs: EntityId[]
+
+    constructor(
+        private readonly matrixes: Matrix<T>[],
+        private readonly combineFunc: (input: T[]) => K,
+        private readonly nullValue: T
+    ) {
+        super();
+        this.fromRefs = [...new Set([...matrixes.flatMap(it => it.getFromRefs())])]
+        this.toRefs = [...new Set([...matrixes.flatMap(it => it.getToRefs())])]
+    }
+
+    get(fromRef: EntityId, toRef: EntityId): K | undefined {
+        return this.combineFunc(this.matrixes.map(it => it.get(fromRef, toRef) ?? this.nullValue))
+    }
+
+    set(fromRef: EntityId, toRef: EntityId, value: K): void {
+        throw Error("Not implemented")
+    }
+
+    getColumn(toRef: EntityId): Record<EntityId, K> {
+        const res: Record<EntityId, K> = {}
+        for(let i = 0; i < this.fromRefs.length; i++) {
+            const fromRef = this.fromRefs[i]
+            res[fromRef] = this.combineFunc(this.matrixes.map(it => it.get(fromRef, toRef) ?? this.nullValue))
+        }
+
+        return res
+    }
+
+    getFromRefs(): EntityId[] {
+        return this.fromRefs
+    }
+
+    getRow(fromRef: EntityId): Record<EntityId, K> {
+        const res: Record<EntityId, K> = {}
+        for(let i = 0; i < this.toRefs.length; i++) {
+            const toRef = this.toRefs[i]
+            res[toRef] = this.combineFunc(this.matrixes.map(it => it.get(fromRef, toRef) ?? this.nullValue))
+        }
+
+        return res
+    }
+
+    getToRefs(): EntityId[] {
+        return this.toRefs;
+    }
+
+    map<J>(mapper: (items: K[]) => J[]): Matrix<J> {
+        const matrix = new DenseMatrix<J>(this.fromRefs, this.toRefs)
+        const items = []
+        for (let i = 0; i < this.fromRefs.length; i++) {
+            for (let j = 0; j < this.toRefs.length; j++) {
+                const fromRef = this.fromRefs[i]
+                const toRef = this.toRefs[j]
+                items.push(this.combineFunc(this.matrixes.map( it => it.get(fromRef, toRef) ?? this.nullValue)))
+            }
+        }
+        matrix.setItems(mapper(items))
+        return matrix
+    }
 }
 
 export class DenseMatrix<T extends any> extends Matrix<T> {
@@ -93,7 +173,7 @@ export class DenseMatrix<T extends any> extends Matrix<T> {
         return ([] as T[]).concat(...this.scores)
     }
 
-    private setItems = (items: T[]) => {
+    public setItems = (items: T[]) => {
         if (items.length !== this.fromRefs.length * this.toRefs.length) {
             throw Error("Invalid amount of items for setItems")
         }
@@ -200,19 +280,50 @@ export class SparseMatrix<T extends any> extends Matrix<T> {
         return matrix
     }
 
-    // TODO: Move this to Matrix class, and let that one decide which type of matrix it returns
-    static combine<T, K = T>(input: Matrix<T>[], func: (input: T[]) => K) {
-        const fromRefs = [...new Set([...input.flatMap(it => it.getFromRefs())])]
-        const toRefs = [...new Set([...input.flatMap(it => it.getToRefs())])]
-        const matrix = new SparseMatrix<K>()
-        for (let i = 0; i < fromRefs.length; i++) {
-            for (let j = 0; j < toRefs.length; j++) {
-                const res = input.map(it => it.get(fromRefs[i], toRefs[j])).filter(isDefined) as T[]
-                matrix.set(fromRefs[i], toRefs[j], func(res))
-            }
-        }
-        return matrix
+}
+
+export class VectorMatrix<T extends any> extends Matrix<T>{
+    constructor(
+        private readonly fromRef: EntityId,
+        private readonly items : Record<EntityId, T> = {},
+    ) {
+        super()
     }
+
+    get(fromRef: EntityId, toRef: EntityId): T | undefined {
+        if (fromRef !== this.fromRef) {
+            return undefined
+        }
+        return this.items[toRef]
+    }
+
+    getColumn(toRef: EntityId): Record<EntityId, T> {
+        throw Error("Can not be called on a vector")
+    }
+
+    getFromRefs(): EntityId[] {
+        return [this.fromRef];
+    }
+
+    getRow(fromRef: EntityId): Record<EntityId, T> {
+        return this.items
+    }
+
+    getToRefs(): EntityId[] {
+        return Object.keys(this.items)
+    }
+
+    map<K>(mapper: (items: T[]) => K[]): Matrix<K> {
+        throw Error("Can not be called on a vector?")
+    }
+
+    set(fromRef: EntityId, toRef: EntityId, value: T): void {
+        if (this.fromRef !== fromRef) {
+            throw Error("Invalid fromRef")
+        }
+        this.items[toRef] = value
+    }
+
 }
 
 type RefFunc<T> = (f: T) => EntityId

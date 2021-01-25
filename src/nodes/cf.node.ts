@@ -4,15 +4,20 @@ import {ProblemInstance} from "../interface/problem.interface.ts";
 import {CFMatrix, SimilarityScores} from "../interface/dto.interface.ts";
 import {EntityId} from "../interface/entity.interface.ts";
 import {getRenderer} from "../renderer.ts";
-import {DenseMatrix, SparseMatrix} from "../utils/matrix.utils.ts";
+import {SparseMatrix} from "../utils/matrix.utils.ts";
+import {Generateable, WithGenerated} from "./node.interface.ts";
 
-interface ConfigInterface {
+interface Generate {
+    MIN_SHARED_VALUES: number
+}
+
+interface ConfigInterface extends Generateable<Generate>{
     entityType: string
     interactionType: string
     comparisonKey?: string
 }
 
-const MIN_SHARED_VALUES = 5
+const MAX_MIN_SHARED_VALUES = 20
 
 export class CFNodeConfig extends NodeConfig<CFNodeProcessor> {
     configType = "cf-node"
@@ -21,6 +26,11 @@ export class CFNodeConfig extends NodeConfig<CFNodeProcessor> {
         protected readonly config: ConfigInterface,
     ) {
         super()
+        if (!this.config.generated) {
+            this.config.generated = {
+                MIN_SHARED_VALUES: Math.floor(Math.random() * MAX_MIN_SHARED_VALUES)
+            }
+        }
     }
 
     protected generateInput() {
@@ -28,11 +38,11 @@ export class CFNodeConfig extends NodeConfig<CFNodeProcessor> {
     }
 
     protected processorFactory() {
-        return new CFNodeProcessor(this.config)
+        return new CFNodeProcessor(this.config as WithGenerated<ConfigInterface>)
     }
 }
 
-export class CFNodeProcessor extends NodeProcessor<ConfigInterface> {
+export class CFNodeProcessor extends NodeProcessor<WithGenerated<ConfigInterface>> {
     private similarities: SparseMatrix<number> = new SparseMatrix()
 
     prepare(instance: ProblemInstance): any {
@@ -101,7 +111,7 @@ export class CFNodeProcessor extends NodeProcessor<ConfigInterface> {
 
         const N = arr.length
 
-        if (N === 0 || N < Math.min(Object.keys(v2).length, MIN_SHARED_VALUES)) {
+        if (N === 0 || N < Math.min(Object.keys(v2).length, this.config.generated.MIN_SHARED_VALUES)) {
             // Not enough refs found with matching scores, returning 0
             return 0
         }

@@ -5,6 +5,7 @@ import {NodeConfig} from "./nodes/node.ts";
 import {JsonConfig, NodeFactory} from "./nodes/node.interface.ts";
 import {Generation} from "./generation.ts";
 import {RootNodeConfig} from "./nodes/root.node.ts";
+import {Recommender} from "./recommender.ts";
 
 const defaultTest = "array"
 
@@ -36,7 +37,6 @@ const main = async (config: ConfigInterface = defaultConfig) => {
 
     const t = performance.now()
     generation
-        .prepare()
         .evaluate(evaluator)
 
     const tFinished = performance.now()
@@ -52,6 +52,41 @@ await main()
 
 function getConfig(type: string): JsonConfig {
     switch (type) {
+        case "combine":
+
+            return {
+                type: "RootNodeConfig",
+                config: {
+                    interactionType: "rating",
+                    type: "maximize",
+                    property: "rating"
+                },
+                input: [
+                    {
+                        type: "CombineNodeConfig",
+                        config: {},
+                        input: [
+                            {
+                                type: "PopularNodeConfig",
+                                config: {
+                                    interactionType: "rating",
+                                    compareValueKey: "rating"
+                                },
+                                input: []
+                            },
+                            {
+                                type: "RandomNodeConfig",
+                                config: {
+                                    fromEntityType: "user",
+                                    toEntityType: "movie"
+                                },
+                                input: []
+
+                            }
+                        ]
+                    }
+                ]
+            }
         case "popular":
             return {
                 type: "RootNodeConfig",
@@ -154,6 +189,8 @@ function getConfig(type: string): JsonConfig {
                     }
                 ]
             }
+        case "recent":
+            return JSON.parse(Deno.readTextFileSync("../output/most_recent_config.json"))
         default:
             throw Error(`Invalid config: ${type}`)
     }

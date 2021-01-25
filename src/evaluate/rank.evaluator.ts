@@ -1,24 +1,30 @@
-import {Evaluator} from "./evaluator.ts";
+import {Evaluator, Result} from "./evaluator.ts";
 import {Recommender} from "../recommender.ts";
 import {countBy, sumBy} from "../utils/functional.utils.ts";
 import {getRenderer} from "../renderer.ts";
+import { Matrix } from "../utils/matrix.utils.ts";
 
 // https://link-springer-com.tudelft.idm.oclc.org/referenceworkentry/10.1007/978-1-4939-7131-2_110162
 export class RankEvaluator extends Evaluator {
+    evaluate(recommender: Recommender, validate: boolean = false): Result {
 
-    evaluate(recommender: Recommender): number {
-        const keys = this.problemInstance.testInteractions.getFromRefs()
+        if (validate === false && this.cache[recommender.hash()]) {
+            return this.cache[recommender.hash()]
+        }
+
+        const testInteractions: Matrix<any> = validate ? this.problemInstance.validateInteractions : this.problemInstance.testInteractions
+        const keys = testInteractions.getFromRefs()
         const recommendations = keys
             .map((fromId, idx) => {
                 getRenderer().setProgress(idx, keys.length)
 
-                const testInteractions = this.problemInstance.testInteractions.getRow(fromId)
+                const interactions = testInteractions.getRow(fromId)
                 const recommendations = recommender.recommend(fromId)
 
                 const found = recommendations.recommendations
-                    .reduce(countBy(it => testInteractions[it.entity.id]!!), 0)
+                    .reduce(countBy(it => interactions[it.entity.id]!!), 0)
 
-                const total = Object.keys(testInteractions).length
+                const total = Object.keys(interactions).length
                 // console.log(`recommendations: ${recommendations}`)
                 // console.log(`found ${found} of total ${total}`)
                 const nrRecommendations = recommendations.recommendations.length
@@ -35,7 +41,16 @@ export class RankEvaluator extends Evaluator {
         const averageRecall = recommendations.reduce(sumBy(it => it.recall), 0) / recommendations.length
         const averagePrecision = recommendations.reduce(sumBy(it => it.precision), 0) / recommendations.length
 
-        // TODO: Do this? Or max? min? randomly select 1? :p
-        return (averageRecall + averagePrecision) / 2
+        const fScore = 2 * (averagePrecision * averageRecall) / (averagePrecision + averageRecall)
+
+        const result = {
+            recall: averageRecall,
+            precision: averagePrecision,
+            fScore,
+            performance: (Number.isNaN(fScore) || fScore < 0) ? 0 : fScore
+        }
+        this.cache[recommender.hash()] = result
+
+        return result
     }
 }

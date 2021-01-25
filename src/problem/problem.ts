@@ -6,5 +6,5 @@ export abstract class Problem {
 
     abstract defaultConfig: RootNodeConfig
 
-    abstract async read(): Promise<ProblemInstance>
+    abstract read(trainingRatio: number): Promise<ProblemInstance>
 }
