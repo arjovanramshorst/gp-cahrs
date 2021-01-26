@@ -43,7 +43,7 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
      * Handles mutation for this configuration
      */
     public mutate(problemInstance: ProblemInstance, combine: (input: NodeConfig<any>[]) => NodeConfig<any>, mutationChance: number) {
-        if (Math.random() < mutationChance) {
+        if (this.generateInput(problemInstance).length > 0 && Math.random() < mutationChance) {
             this.generate(problemInstance, combine)
         } else {
             this.input.forEach(it => it.mutate(problemInstance, combine, mutationChance))

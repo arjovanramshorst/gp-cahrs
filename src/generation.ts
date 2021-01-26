@@ -101,7 +101,7 @@ export class Generation {
     }
 
     private getOutputFilename = () =>
-        `${this.config.outputFilename}_${this.config.maxGeneration}_${this.config.generationSize}.csv`
+        `../output/${this.config.outputFilename}_${this.config.maxGeneration}_${this.config.generationSize}.csv`
 
 
     public print() {
