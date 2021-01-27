@@ -119,11 +119,11 @@ export class PropertyNodeProcessor extends NodeProcessor<ConfigInterface> {
 function getComparisons(type: PropertyType): ComparisonType[] {
     switch (type) {
         case PropertyType.array:
-            return Object.keys(ARRAY_COMPARISON) as ComparisonType[]
+            return [] //Object.keys(ARRAY_COMPARISON) as ComparisonType[]
         case PropertyType.number:
             return Object.keys(NUMBER_COMPARISON) as ComparisonType[]
         case PropertyType.string:
-            return Object.keys(STRING_COMPARISON) as ComparisonType[]
+            return [] // Object.keys(STRING_COMPARISON) as ComparisonType[]
         default:
             return []
     }

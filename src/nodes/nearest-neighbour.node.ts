@@ -55,7 +55,10 @@ export class NearestNeighbourConfig extends NodeConfig<NearestNeighbourProcessor
                 interactionType: this.config.interactionType,
                 comparisonKey: this.config.compareValueKey
             })]),
-            ...PropertyNodeConfig.PotentialConfigs(problemInstance.entityMap[this.config.fromEntityType], problemInstance.entityMap[this.config.fromEntityType])
+            ...(this.config.inverted 
+	        ? PropertyNodeConfig.PotentialConfigs(problemInstance.entityMap[this.config.toEntityType], problemInstance.entityMap[this.config.toEntityType])
+	        : PropertyNodeConfig.PotentialConfigs(problemInstance.entityMap[this.config.fromEntityType], problemInstance.entityMap[this.config.fromEntityType])
+	       )
         ]
     }
 

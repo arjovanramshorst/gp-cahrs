@@ -2,8 +2,11 @@ import {Reproduce} from "./reproduce.ts";
 import {combineInputs, EvaluatedRecommender} from "../generation.ts";
 import {Recommender} from "../recommender.ts";
 import {sumBy} from "../utils/functional.utils.ts";
+import {NodeConfig} from "../nodes/node.ts";
+import {NodeFactory} from "../nodes/node.interface.ts";
+import {RootNodeConfig} from "../nodes/root.node.ts";
 
-const MUTATION_CHANCE = 0.07 // 0.7%
+const MUTATION_CHANCE = 0.007 // 0.7%
 
 export class RandomReproduce extends Reproduce {
     produceOffspring(parents: EvaluatedRecommender[]): Recommender[] {
@@ -29,9 +32,13 @@ export class RandomReproduce extends Reproduce {
                 foundIndex = Math.floor(Math.random() * parents.length)
             }
 
-            const childConfig = parents[foundIndex].recommender.getConfig().mutate(this.problemInstance, combineInputs, MUTATION_CHANCE)
+            const childConfigObject = parents[foundIndex].recommender.getConfig().stringify()
+
+            const newConfig = NodeConfig.parse(childConfigObject, NodeFactory)
+                .mutate(this.problemInstance, combineInputs, MUTATION_CHANCE) as RootNodeConfig
+
             const child = new Recommender(this.problemInstance)
-                .init(childConfig)
+                .init(newConfig)
 
             offspring.push(child)
         }

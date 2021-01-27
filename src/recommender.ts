@@ -3,6 +3,8 @@ import {EntityId} from "./interface/entity.interface.ts";
 import {ProblemInstance} from "./interface/problem.interface.ts";
 import {RootNodeConfig} from "./nodes/root.node.ts";
 import {Recommendations} from "./interface/dto.interface.ts";
+import {NodeConfig} from "./nodes/node.ts";
+import {NodeFactory} from "./nodes/node.interface.ts";
 
 
 export class Recommender {
@@ -49,6 +51,12 @@ export class Recommender {
         }
 
         return this.config
+    }
+
+    public clone() {
+        const clone = new Recommender(this.problemInstance)
+        const copiedConfig = NodeConfig.parse(this.getConfig().stringify(), NodeFactory) as RootNodeConfig
+        return clone.init(copiedConfig)
     }
 }
 
