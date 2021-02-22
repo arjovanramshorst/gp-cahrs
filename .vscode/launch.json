@@ -26,14 +26,16 @@
             "name": "Run GP-CAHRS",
             "request": "launch",
             "type": "pwa-node",
-            "program": "src/main.ts",
+            "program": "main.ts",
+            "args": [
+                "headless"
+            ],
             "cwd": "${workspaceFolder}/src",
             "runtimeExecutable": "deno",
             "runtimeArgs": [
                 "run",
                 "--inspect-brk",
-                "--allow-all",
-                "--v8-flags=--max-old-space-size=8192"
+                "--allow-all"
             ],
             "attachSimplePort": 9229
         }

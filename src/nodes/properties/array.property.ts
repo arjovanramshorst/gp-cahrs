@@ -1,14 +1,14 @@
-import {intersection} from "../../utils/set.utils.ts";
+import { intersection } from "../../utils/set.utils.ts";
 
-export type ArrayComparisonType = keyof typeof ARRAY_COMPARISON
+export type ArrayComparisonType = keyof typeof ARRAY_COMPARISON;
 
 const ARRAY_COMPARISON = {
-    arrayDistance,
-}
+  arrayDistance,
+};
 
-export default ARRAY_COMPARISON
+export default ARRAY_COMPARISON;
 
 function arrayDistance(a: any[], b: any[]) {
-    const l = intersection(a, b).length
-    return l / (a.length + b.length - l)
+  const l = intersection(a, b).length;
+  return l / (a.length + b.length - l);
 }

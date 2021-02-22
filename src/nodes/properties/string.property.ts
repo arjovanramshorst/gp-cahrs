@@ -1,12 +1,11 @@
-
-export type StringComparisonType = keyof typeof STRING_COMPARISON
+export type StringComparisonType = keyof typeof STRING_COMPARISON;
 
 const STRING_COMPARISON = {
-    stringSame
-}
+  stringSame,
+};
 
-export default STRING_COMPARISON
+export default STRING_COMPARISON;
 
 function stringSame(a: string, b: string) {
-    return a === b ? 1 : 0
+  return a === b ? 1 : 0;
 }

@@ -1,197 +1,199 @@
-import {ConfigInterface} from "./interface/config.interface.ts";
-import {defaultConfig} from "./default.config.ts";
-import {getRenderer} from "./renderer.ts";
-import {NodeConfig} from "./nodes/node.ts";
-import {JsonConfig, NodeFactory} from "./nodes/node.interface.ts";
-import {Generation} from "./generation.ts";
-import {RootNodeConfig} from "./nodes/root.node.ts";
-import {Recommender} from "./recommender.ts";
+import { ConfigInterface } from "./interface/config.interface.ts";
+import { defaultConfig } from "./default.config.ts";
+import { getRenderer } from "./renderer.ts";
+import { NodeConfig } from "./nodes/node.ts";
+import { JsonConfig, NodeFactory } from "./nodes/node.interface.ts";
+import { Generation } from "./generation.ts";
+import { RootNodeConfig } from "./nodes/root.node.ts";
+import { Recommender } from "./recommender.ts";
 
-const defaultTest = "array"
+const defaultTest = "array";
 
 const main = async (config: ConfigInterface = defaultConfig) => {
+  if (Deno.args.length === 0) {
+    console.log("This command should be called with one argument:");
+    console.log("{node}");
+    console.log("example: ./run.sh perf arrayDistance 2");
+  }
+  const configType = Deno.args[0] ?? defaultTest;
 
-    if (Deno.args.length === 0) {
-        console.log("This command should be called with one argument:")
-        console.log("{node}")
-        console.log("example: ./run.sh perf arrayDistance 2")
-    }
-    const configType = Deno.args[0] ?? defaultTest
+  console.log(`Running evaluation for ${configType}`);
 
-    console.log(`Running evaluation for ${configType}`)
+  // Read data
+  const problem = config.makeProblem();
 
-    // Read data
-    const problem = config.makeProblem()
+  // Preprocess data
+  console.log(`Reading ${problem.name}...`);
+  const instance = await problem.read(1);
+  console.log(`...Done!`);
 
-    // Preprocess data
-    console.log(`Reading ${problem.name}...`)
-    const instance = await problem.read()
-    console.log(`...Done!`)
+  let generation = Generation
+    .fromConfig(
+      config,
+      instance,
+      NodeConfig.parse(getConfig(configType), NodeFactory) as RootNodeConfig,
+    );
 
-    let generation = Generation
-        .fromConfig(config, instance, NodeConfig.parse(getConfig(configType), NodeFactory) as RootNodeConfig)
+  const evaluator = config.makeEvaluator(instance);
 
-    const evaluator = config.makeEvaluator(instance)
+  getRenderer().setActive(generation);
 
-    getRenderer().setActive(generation)
+  const t = performance.now();
+  generation
+    .evaluate(evaluator);
 
-    const t = performance.now()
-    generation
-        .evaluate(evaluator)
+  const tFinished = performance.now();
+  console.log(`Time ran is ${tFinished - t}`);
 
-    const tFinished = performance.now()
-    console.log(`Time ran is ${tFinished - t}`)
+  const best = generation.best();
 
-    const best = generation.best()
+  console.log(`Score of best found RS: ${best.score}`);
+};
 
-    console.log(`Score of best found RS: ${best.score}`)
-}
+await main();
 
-await main()
-
-
-function getConfig(type: string): JsonConfig {
-    switch (type) {
-        case "combine":
-
-            return {
-                type: "RootNodeConfig",
+export function getConfig(type: string): JsonConfig {
+  switch (type) {
+    case "combine":
+      return {
+        type: "RootNodeConfig",
+        config: {
+          interactionType: "rating",
+          type: "maximize",
+          property: "rating",
+        },
+        input: [
+          {
+            type: "CombineNodeConfig",
+            config: {},
+            input: [
+              {
+                type: "PopularNodeConfig",
                 config: {
-                    interactionType: "rating",
-                    type: "maximize",
-                    property: "rating"
+                  interactionType: "rating",
+                  compareValueKey: "rating",
                 },
-                input: [
-                    {
-                        type: "CombineNodeConfig",
-                        config: {},
-                        input: [
-                            {
-                                type: "PopularNodeConfig",
-                                config: {
-                                    interactionType: "rating",
-                                    compareValueKey: "rating"
-                                },
-                                input: []
-                            },
-                            {
-                                type: "RandomNodeConfig",
-                                config: {
-                                    fromEntityType: "user",
-                                    toEntityType: "movie"
-                                },
-                                input: []
+                input: [],
+              },
+              {
+                type: "RandomNodeConfig",
+                config: {
+                  fromEntityType: "user",
+                  toEntityType: "movie",
+                },
+                input: [],
+              },
+            ],
+          },
+        ],
+      };
+    case "popular":
+      return {
+        type: "RootNodeConfig",
+        config: {
+          interactionType: "rating",
+          type: "maximize",
+          property: "rating",
+        },
+        input: [
+          {
+            type: "PopularNodeConfig",
+            config: {
+              interactionType: "rating",
+              compareValueKey: "rating",
+            },
+            input: [],
+          },
+        ],
+      };
+    case "random":
+      return {
+        type: "RootNodeConfig",
+        config: {
+          interactionType: "rating",
+          type: "maximize",
+          property: "rating",
+        },
+        input: [
+          {
+            type: "RandomNodeConfig",
+            config: {
+              fromEntityType: "user",
+              toEntityType: "movie",
+            },
+            input: [],
+          },
+        ],
+      };
+    case "cf":
+      return {
+        type: "RootNodeConfig",
+        config: {
+          interactionType: "rating",
+          type: "maximize",
+          property: "rating",
+        },
+        input: [
+          {
+            type: "NearestNeighbourConfig",
+            config: {
+              interactionType: "rating",
+              fromEntityType: "user",
+              toEntityType: "movie",
+              compareValueKey: "rating",
+              inverted: false,
+            },
+            input: [{
+              type: "CFNodeConfig",
+              config: {
+                entityType: "user",
+                interactionType: "rating",
+                comparisonKey: "rating",
+              },
+              input: [],
+            }],
+          },
+        ],
+      };
+    case "array":
+      return {
+        type: "RootNodeConfig",
+        config: {
+          interactionType: "rating",
+          type: "maximize",
+          property: "rating",
+        },
+        input: [
+          {
+            type: "NearestNeighbourConfig",
+            config: {
+              interactionType: "rating",
+              fromEntityType: "user",
+              toEntityType: "movie",
+              compareValueKey: "rating",
+              inverted: true,
+            },
+            input: [{
+              type: "PropertyNodeConfig",
+              config: {
+                comparisonType: "arrayDistance",
 
-                            }
-                        ]
-                    }
-                ]
-            }
-        case "popular":
-            return {
-                type: "RootNodeConfig",
-                config: {
-                    interactionType: "rating",
-                    type: "maximize",
-                    property: "rating"
-                },
-                input: [
-                    {
-                        type: "PopularNodeConfig",
-                        config: {
-                            interactionType: "rating",
-                            compareValueKey: "rating"
-                        },
-                        input: []
-                    }
-                ]
-            }
-        case "random":
-            return {
-                type: "RootNodeConfig",
-                config: {
-                    interactionType: "rating",
-                    type: "maximize",
-                    property: "rating"
-                },
-                input: [
-                    {
-                        type: "RandomNodeConfig",
-                        config: {
-                            fromEntityType: "user",
-                            toEntityType: "movie"
-                        },
-                        input: []
-                    }
-                ]
-            }
-        case "cf":
-            return {
-                type: "RootNodeConfig",
-                config: {
-                    interactionType: "rating",
-                    type: "maximize",
-                    property: "rating"
-                },
-                input: [
-                    {
-                        type: "NearestNeighbourConfig",
-                        config: {
-                            interactionType: "rating",
-                            fromEntityType: "user",
-                            toEntityType: "movie",
-                            compareValueKey: "rating",
-                            inverted: false
-                        },
-                        input: [{
-                            type: "CFNodeConfig",
-                            config: {
-                                entityType: "user",
-                                interactionType: "rating",
-                                comparisonKey: "rating"
-                            },
-                            input: []
-                        }]
-                    }
-                ]
-            }
-        case "array":
-            return {
-                type: "RootNodeConfig",
-                config: {
-                    interactionType: "rating",
-                    type: "maximize",
-                    property: "rating"
-                },
-                input: [
-                    {
-                        type: "NearestNeighbourConfig",
-                        config: {
-                            interactionType: "rating",
-                            fromEntityType: "user",
-                            toEntityType: "movie",
-                            compareValueKey: "rating",
-                            inverted: true
-                        },
-                        input: [{
-                            type: "PropertyNodeConfig",
-                            config: {
-                                comparisonType: "arrayDistance",
+                fromEntityType: "movie",
+                toEntityType: "movie",
 
-                                fromEntityType: "movie",
-                                toEntityType: "movie",
-
-                                fromKey: "genres",
-                                toKey: "genres",
-                            },
-                            input: []
-                        }]
-                    }
-                ]
-            }
-        case "recent":
-            return JSON.parse(Deno.readTextFileSync("../output/most_recent_config.json"))
-        default:
-            throw Error(`Invalid config: ${type}`)
-    }
+                fromKey: "genres",
+                toKey: "genres",
+              },
+              input: [],
+            }],
+          },
+        ],
+      };
+    case "recent":
+      return JSON.parse(
+        Deno.readTextFileSync("../output/most_recent_config.json"),
+      );
+    default:
+      throw Error(`Invalid config: ${type}`);
+  }
 }

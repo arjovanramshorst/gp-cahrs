@@ -1,10 +1,10 @@
-import {RootNodeConfig} from "../nodes/root.node.ts";
-import {ProblemInstance} from "../interface/problem.interface.ts";
+import { RootNodeConfig } from "../nodes/root.node.ts";
+import { ProblemInstance } from "../interface/problem.interface.ts";
 
 export abstract class Problem {
-    abstract name: string
+  abstract name: string;
 
-    abstract defaultConfig: RootNodeConfig
+  abstract defaultConfig: RootNodeConfig;
 
-    abstract read(trainingRatio: number): Promise<ProblemInstance>
+  abstract read(trainingRatio: number): Promise<ProblemInstance>;
 }
