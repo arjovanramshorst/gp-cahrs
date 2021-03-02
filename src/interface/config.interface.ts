@@ -11,6 +11,7 @@ export interface ConfigInterface {
   makeEvaluator: (instance: ProblemInstance) => Evaluator;
   outputFilename: string;
   interleavedTrainingSize: number;
+  overfitting: "normal" | "interleaved"
 }
 
 export function printConfig(config: ConfigInterface) {

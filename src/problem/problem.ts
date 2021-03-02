@@ -6,5 +6,5 @@ export abstract class Problem {
 
   abstract defaultConfig: RootNodeConfig;
 
-  abstract read(trainingRatio: number): Promise<ProblemInstance>;
+  abstract read(interleaveSize: number, interleaveSeed?: number): Promise<ProblemInstance>;
 }

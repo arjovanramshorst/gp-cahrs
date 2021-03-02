@@ -12,4 +12,5 @@ export const defaultConfig: ConfigInterface = {
   makeEvaluator: (instance: ProblemInstance) => new RankEvaluator(instance),
   outputFilename: `Run_${new Date().toISOString()}`,
   interleavedTrainingSize: 0.1,
+  overfitting: "interleaved",
 };

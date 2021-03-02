@@ -1,3 +1,4 @@
+import { generateMulberrySeed } from "./utils/random.utils.ts";
 import { WorkerPool } from "./threadpool.ts";
 import { Generation } from "./generation.ts";
 import { defaultConfig } from "./default.config.ts";
@@ -20,33 +21,43 @@ const main = async (config: ConfigInterface = defaultConfig) => {
   // Read data
   const problem = config.makeProblem();
 
-  // Preprocess data
+  // Preprocess data, used for generating the initial generation of RS's.
   console.log(`Reading ${problem.name}...`);
   const instance = await problem.read(1);
   console.log(`...Done!`);
 
-  // let evaluator = config.makeEvaluator(instance);
-  // const reproducer = config.makeReproduce(instance);
-
-  console.log("Generating initial generation...");
   // Generate initial generation
+  console.log("Generating initial generation...");
   let generation = Generation
     .initialGeneration(config, instance);
 
   while (!generation.isFinished()) {
     getRenderer().setActive(generation);
 
-    await generation.evaluate(pool);
-    // instance = await problem.read(config.interleavedTrainingSize);
-    // evaluator = config.makeEvaluator(instance);
+    switch (config.overfitting) {
+      case "interleaved":
+        await generation.evaluate(
+          pool,
+          // Take random 10% of test set every other generation
+          generation.gen % 2 === 0 ? 1 : 0.1,
+          generateMulberrySeed(),
+        );
+        break;
+      case "normal":
+        await generation.evaluate(
+          pool,
+          1,
+          generateMulberrySeed(),
+        );
+        break;
+      default:
+        throw Error(
+          `Invalid config value for overfitting: ${config.overfitting}`,
+        );
+    }
+
     generation = generation.nextGeneration(instance);
   }
-
-  const best = generation.best();
-
-  console.log(`Score of best found RS: ${best.score}`);
-
-  // console.log(output)
 };
 
 await main();

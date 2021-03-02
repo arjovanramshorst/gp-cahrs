@@ -1,13 +1,11 @@
-import { WorkerRequest } from "./worker.ts";
 import { WorkerPool } from "./threadpool.ts";
 import { Recommender } from "./recommender.ts";
 import { ProblemInstance } from "./interface/problem.interface.ts";
 import { ConfigInterface, printConfig } from "./interface/config.interface.ts";
-import { Evaluator, Result } from "./evaluate/evaluator.ts";
+import { Result } from "./evaluate/evaluator.ts";
 import { RootNodeConfig } from "./nodes/root.node.ts";
 import { NodeConfig } from "./nodes/node.ts";
 import { CombineNodeConfig } from "./nodes/combine.node.ts";
-import { getRenderer } from "./renderer.ts";
 
 export interface EvaluatedRecommender {
   score: number;
@@ -22,12 +20,11 @@ export class Generation {
   private constructor(
     private readonly config: ConfigInterface,
     private readonly recommenders: Recommender[],
-    private readonly gen: number = 0,
+    readonly gen: number = 0,
   ) {
   }
 
   public nextGeneration(instance: ProblemInstance): Generation {
-    // TODO: make sure prepare is called for every generated node here?
     const offspring = this.config.makeReproduce(instance).produceOffspring(
       this.evaluated,
     );
@@ -35,7 +32,11 @@ export class Generation {
     return new Generation(this.config, offspring, this.gen + 1);
   }
 
-  public async evaluate(workerPool: WorkerPool) {
+  public async evaluate(
+    workerPool: WorkerPool,
+    interleaveSize: number,
+    interleaveSeed: number,
+  ) {
     const results = await Promise.all(
       this.recommenders
         .map((it) => it.getConfig().stringify())
@@ -44,6 +45,8 @@ export class Generation {
             generation: this.gen,
             idx: idx,
             recommenderHash: config,
+            interleaveSize,
+            interleaveSeed,
           })
         ),
     );
@@ -62,10 +65,6 @@ export class Generation {
     });
 
     this.evaluated.sort((a, b) => b.score - a.score);
-    // this.state = `Validating best RS from generation: ${this.gen}`;
-    // const best = this.evaluated[0].recommender.clone();
-    // const evaluateBest = evaluator.evaluate(best.prepare(), true);
-    // this.writeResult(best, this.gen, 0, evaluateBest, true);
 
     return this;
   }

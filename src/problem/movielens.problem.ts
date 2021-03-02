@@ -1,3 +1,4 @@
+import { mulberry32, generateMulberrySeed } from "../utils/random.utils.ts";
 import { PropertyType } from "../interface/entity.interface.ts";
 import { readCsv } from "../utils/csv.utils.ts";
 import { groupBy, toMap, toMatrix } from "../utils/functional.utils.ts";
@@ -20,7 +21,10 @@ export class MovielensProblem extends Problem {
     property: "rating",
   });
 
-  async read(trainingRatio = 1) {
+  async read(
+    interleaveSize = 1,
+    interleaveSeed: number = generateMulberrySeed(),
+  ) {
     const movies = await this.readMovies();
     const ratings = await this.readRatings();
     const tags = await this.readTags();
@@ -31,9 +35,11 @@ export class MovielensProblem extends Problem {
 
     const grouped = ratings.reduce(groupBy((it) => it.fromId), {});
 
-    const selectedIds = trainingRatio === 1
+    const PRNG = mulberry32(interleaveSeed);
+
+    const selectedIds = interleaveSize === 1
       ? Object.keys(grouped).reduce(toMap((it) => it, (it) => it), {})
-      : Object.keys(grouped).filter((it) => Math.random() < trainingRatio)
+      : Object.keys(grouped).filter((it) => PRNG() < interleaveSize)
         .reduce(toMap((it) => it, (it) => it), {});
 
     Object.keys(grouped).forEach((fromRef) => {

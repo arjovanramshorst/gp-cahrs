@@ -9,6 +9,8 @@ export interface WorkerRequest {
   idx: number;
   worker: number;
   recommenderHash: JsonConfig;
+  interleaveSize: number;
+  interleaveSeed?: number;
 }
 
 export interface WorkerResponse {
@@ -17,6 +19,7 @@ export interface WorkerResponse {
   recommenderHash: JsonConfig;
   result: Result;
   worker: number;
+  interleaveSize: number;
 }
 
 // @ts-ignore workers work anyway
@@ -41,6 +44,7 @@ self.onmessage = async ({ data }: { data: WorkerRequest }) => {
     recommenderHash: data.recommenderHash,
     result: result,
     worker: data.worker,
+    interleaveSize: data.interleaveSize,
   });
 
   self.close();
