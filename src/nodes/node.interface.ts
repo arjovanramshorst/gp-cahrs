@@ -44,3 +44,12 @@ export interface Generateable<G> {
 export type WithGenerated<T extends Generateable<T["generated"]>> = T & {
   generated: NonNullable<T["generated"]>;
 };
+
+export interface NodeOutput {
+  fromType: string;
+  toType: string;
+}
+
+export interface InternalNodeConfig {
+  output: NodeOutput
+}

@@ -9,14 +9,14 @@ import { EntityId } from "../interface/entity.interface.ts";
 import { CFNodeConfig } from "./cf.node.ts";
 import { PropertyNodeConfig } from "./property.node.ts";
 import { Matrix, SparseMatrix, VectorMatrix } from "../utils/matrix.utils.ts";
-import { Generateable, WithGenerated } from "./node.interface.ts";
+import {Generateable, InternalNodeConfig, WithGenerated} from "./node.interface.ts";
 
 interface Generate {
   N: number;
   THRESHOLD: number;
 }
 
-interface ConfigInterface extends Generateable<Generate> {
+interface ConfigInterface extends Generateable<Generate>, InternalNodeConfig {
   interactionType: string;
   fromEntityType: string;
   toEntityType: string;
@@ -49,6 +49,10 @@ export class NearestNeighbourConfig
     return [
       ...(this.config.inverted ? [] : [
         new CFNodeConfig({
+          output: {
+            fromType: this.config.fromEntityType,
+            toType: this.config.fromEntityType
+          },
           entityType: this.config.fromEntityType,
           interactionType: this.config.interactionType,
           comparisonKey: this.config.compareValueKey,
@@ -65,6 +69,8 @@ export class NearestNeighbourConfig
         )),
     ];
   }
+
+
 
   protected processorFactory() {
     return new NearestNeighbourProcessor(

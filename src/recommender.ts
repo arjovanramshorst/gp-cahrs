@@ -51,6 +51,10 @@ export class Recommender {
     return this.config;
   }
 
+  public crossover(other: Recommender) {
+    this.getConfig().crossover(other.getConfig(), NodeFactory)
+  }
+
   public clone() {
     const clone = new Recommender(this.problemInstance);
     const copiedConfig = NodeConfig.parse(

@@ -14,8 +14,9 @@ import ARRAY_COMPARISON from "./properties/array.property.ts";
 import { compare, ComparisonType } from "./properties/property.ts";
 import { getRenderer } from "../renderer.ts";
 import { DenseMatrix, Matrix } from "../utils/matrix.utils.ts";
+import {InternalNodeConfig} from "./node.interface.ts";
 
-interface ConfigInterface {
+interface ConfigInterface extends InternalNodeConfig {
   comparisonType: ComparisonType;
 
   fromEntityType: string;
@@ -62,11 +63,15 @@ export class PropertyNodeConfig extends NodeConfig<PropertyNodeProcessor> {
             .forEach((comparisonType) => {
               res.push(
                 new PropertyNodeConfig({
+                  output: {
+                    fromType: fromEntities.type,
+                    toType: toEntities?.type ?? fromEntities.type,
+                  },
                   comparisonType,
                   fromKey,
                   toKey,
                   fromEntityType: fromEntities.type,
-                  toEntityType: toEntities?.type ?? fromEntities.type,
+                  toEntityType: toEntities?.type ?? fromEntities.type, // Remove and replace with above
                 }),
               );
             });

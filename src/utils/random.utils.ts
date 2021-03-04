@@ -1,8 +1,9 @@
 /**
  * @param from Array from which to select a random item
  */
-export const pick = (...from: any[]) =>
-  from[Math.floor(Math.random() * from.length)];
+export const pick = <T extends any>(k: number = 1) =>
+  (...from: T[]): T[] =>
+    [...new Array(k)].map((_) => from[Math.floor(Math.random() * from.length)]);
 
 /**
  * Generates a random seed to be used by the 32 bit mulberry random function

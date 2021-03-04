@@ -9,13 +9,13 @@ import { SimilarityScores } from "../interface/dto.interface.ts";
 import { getRenderer } from "../renderer.ts";
 import { VectorMatrix } from "../utils/matrix.utils.ts";
 import { EntityId } from "../interface/entity.interface.ts";
-import { Generateable, WithGenerated } from "./node.interface.ts";
+import {Generateable, InternalNodeConfig, WithGenerated} from "./node.interface.ts";
 
 interface Generate {
   seed: number;
 }
 
-interface ConfigInterface extends Generateable<Generate> {
+interface ConfigInterface extends Generateable<Generate>, InternalNodeConfig {
   fromEntityType: string;
   toEntityType: string;
 }

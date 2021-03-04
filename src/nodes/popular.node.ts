@@ -6,10 +6,11 @@ import {
 } from "../interface/processor.interface.ts";
 import { ProblemInstance } from "../interface/problem.interface.ts";
 import { SimilarityScores } from "../interface/dto.interface.ts";
-import { SparseMatrix, VectorMatrix } from "../utils/matrix.utils.ts";
+import { VectorMatrix } from "../utils/matrix.utils.ts";
 import { EntityId } from "../interface/entity.interface.ts";
+import {InternalNodeConfig} from "./node.interface.ts";
 
-interface ConfigInterface {
+interface ConfigInterface extends InternalNodeConfig {
   interactionType: string;
   compareValueKey?: string;
 }

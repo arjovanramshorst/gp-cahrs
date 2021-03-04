@@ -1,3 +1,4 @@
+import { pick } from "./../utils/random.utils.ts";
 import { Reproduce } from "./reproduce.ts";
 import { combineInputs, EvaluatedRecommender } from "../generation.ts";
 import { Recommender } from "../recommender.ts";
@@ -9,45 +10,33 @@ import { RootNodeConfig } from "../nodes/root.node.ts";
 const MUTATION_CHANCE = 0.007; // 0.7%
 
 export class RandomReproduce extends Reproduce {
-  produceOffspring(parents: EvaluatedRecommender[]): Recommender[] {
-    const totalScore = parents.reduce(sumBy((it) => it.score), 0);
-
-    const aggregatedParents = parents.reduce((agg, it) => [
-      ...agg,
-      {
-        score: (agg.length > 0 ? agg[agg.length - 1].score : 0) + it.score,
-        recommender: it.recommender,
-      },
-    ], [] as EvaluatedRecommender[]);
-
+  produceOffspring(generation: EvaluatedRecommender[]): Recommender[] {
     const offspring = [];
-    while (offspring.length < parents.length) {
-      let foundIndex;
+    while (offspring.length < generation.length) {
 
-      if (totalScore > 0) {
-        const index = Math.random() * totalScore;
-        foundIndex = aggregatedParents.findIndex((it) => it.score > index);
-      } else {
-        // Handles the case when an entire generation is f*d
-        foundIndex = Math.floor(Math.random() * parents.length);
-      }
+      const [parent1, parent2] = this.tournamentSelection(generation)
+      const children = this.crossover(parent1, parent2)
+        .map(child => new Recommender(this.problemInstance)
+          .init(child.getConfig().mutate(this.problemInstance, combineInputs, MUTATION_CHANCE) as RootNodeConfig)
+        )
 
-      const childConfigObject = parents[foundIndex].recommender.getConfig()
-        .stringify();
-
-      const newConfig = NodeConfig.parse(childConfigObject, NodeFactory)
-        .mutate(
-          this.problemInstance,
-          combineInputs,
-          MUTATION_CHANCE,
-        ) as RootNodeConfig;
-
-      const child = new Recommender(this.problemInstance)
-        .init(newConfig);
-
-      offspring.push(child);
+      offspring.push(...children);
     }
 
     return offspring;
+  }
+
+  tournamentSelection(parents: EvaluatedRecommender[], k = 4) { // add K to config
+    const selected = pick<EvaluatedRecommender>(4)(...parents).sort((a, b) => b.score - a.score);
+
+    return [selected[0].recommender, selected[1].recommender]
+  }
+
+  crossover(parent1: Recommender, parent2: Recommender) {
+    const child1 = parent1.clone()
+    const child2 = parent2.clone()
+    child1.crossover(child2)
+
+    return [child1, child2]
   }
 }

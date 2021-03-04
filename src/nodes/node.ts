@@ -8,12 +8,12 @@ import { ProcessTreeNotInitializedError } from "../errors.ts";
 import { powerset } from "../utils/functional.utils.ts";
 import { getRenderer } from "../renderer.ts";
 import { blue, gray, green } from "../deps.ts";
-import { JsonConfig } from "./node.interface.ts";
+import {NodeOutput, JsonConfig, InternalNodeConfig} from "./node.interface.ts";
 
 export abstract class NodeConfig<C extends NodeProcessor<any>> {
   protected abstract readonly configType: string;
 
-  protected abstract readonly config: any;
+  protected abstract readonly config: InternalNodeConfig;
 
   protected input: NodeConfig<any>[] = [];
 
@@ -70,7 +70,44 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
     return this;
   }
 
+  public getOutput() {
+    return this.config.output
+  };
+
   /**
+   * Returns true if this node can be replaced by the target node.
+   */
+  public canReplace(
+    config: NodeConfig<any>,
+  ) {
+    const output = this.getOutput()
+    const compare = config.getOutput()
+    return output.fromType === compare.fromType && output.toType === compare.toType
+   }
+
+   public getPotentialReplacements(
+       other: NodeConfig<any>,
+       factory: (type: string, config: InternalNodeConfig) => NodeConfig<any>,
+   ): (() => void)[] {
+    const potentials = []
+      for( let i = 0; i < this.input.length; i++) {
+        for (let j = 0; j < other.input.length; j++) {
+          if (this.input[i].canReplace(other.input[j])) {
+
+            potentials.push(() => {
+              const thisCopy = NodeConfig.parse(this.input[i].stringify(), factory)
+              const otherCopy = NodeConfig.parse(other.input[j].stringify(), factory)
+              this.input[i] = otherCopy
+              other.input[j] = thisCopy
+            })
+          }
+        }
+      }
+
+      return potentials
+   }
+
+   /**
      * Recursively prepares the input nodes, and finally the current one.
      *
      * @param problemInstance
@@ -99,6 +136,14 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
     return this.processor.process(input, params);
   }
 
+  protected asArray(): NodeConfig<any>[] {
+    const recursiveInput = this.input
+        .map(it => it.asArray())
+        .flat()
+
+    return [...this.input, ...recursiveInput]
+  }
+
   public print(indent: number = 0): void {
     const stateString = `${this.state}   `;
     console.log(
@@ -111,7 +156,7 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
 
   public static parse(
     config: JsonConfig,
-    factory: (type: string, config: any) => NodeConfig<any>,
+    factory: (type: string, config: InternalNodeConfig) => NodeConfig<any>,
   ): NodeConfig<any> {
     const node = factory(config.type, config.config);
     const input = config.input.map((input) => NodeConfig.parse(input, factory));

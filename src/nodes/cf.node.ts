@@ -4,17 +4,17 @@ import {
   ProcessParams,
 } from "../interface/processor.interface.ts";
 import { ProblemInstance } from "../interface/problem.interface.ts";
-import { CFMatrix, SimilarityScores } from "../interface/dto.interface.ts";
+import { SimilarityScores } from "../interface/dto.interface.ts";
 import { EntityId } from "../interface/entity.interface.ts";
 import { getRenderer } from "../renderer.ts";
 import { SparseMatrix } from "../utils/matrix.utils.ts";
-import { Generateable, WithGenerated } from "./node.interface.ts";
+import {Generateable, InternalNodeConfig, WithGenerated} from "./node.interface.ts";
 
 interface Generate {
   MIN_SHARED_VALUES: number;
 }
 
-interface ConfigInterface extends Generateable<Generate> {
+interface ConfigInterface extends Generateable<Generate>, InternalNodeConfig {
   entityType: string;
   interactionType: string;
   comparisonKey?: string;
@@ -87,7 +87,7 @@ export class CFNodeProcessor
     );
   }
 
-  process(input: CFMatrix[], params: ProcessParams): SimilarityScores {
+  process(input: SimilarityScores[], params: ProcessParams): SimilarityScores {
     if (input.length !== 0) {
       throw Error("invalid input length");
     }

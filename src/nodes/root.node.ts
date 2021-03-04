@@ -13,8 +13,10 @@ import {
 import { NearestNeighbourConfig } from "./nearest-neighbour.node.ts";
 import { PopularNodeConfig } from "./popular.node.ts";
 import { PropertyNodeConfig } from "./property.node.ts";
+import {InternalNodeConfig, NodeOutput} from "./node.interface.ts";
+import {pick} from "../utils/random.utils.ts";
 
-interface ConfigInterface {
+interface ConfigInterface extends InternalNodeConfig {
   interactionType: string;
   type: "exist" | "maximize" | "minimize";
   property?: string; // keyof?
@@ -36,6 +38,10 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
       problemInstance.interactionMap[this.config.interactionType].toType;
     return [
       new NearestNeighbourConfig({
+        output: {
+          fromType,
+          toType,
+        },
         interactionType: this.config.interactionType,
         toEntityType: toType,
         fromEntityType: fromType,
@@ -43,6 +49,10 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
         inverted: false,
       }),
       new NearestNeighbourConfig({
+        output: {
+          fromType,
+          toType,
+        },
         interactionType: this.config.interactionType,
         toEntityType: toType,
         fromEntityType: fromType,
@@ -50,6 +60,10 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
         inverted: true,
       }),
       new PopularNodeConfig({
+        output: {
+          fromType,
+          toType,
+        },
         interactionType: this.config.interactionType,
       }),
       ...PropertyNodeConfig.PotentialConfigs(
@@ -57,6 +71,27 @@ export class RootNodeConfig extends NodeConfig<RootNodeProcessor> {
         problemInstance.entityMap[toType],
       ),
     ];
+  }
+
+  public crossover(
+    other: RootNodeConfig,
+    factory: (type: string, config: InternalNodeConfig) => NodeConfig<any>,
+  ) {
+    const thisConfigs = this.asArray()
+    const otherConfigs = other.asArray()
+    const potentialReplacements: (() => void)[] = []
+
+    for (let i = 0; i < thisConfigs.length; i++) {
+      for (let j = 0; j < otherConfigs.length; j++) {
+        thisConfigs[i].getPotentialReplacements(otherConfigs[j], factory)
+            .forEach(replacementFunction => potentialReplacements.push(replacementFunction))
+      }
+    }
+
+    if (potentialReplacements.length > 0) {
+      const actualReplacement = pick<() => void>(1)(...potentialReplacements)[0]
+      actualReplacement()
+    }
   }
 
   protected processorFactory(): RootNodeProcessor {

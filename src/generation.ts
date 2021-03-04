@@ -154,6 +154,7 @@ export const combineInputs = (input: NodeConfig<any>[]) => {
   const config = new CombineNodeConfig({
     type: "Similarity",
     entityType: "any",
+    output: input[0].getOutput()
   });
   config.setCombineInput(input);
   return config;

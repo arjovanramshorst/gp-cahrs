@@ -5,7 +5,7 @@ import {
 } from "../interface/processor.interface.ts";
 import { ProblemInstance } from "../interface/problem.interface.ts";
 import { SimilarityScores } from "../interface/dto.interface.ts";
-import { Generateable, WithGenerated } from "./node.interface.ts";
+import {Generateable, InternalNodeConfig, WithGenerated} from "./node.interface.ts";
 import { pick } from "../utils/random.utils.ts";
 import { CombinedMatrix } from "../utils/matrix.utils.ts";
 
@@ -13,7 +13,7 @@ interface Generate {
   strategy: "avg" | "max" | "min";
 }
 
-interface ConfigInterface extends Generateable<Generate> {
+interface ConfigInterface extends Generateable<Generate>, InternalNodeConfig {
   type: "Similarity"; // | "CFMatrix"
   entityType: string;
 }
@@ -27,7 +27,7 @@ export class CombineNodeConfig extends NodeConfig<CombineNodeProcessor> {
     super();
     if (!this.config.generated) {
       this.config.generated = {
-        strategy: pick("avg", "max", "min"),
+        strategy: pick<Generate["strategy"]>()("avg", "max", "min")[0],
       };
     }
   }
