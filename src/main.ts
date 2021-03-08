@@ -5,7 +5,7 @@ import { defaultConfig } from "./default.config.ts";
 import { ConfigInterface } from "./interface/config.interface.ts";
 import { getRenderer } from "./renderer.ts";
 
-const RUNNERS = 4;
+const RUNNERS = 2;
 
 const main = async (config: ConfigInterface = defaultConfig) => {
   if (Deno.args.length > 0) {

@@ -28,7 +28,7 @@ self.onmessage = async ({ data }: { data: WorkerRequest }) => {
   console.log("Worker received message");
   const config = defaultConfig;
   const problem = config.makeProblem();
-  const instance = await problem.read(1);
+  const instance = await problem.read(data.interleaveSize, data.interleaveSeed);
   const evaluator = config.makeEvaluator(instance);
   const recommender = Recommender.fromConfigHash(
     instance,

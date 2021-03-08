@@ -28,6 +28,6 @@ then
   echo "Evaluation specific version"
   deno run --allow-read --allow-write --v8-flags=--max-old-space-size=$OLD_SPACE_SIZE,--initial-old-space-size=$OLD_SPACE_SIZE test.ts $2
 else
-  deno run --allow-read --allow-write --unstable --v8-flags=--max-old-space-size=16384 main.ts $1
+  deno run --allow-read --allow-write --unstable --v8-flags=--max-old-space-size=32000 main.ts $1
 fi
 #,--max-semi-space-size=$SEMI_SPACE_SIZE,--min-semi-space-size=$SEMI_SPACE_SIZE

@@ -6,7 +6,7 @@ import { MovielensProblem } from "./problem/movielens.problem.ts";
 
 export const defaultConfig: ConfigInterface = {
   maxGeneration: 30,
-  generationSize: 2,
+  generationSize: 20,
   makeProblem: () => new MovielensProblem(),
   makeReproduce: (instance: ProblemInstance) => new RandomReproduce(instance),
   makeEvaluator: (instance: ProblemInstance) => new RankEvaluator(instance),
