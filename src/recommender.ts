@@ -1,6 +1,6 @@
 import { ProcessTreeNotInitializedError } from "./errors.ts";
 import { EntityId } from "./interface/entity.interface.ts";
-import { ProblemInstance } from "./interface/problem.interface.ts";
+import {ProblemInstance, ProblemInstanceLight} from "./interface/problem.interface.ts";
 import { RootNodeConfig } from "./nodes/root.node.ts";
 import { Recommendations } from "./interface/dto.interface.ts";
 import { NodeConfig } from "./nodes/node.ts";
@@ -9,7 +9,7 @@ import { JsonConfig, NodeFactory } from "./nodes/node.interface.ts";
 export class Recommender {
   private state = "        ";
   constructor(
-    private readonly problemInstance: ProblemInstance,
+    private readonly problemInstance: ProblemInstanceLight,
   ) {
   }
 
@@ -23,12 +23,12 @@ export class Recommender {
     return this;
   }
 
-  public prepare() {
+  public prepare(problemInstance: ProblemInstance) {
     if (!this.config) {
       throw Error("Not yet initialized");
     }
     this.state = "PREPARE ";
-    this.config.prepare(this.problemInstance);
+    this.config.prepare(problemInstance);
 
     return this;
   }

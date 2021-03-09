@@ -35,7 +35,7 @@ self.onmessage = async ({ data }: { data: WorkerRequest }) => {
     data.recommenderHash,
   );
 
-  recommender.prepare();
+  recommender.prepare(instance);
   const result = evaluator.evaluate(recommender, false);
 
   sendResponse({

@@ -143,6 +143,46 @@ export class MovielensProblem extends Problem {
     };
   }
 
+  readLight() {
+    return {
+      defaultConfig: this.defaultConfig,
+      interactionMap: {
+        rating: {
+          fromType: "user",
+          toType: "movie",
+          type: "rating",
+          properties: {
+            rating: PropertyType.number,
+            timestamp: PropertyType.timestamp,
+          },
+        },
+        tag: {
+          fromType: "user",
+          toType: "movie",
+          type: "tag",
+          properties: {
+            tag: PropertyType.string,
+            timestamp: PropertyType.timestamp,
+          },
+        },
+      },
+      entityMap: {
+        user: {
+          type: "user",
+          properties: {},
+        },
+        movie: {
+          type: "movie",
+          properties: {
+            title: PropertyType.string,
+            genres: PropertyType.array,
+            tags: PropertyType.array,
+          },
+        },
+      },
+    };
+  }
+
   async readRatings() {
     return (await readCsv("ml-latest-small/ratings.csv"))
       .slice(1)

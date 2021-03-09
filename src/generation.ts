@@ -1,6 +1,6 @@
 import { WorkerPool } from "./threadpool.ts";
 import { Recommender } from "./recommender.ts";
-import { ProblemInstance } from "./interface/problem.interface.ts";
+import {ProblemInstance, ProblemInstanceLight} from "./interface/problem.interface.ts";
 import { ConfigInterface, printConfig } from "./interface/config.interface.ts";
 import { Result } from "./evaluate/evaluator.ts";
 import { RootNodeConfig } from "./nodes/root.node.ts";
@@ -24,7 +24,7 @@ export class Generation {
   ) {
   }
 
-  public nextGeneration(instance: ProblemInstance): Generation {
+  public nextGeneration(instance: ProblemInstanceLight): Generation {
     const offspring = this.config.makeReproduce(instance).produceOffspring(
       this.evaluated,
     );
@@ -50,7 +50,6 @@ export class Generation {
           })
         ),
     );
-
     results.forEach((res) => {
       this.writeResult(
         this.recommenders[res.idx],
@@ -80,7 +79,7 @@ export class Generation {
 
   public static initialGeneration(
     config: ConfigInterface,
-    problem: ProblemInstance,
+    problem: ProblemInstanceLight,
   ) {
     const rs = [...Array(config.generationSize)]
       .map((index) => Generation.generateRandomRS(problem));
@@ -109,7 +108,7 @@ export class Generation {
     }
   }
 
-  private static generateRandomRS(problem: ProblemInstance) {
+  private static generateRandomRS(problem: ProblemInstanceLight) {
     return new Recommender(problem)
       .init(
         RootNodeConfig
@@ -154,7 +153,7 @@ export const combineInputs = (input: NodeConfig<any>[]) => {
   const config = new CombineNodeConfig({
     type: "Similarity",
     entityType: "any",
-    output: input[0].getOutput()
+    output: input[0].getOutput(),
   });
   config.setCombineInput(input);
   return config;

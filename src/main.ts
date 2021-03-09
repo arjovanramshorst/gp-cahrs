@@ -5,7 +5,7 @@ import { defaultConfig } from "./default.config.ts";
 import { ConfigInterface } from "./interface/config.interface.ts";
 import { getRenderer } from "./renderer.ts";
 
-const RUNNERS = 2;
+const RUNNERS = 4;
 
 const main = async (config: ConfigInterface = defaultConfig) => {
   if (Deno.args.length > 0) {
@@ -23,7 +23,7 @@ const main = async (config: ConfigInterface = defaultConfig) => {
 
   // Preprocess data, used for generating the initial generation of RS's.
   console.log(`Reading ${problem.name}...`);
-  const instance = await problem.read(1);
+  const instance = await problem.readLight();
   console.log(`...Done!`);
 
   // Generate initial generation

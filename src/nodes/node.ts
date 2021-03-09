@@ -1,4 +1,4 @@
-import { ProblemInstance } from "../interface/problem.interface.ts";
+import {ProblemInstance, ProblemInstanceLight} from "../interface/problem.interface.ts";
 import {
   NodeProcessor,
   ProcessNodeDTO,
@@ -22,7 +22,7 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
   private state: string = STATE.PENDING;
 
   protected abstract generateInput(
-    problemInstance: ProblemInstance,
+    problemInstance: ProblemInstanceLight,
   ): NodeConfig<any>[];
 
   /**
@@ -33,7 +33,7 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
      * @param combine is necessary to remove circular dependencies
      */
   public generate(
-    problemInstance: ProblemInstance,
+    problemInstance: ProblemInstanceLight,
     combine: (input: NodeConfig<any>[]) => NodeConfig<any>,
   ) {
     const input = NodeConfig.selectRandom(this.generateInput(problemInstance));
@@ -52,7 +52,7 @@ export abstract class NodeConfig<C extends NodeProcessor<any>> {
      * Handles mutation for this configuration
      */
   public mutate(
-    problemInstance: ProblemInstance,
+    problemInstance: ProblemInstanceLight,
     combine: (input: NodeConfig<any>[]) => NodeConfig<any>,
     mutationChance: number,
   ) {
