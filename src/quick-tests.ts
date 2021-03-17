@@ -111,7 +111,7 @@ interface ConfigTerminal {
 
 const terminals = ["fill"]
 
-const isFunction = (config: Config) => !terminals.includes(config.type)
+const isFunction = (config: Config) => terminals.indexOf(config.type) === -1
 
 export const config: Config = {
   type: "sum",

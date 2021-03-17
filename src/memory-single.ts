@@ -1,3 +1,3 @@
-import {calcRecursive, config} from "./quick-tests.ts";
+import {calcRecursive, config} from "./quick-tests";
 
 calcRecursive(config)
