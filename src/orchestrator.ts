@@ -1,51 +1,14 @@
-import { WorkerPool } from "./threadpool.ts";
-import { JsonConfig } from "./nodes/node.interface.ts";
-import { defaultConfig } from "./default.config.ts";
-import { WorkerRequest, WorkerResponse } from "./worker.ts";
-// For each individual in a generation
-// as long as a configuration exists
-// every time a new worker is available
-
-const RUNNERS = 4;
-
-const config = {
-  type: "RootNodeConfig",
-  config: {
-    interactionType: "rating",
-    type: "maximize",
-    property: "rating",
-  },
-  input: [
+const testMultiThread = () => {
+  const worker = new Worker(
+    new URL("./memory-worker.ts", import.meta.url).href,
     {
-      type: "PopularNodeConfig",
-      config: {
-        interactionType: "rating",
-        compareValueKey: "rating",
-      },
-      input: [],
+      type: "module",
     },
-  ],
-};
-
-const runConfigs = async (configs: JsonConfig[]) => {
-  const pool = new WorkerPool(RUNNERS);
-  pool.init();
-  const results = configs.map((it, idx) => ({
-    idx: idx,
-    generation: 0,
-    recommenderHash: it,
-  })).map((it) => pool.addWorkerTask(it));
-
-  return await Promise.all(results);
-};
-
-
-const main = () => {
-  // Generate initial generation
-  
-  let generation = Generation.initialGeneration(config, instance);
-
-    while ()
-  // Evaluate
-  // Add evaluated
+  );
+  worker.postMessage({});
 }
+
+testMultiThread()
+testMultiThread()
+testMultiThread()
+testMultiThread()
