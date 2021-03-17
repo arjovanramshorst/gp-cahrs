@@ -1,21 +1,5 @@
-import {CombinedMatrix, DenseMatrix} from "./utils/matrix.utils.ts";
 
 const SIZE = 100000;
-
-const testDenseMatrix = () => {
-  const refs = [...new Array(SIZE).keys()];
-  const a = new DenseMatrix<number>(refs, refs);
-  const b = new DenseMatrix<number>(refs, refs);
-
-  for (let i = 0; i < SIZE; i++) {
-    for (let j = 0; j < SIZE; j++) {
-      a.setByIndex(i, j, 1)
-      b.setByIndex(i, j, 2)
-    }
-  }
-  const res = CombinedMatrix.combine([a, b], (arr) => arr[0] + arr[1])
-  console.log(res)
-};
 
 var matrixInMemory = 0
 
@@ -228,3 +212,4 @@ const measure = (times: number, fn: () => void) => {
 // measure(1, () => calcRecursive(config));
 
 // measure(1, () => testArraySum());
+
