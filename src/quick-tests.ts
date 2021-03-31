@@ -105,7 +105,7 @@ interface ConfigFunction {
 }
 
 interface ConfigTerminal {
-  type: "sum" | "fill" | "multiply"
+  type: "fill"
   value: number
 }
 

@@ -1,0 +1,9 @@
+{
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "lib": ["dom", "ES2019"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2017"
+  }
+}
