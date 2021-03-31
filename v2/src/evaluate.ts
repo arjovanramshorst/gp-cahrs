@@ -1,7 +1,7 @@
 import { ProblemInstance } from "./interface/problem.interface";
-import { calcFunction, isFunction } from "./functions/function";
-import { FunctionConfigs, PossibleConfigs } from "./interface/config.interface";
-import { calcTerminal, isTerminal } from "./terminals/terminal";
+import { calcFunction } from "./functions/function";
+import { calcTerminal } from "./terminals/terminal";
+import {ConfigTree} from "./tree";
 
 let COUNT = 0
 
@@ -14,22 +14,22 @@ export const subCount = () => {
 }
 
 export const calcRecursive = (
-  config: PossibleConfigs,
+  configFinger: ConfigTree,
   problemInstance: ProblemInstance,
   depth: number = 0,
 ) => {
-  print(depth, `Entered ${config.type}, config: ${config.config}`);
+  print(depth, `Entered ${configFinger.config.type}, config: ${configFinger.config}`);
   let input;
-  if (isFunction(config)) {
+  if (isFunction(configFinger)) {
     input = [];
 
-    (config as FunctionConfigs).input.forEach((inputConfig, idx) => {
+    configFinger.input.forEach((inputConfig, idx) => {
       if (isFunction(inputConfig)) {
         input[idx] = calcRecursive(inputConfig, problemInstance, depth + 1);
       }
     });
     // Only calculate terminals after functions are done (memory related reasons)
-    (config as FunctionConfigs).input.forEach((inputConfig, idx) => {
+    configFinger.input.forEach((inputConfig, idx) => {
       if (isTerminal(inputConfig)) {
         input[idx] = calcRecursive(inputConfig, problemInstance, depth + 1);
       }
@@ -37,24 +37,23 @@ export const calcRecursive = (
   }
   // Depth first, so first calculate functions
 
-  print(depth, `Calculating ${config.type}, config: ${config.config}`);
-  const res = calc(config, input, problemInstance);
-  print(depth, `Finished ${config.type}, config: ${config.config}`);
+  print(depth, `Calculating ${configFinger.config.type}, config: ${JSON.stringify(configFinger.config)}`);
+  const res = calc(configFinger, input, problemInstance);
+  print(depth, `Finished ${configFinger.config.type}`);
   return res;
 };
 
 
 const calc = (
-  config: PossibleConfigs,
+  config: ConfigTree,
   input: any,
   problemInstance: ProblemInstance,
 ) => {
   if (isFunction(config)) {
-    return calcFunction(config, input);
-  } else if (isTerminal(config)) {
-    return calcTerminal(config, problemInstance);
+    return calcFunction(config.config, input);
+  } else {
+    return calcTerminal(config.config, problemInstance);
   }
-  throw Error("invalid config");
 };
 
 const print = (depth: number, str: string) => {
@@ -62,3 +61,6 @@ const print = (depth: number, str: string) => {
 
   console.log(`${prefix}${str}`);
 };
+
+const isFunction = (config: ConfigTree) => config.input.length > 0
+const isTerminal = (config: ConfigTree) => !isFunction(config)

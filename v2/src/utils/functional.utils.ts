@@ -31,3 +31,8 @@ export const inputCombinations = (list: any[], amount: number) => {
   }
   throw Error("TODO: Turn inputCOmbinations in recursive function")
 };
+
+export const filterUndefined = (obj: any) => {
+  Object.keys(obj).forEach(key => obj[key] === undefined && delete obj[key])
+  return obj
+}

@@ -1,4 +1,5 @@
 import { CONFIG } from './default.config';
+import { calcRecursive } from './evaluate';
 import { Functions } from './functions/function';
 import { readMovieLens } from './problems/movielens.problem';
 import { getTerminals } from './terminals/terminal';
@@ -26,8 +27,12 @@ const main = async () => {
   console.log("\n\nGROW TREE:")
   console.log(JSON.stringify(treeGrowth, null, 2))
 
-  console.log("\n\FULL TREE::")
+  console.log("\n\nFULL TREE:")
   console.log(JSON.stringify(treeFull, null, 2))
+
+  const res = calcRecursive(treeGrowth, problem)
+  console.log("\nResult:")
+  console.log(res)
 }
 
 main()

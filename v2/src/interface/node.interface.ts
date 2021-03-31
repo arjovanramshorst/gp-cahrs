@@ -1,4 +1,5 @@
 import { ProblemInstance } from "./problem.interface";
+import {DTO} from "./dto.interface";
 
 export type NodeFunction<Config, Input, Output> = (
   config: Config,
@@ -12,5 +13,5 @@ export type NodeTerminal<Config, Output> = (
 
 export interface NodeImplementation {
   type: string;
-  createConfig?: () => any;
+  createConfig?: (output: DTO) => any;
 }

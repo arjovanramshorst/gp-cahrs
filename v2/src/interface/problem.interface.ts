@@ -1,7 +1,10 @@
 import { DTO } from "./dto.interface";
-import { Matrix, Vector } from "./util.interface";
+import { GPMatrix, Vector } from "./util.interface";
 
-export type ReadProblemFunction = () => Promise<ProblemInstance>;
+export type ReadProblemFunction = (
+  interleaveSize?: number,
+  interleaveSeed?: number
+) => Promise<ProblemInstance>;
 
 export interface ProblemInstance {
 
@@ -56,5 +59,5 @@ interface Interaction {
   fromEntityType: string;
   toEntityType: string;
 
-  interactions: Matrix<number>;
+  interactions: GPMatrix;
 }

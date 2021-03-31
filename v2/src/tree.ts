@@ -8,6 +8,16 @@ import { CONFIG } from "./default.config";
 
 type TreeTable = DTO[][];
 
+export interface ConfigTree {
+  config: NodeConfig;
+  output: DTO;
+  input: ConfigTree[];
+}
+
+export interface NodeConfig {
+  type: string;
+}
+
 export const generateTree = (
   outputDTO: DTO,
   treeTable: TreeTable,
@@ -16,22 +26,29 @@ export const generateTree = (
   maxDepth: number,
   grow: boolean = false
 ): ConfigTree => {
+  // Find terminals that possibly match OutputDTO
   const validTerminals = terminals.filter((it) =>
+
     findMatchingType(outputDTO, it.getOutput())
   );
+  // Find functions that possibly match OutputDTO
   const validFunctions = functions
     .map((it) => {
+      // Find all valid combinations of inputs possbile for this function
       const possibleInput = inputCombinations(
         treeTable[maxDepth - 1],
         it.inputSize
       )
+        // Make sure the types are matching for the output of this function given the random input combination
         .filter((input) => findMatchingType(outputDTO, it.getOutput(input)))
+        // Map to detailed input configuration to get the required output
         .map((input) => it.specifyInput(outputDTO, input));
       return {
         function: it,
         possibleInput,
       };
     })
+    // Filter functions that have no valid input configuration
     .filter((it) => it.possibleInput.length > 0);
 
   let selected: NodeImplementation;
@@ -53,7 +70,7 @@ export const generateTree = (
   }
   const config = {
     type: selected.type,
-    ...(selected.createConfig ? selected.createConfig() : {}),
+    ...(selected.createConfig ? selected.createConfig(outputDTO) : {}),
   };
 
   return {
@@ -65,15 +82,6 @@ export const generateTree = (
   };
 };
 
-interface ConfigTree {
-  config: Config;
-  output: DTO;
-  input: ConfigTree[];
-}
-
-interface Config {
-  type: string;
-}
 
 export const generateTreeTables = (
   terminals: TerminalImplementation[],

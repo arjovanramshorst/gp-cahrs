@@ -1,29 +1,19 @@
-import { ProblemInstance } from "./../interface/problem.interface";
+import { ProblemInstance } from "../interface/problem.interface";
 import {
-  fillMatrix,
   RandomMatrix,
   RandomScalar,
   RandomVector,
 } from "./fill.terminal";
 
-import { PossibleConfigs } from "./../interface/config.interface";
 import { DTO } from "../interface/dto.interface";
 import { getPropertyTerminals } from "./property.terminal";
 import { NodeImplementation } from "../interface/node.interface";
+import {NodeConfig} from "../tree";
 
-const terminals = ["fill"];
 
-export const isTerminal = (config: PossibleConfigs) => {
-  return terminals.indexOf(config.type) >= 0;
-};
-
-export const calcTerminal = (config, problemInstance) => {
-  switch (config.type) {
-    case "fill":
-      return fillMatrix(config.config, problemInstance);
-    default:
-      throw Error("invalid config");
-  }
+export const calcTerminal = (config: NodeConfig, problemInstance) => {
+  const Terminal = TerminalFactory(getTerminals(problemInstance), config.type)
+  return Terminal.evaluate(config, problemInstance)
 };
 
 export const TerminalFactory = (

@@ -1,22 +1,15 @@
-import { FunctionImplementation } from "./function";
+import {add, subtract, multiply} from "mathjs"
+import {FunctionImplementation} from "./function";
 import {
   DTO,
   DTOMatrix,
   DTOType,
   DTOVector,
   findMatchingType,
-} from "./../interface/dto.interface";
-import { Matrix } from "../interface/util.interface";
-import { NodeFunction } from "./../interface/node.interface";
-import { PropertyType } from "../interface/problem.interface";
+} from "../interface/dto.interface";
+import {PropertyType} from "../interface/problem.interface";
 
 export type MatrixMathConfig = {};
-
-type MatrixMathFunction = NodeFunction<
-  MatrixMathConfig,
-  [Matrix<number>, Matrix<number>],
-  Matrix<number>
->;
 
 export const mathMatrixOutput = (input: DTO[]) => {
   const [left, right] = input;
@@ -53,9 +46,9 @@ export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
         ...it,
         items: (output as DTOMatrix).columns,
         entity: (output as DTOMatrix).fromEntity,
-      };
+      } as DTO;
     }
-    return it
+    return it;
   });
 };
 
@@ -72,42 +65,35 @@ const invalidVector = (vector: DTO) => {
   return false;
 };
 
-export const MultiplyFunction: FunctionImplementation = {
+const MultiplyFunction: FunctionImplementation = {
   type: "multiply",
   inputSize: 2,
   getOutput: mathMatrixOutput,
-  evaluate: (input) => multiplyMatrix({}, [input[0], input[1]]),
+  evaluate: (config, input) => {
+    return multiply(input[0], input[1])
+  },
   specifyInput: mathMatrixInput,
 };
 
-export const SumFunction: FunctionImplementation = {
+const SumFunction: FunctionImplementation = {
   type: "sum",
   inputSize: 2,
   getOutput: mathMatrixOutput,
-  evaluate: (input) => sumMatrix({}, [input[0], input[1]]),
+  evaluate: (config, input) => {
+    return add(input[0], input[1])
+  },
   specifyInput: mathMatrixInput,
 };
 
-export const multiplyMatrix: MatrixMathFunction = (config, [a, b]) => {
-  // TODO: handle scalars
-  for (let i = 0; i < a.length; i++) {
-    for (let j = 0; j < a[0].length; j++) {
-      a[i][j] *= b[i][j];
-    }
-  }
-  // force GC?
-  b = [];
-  return a;
+const SubtractFunction: FunctionImplementation = {
+  type: "subtract",
+  inputSize: 2,
+  getOutput: mathMatrixOutput,
+  evaluate: (config, input) => {
+    return subtract(input[0], input[1])
+  },
+  specifyInput: mathMatrixInput,
 };
 
-export const sumMatrix: MatrixMathFunction = (config, [a, b]) => {
-  // TODO: handle scalars
-  for (let i = 0; i < a.length; i++) {
-    for (let j = 0; j < a[0].length; j++) {
-      a[i][j] += b[i][j];
-    }
-  }
-  // force GC?
-  b = [];
-  return a;
-};
+
+export const MathFunctions = [MultiplyFunction, SumFunction, SubtractFunction];

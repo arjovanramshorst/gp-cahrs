@@ -1,5 +1,5 @@
 import { DTOType } from '../interface/dto.interface';
-import { ProblemInstance } from './../interface/problem.interface';
+import { ProblemInstance } from '../interface/problem.interface';
 import { TerminalImplementation } from './terminal';
 
 export const getPropertyTerminals = (problemInstance: ProblemInstance): TerminalImplementation[] => {
@@ -16,12 +16,7 @@ export const getPropertyTerminals = (problemInstance: ProblemInstance): Terminal
           entity: entityKey,
           size: property.items.length
         }),
-        create: () => ({
-
-        }),
-        evaluate: () => {
-
-        }
+        evaluate: () => property.items
       }
     })
   })

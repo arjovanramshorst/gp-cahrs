@@ -1,4 +1,5 @@
+import {MathArray, Matrix} from "mathjs";
 
-export type Matrix<T> = T[][];
+export type GPMatrix = number[][] | MathArray | Matrix;
 
 export type Vector<T> = T[]

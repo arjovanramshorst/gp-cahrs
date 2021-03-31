@@ -1,15 +1,5 @@
 import { PropertyType } from "./problem.interface";
 
-export type NodeTerminal = {
-  name: string;
-  output: DTO;
-};
-
-export type NodeFunction = {
-  name: string;
-  output: DTO;
-  input: DTO[];
-};
 
 export enum DTOType {
   matrix = "matrix",
@@ -31,23 +21,34 @@ export const findMatchingType = (left?: DTO, right?: DTO): DTO | undefined => {
     return undefined;
   }
 
-  const match = {
+  let match = {
     dtoType: left.dtoType
   }
   // Check if for every field that is defined in left, if it is the same if defined in right, 
-  Object.keys(left).forEach((key) => {
-    if (key && right[key] !== left[key]) {
-      return undefined;
+  const matchLeft = Object.keys(left).every((key) => {
+    // If defined in right, it must be the same, else return undefined
+    if (right[key] && right[key] !== left[key]) {
+      return false
     } else {
       match[key] = left[key]
+      return true
     }
   });
-  Object.keys(right).forEach((key) => {
-    // Set keys missed by previous check
-    match[key] = right[key]
+  const matchRight = Object.keys(right).every((key) => {
+    // If defined in left, it must be the same, else return undefined
+    if (left[key] && right[key] !== left[key]) {
+      return false;
+    } else {
+      match[key] = right[key]
+      return true
+    }
   })
 
-  return match;
+  if (matchLeft && matchRight) {
+    return match
+  } else {
+    return undefined
+  }
 };
 
 export interface DTOMatrix extends DTO {

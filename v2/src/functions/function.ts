@@ -1,15 +1,11 @@
-import { MultiplyFunction, SumFunction } from "./math.function";
-import { PossibleConfigs } from "./../interface/config.interface";
+import { PropertyFunctions } from "./property.function";
+import { MathFunctions } from "./math.function";
 import { DTO } from "../interface/dto.interface";
 import { NodeImplementation } from "../interface/node.interface";
+import {NodeConfig} from "../tree";
 
-const functions = ["sum", "multiply"];
 
-export const isFunction = (config: PossibleConfigs) => {
-  return functions.indexOf(config.type) >= 0;
-};
-
-export const calcFunction = (config, input) => {
+export const calcFunction = (config: NodeConfig, input: any) => {
   const Function = FunctionFactory(config.type);
   return Function.evaluate(config, input);
 };
@@ -25,14 +21,14 @@ export const FunctionFactory = (type: string): FunctionImplementation => {
 };
 
 export const Functions: FunctionImplementation[] = [
-  SumFunction,
-  MultiplyFunction,
+  ...MathFunctions,
+  ...PropertyFunctions,
 ];
 
-export interface FunctionImplementation extends NodeImplementation{
+export interface FunctionImplementation extends NodeImplementation {
   type: string;
   inputSize: number;
   getOutput: (input: DTO[]) => DTO | undefined;
-  specifyInput: (output: DTO, input: DTO[]) => DTO[]
-  evaluate: (config: any, input: any) => any;
+  specifyInput: (output: DTO, input: DTO[]) => DTO[];
+  evaluate: (config: NodeConfig, input: any) => any;
 }

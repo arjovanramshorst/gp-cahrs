@@ -1,9 +1,9 @@
-const math = require("mathjs")
-import { generateMulberrySeed } from "./../utils/random.utils";
-import { PropertyType, ReadProblemFunction } from "./../interface/problem.interface";
+import {Matrix, zeros} from "mathjs"
+import { generateMulberrySeed } from "../utils/random.utils";
+import {PropertyType, ReadProblemFunction} from "../interface/problem.interface";
 import { readCsvFile } from "../utils/fs.utils";
 import { groupBy, toIdxMap } from "../utils/functional.utils";
-import { DTOType } from '../interface/dto.interface';
+import {DTOMatrix, DTOType} from '../interface/dto.interface';
 
 export const readMovieLens: ReadProblemFunction = async (
   interleaveSize: number = 1,
@@ -22,8 +22,8 @@ export const readMovieLens: ReadProblemFunction = async (
   const userRefs = Object.keys(groupedUsers)
   const userToIdxMap = userRefs.reduce(toIdxMap, {})
 
-  const ratingMatrix = math.zeros([userRefs.length, movieRefs.length], 'sparse')
-  const tagMatrix = math.zeros([userRefs.length, movieRefs.length], 'sparse')
+  const ratingMatrix: any = zeros([userRefs.length, movieRefs.length], 'sparse')
+  const tagMatrix: any = zeros([userRefs.length, movieRefs.length], 'sparse')
 
   ratings.forEach(rating => {
     ratingMatrix.set([userToIdxMap[rating.userId], movieToIdxMap[rating.movieId]], rating.rating)
@@ -42,7 +42,7 @@ export const readMovieLens: ReadProblemFunction = async (
       toEntity: "movie",
       rows: userRefs.length,
       columns: movieRefs.length
-    },
+    } as DTOMatrix,
 
     validate: [],
     filter: [],
@@ -75,7 +75,7 @@ export const readMovieLens: ReadProblemFunction = async (
             type: PropertyType.array,
             items: movieTags
           }
-        } 
+        }
       }
     },
     
