@@ -16,6 +16,9 @@ export const getPropertyTerminals = (problemInstance: ProblemInstance): Terminal
           entity: entityKey,
           size: property.items.length
         }),
+        create: () => ({
+
+        }),
         evaluate: () => {
 
         }

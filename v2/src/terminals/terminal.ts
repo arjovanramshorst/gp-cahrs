@@ -9,6 +9,7 @@ import {
 import { PossibleConfigs } from "./../interface/config.interface";
 import { DTO } from "../interface/dto.interface";
 import { getPropertyTerminals } from "./property.terminal";
+import { NodeImplementation } from "../interface/node.interface";
 
 const terminals = ["fill"];
 
@@ -25,7 +26,10 @@ export const calcTerminal = (config, problemInstance) => {
   }
 };
 
-export const TerminalFactory = (terminals: TerminalImplementation[], type: string): TerminalImplementation => {
+export const TerminalFactory = (
+  terminals: TerminalImplementation[],
+  type: string
+): TerminalImplementation => {
   const res = terminals.find((it) => it.type === type);
 
   if (!res) {
@@ -44,9 +48,18 @@ export const getTerminals = (
   ...getPropertyTerminals(problemInstance),
 ];
 
-export interface TerminalImplementation {
-  type: string;
+export interface TerminalImplementation extends NodeImplementation {
   getOutput: () => DTO | undefined;
   // TODO: problemInstance might not be necessary here?
   evaluate: (config: any, problemInstance: ProblemInstance) => any;
+}
+
+interface ConfigTree {
+  config: Config;
+  output: DTO;
+  input: ConfigTree[];
+}
+
+interface Config {
+  type: string;
 }

@@ -1,6 +1,7 @@
 import { FunctionImplementation } from "./function";
 import {
   DTO,
+  DTOMatrix,
   DTOType,
   DTOVector,
   findMatchingType,
@@ -20,7 +21,7 @@ type MatrixMathFunction = NodeFunction<
 export const mathMatrixOutput = (input: DTO[]) => {
   const [left, right] = input;
   if (invalidVector(left) || invalidVector(right)) {
-    return undefined
+    return undefined;
   }
 
   if (left.dtoType === DTOType.scalar) {
@@ -37,21 +38,46 @@ export const mathMatrixOutput = (input: DTO[]) => {
   return undefined;
 };
 
+export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
+  return input.map((it) => {
+    if (it.dtoType === DTOType.matrix) {
+      return output;
+    }
+    if (it.dtoType === DTOType.vector && output.dtoType === DTOType.vector) {
+      return output;
+    }
+
+    if (it.dtoType === DTOType.vector && output.dtoType === DTOType.matrix) {
+      // TODO: add possibility for column vectors as well?
+      return {
+        ...it,
+        items: (output as DTOMatrix).columns,
+        entity: (output as DTOMatrix).fromEntity,
+      };
+    }
+    return it
+  });
+};
+
 const invalidVector = (vector: DTO) => {
-  if (vector.dtoType === DTOType.vector && (vector as DTOVector).valueType !== PropertyType.number) {
+  if (
+    vector.dtoType === DTOType.vector &&
+    (vector as DTOVector).valueType !== PropertyType.number
+  ) {
     // Vector is invalid
-    return true
+    return true;
   }
 
   // Not a vector, or a number
-  return false
-}
+  return false;
+};
 
 export const MultiplyFunction: FunctionImplementation = {
   type: "multiply",
   inputSize: 2,
   getOutput: mathMatrixOutput,
   evaluate: (input) => multiplyMatrix({}, [input[0], input[1]]),
+  specifyInput: mathMatrixInput,
 };
 
 export const SumFunction: FunctionImplementation = {
@@ -59,7 +85,8 @@ export const SumFunction: FunctionImplementation = {
   inputSize: 2,
   getOutput: mathMatrixOutput,
   evaluate: (input) => sumMatrix({}, [input[0], input[1]]),
-}
+  specifyInput: mathMatrixInput,
+};
 
 export const multiplyMatrix: MatrixMathFunction = (config, [a, b]) => {
   // TODO: handle scalars

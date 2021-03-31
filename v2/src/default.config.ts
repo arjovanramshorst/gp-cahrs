@@ -1,0 +1,5 @@
+
+export const CONFIG = {
+  GROWTH_FUNCTION_FRACTION: 0.5,
+  MAX_DEPTH: 3
+}

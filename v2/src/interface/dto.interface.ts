@@ -21,7 +21,11 @@ export interface DTO {
   dtoType: DTOType,
 }
 
-export const findMatchingType = (left: DTO, right: DTO): DTO | undefined => {
+export const findMatchingType = (left?: DTO, right?: DTO): DTO | undefined => {
+  if (!left || !right) {
+    return undefined
+  }
+
   // Different types
   if (left.dtoType !== right.dtoType) {
     return undefined;

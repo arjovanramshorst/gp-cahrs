@@ -1,6 +1,7 @@
 import { MultiplyFunction, SumFunction } from "./math.function";
 import { PossibleConfigs } from "./../interface/config.interface";
 import { DTO } from "../interface/dto.interface";
+import { NodeImplementation } from "../interface/node.interface";
 
 const functions = ["sum", "multiply"];
 
@@ -28,9 +29,10 @@ export const Functions: FunctionImplementation[] = [
   MultiplyFunction,
 ];
 
-export interface FunctionImplementation {
+export interface FunctionImplementation extends NodeImplementation{
   type: string;
   inputSize: number;
   getOutput: (input: DTO[]) => DTO | undefined;
+  specifyInput: (output: DTO, input: DTO[]) => DTO[]
   evaluate: (config: any, input: any) => any;
 }
