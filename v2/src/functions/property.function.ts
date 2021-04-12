@@ -1,7 +1,8 @@
-import { DTO, DTOMatrix, DTOType, DTOVector } from "../interface/dto.interface";
-import { PropertyType } from "../interface/problem.interface";
-import { filterUndefined } from "../utils/functional.utils";
-import { FunctionImplementation } from "./function";
+import {DTO, DTOMatrix, DTOType, DTOVector} from "../interface/dto.interface";
+import {PropertyType} from "../interface/problem.interface";
+import {filterUndefined} from "../utils/functional.utils";
+import {FunctionImplementation} from "./function";
+import {setUnion, setIntersect} from "mathjs"
 
 const compareOutput = (
   type: PropertyType,
@@ -40,18 +41,29 @@ const compareInput = (
     {
       dtoType: DTOType.vector,
       entity: output.toEntity,
-      items: output.rows,
+      items: output.columns,
       valueType: right.valueType,
     },
   ].map((it) => filterUndefined(it));
 };
+
+const vectorLoop = (fn: (rowItem, colItem) => number) => (config, input: any[]) => {
+  const res = []
+  input[0].forEach((rowItem, idx) => {
+    res.push([])
+    input[1].forEach(colItem => {
+      res[idx].push(fn(rowItem, colItem))
+    })
+  })
+  return res
+}
 
 const CompareStringFunction: FunctionImplementation = {
   type: "compareString",
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.string, input),
   specifyInput: compareInput,
-  evaluate: (input) => undefined, // TODO:
+  evaluate: vectorLoop((rowItem, colItem) => rowItem == colItem ? 1 : 0),
 };
 
 const CompareArrayFunction: FunctionImplementation = {
@@ -59,7 +71,7 @@ const CompareArrayFunction: FunctionImplementation = {
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.array, input),
   specifyInput: compareInput,
-  evaluate: (input) => undefined, // TODO:
+  evaluate: vectorLoop((rowItem, colItem) => 1 - setIntersect(rowItem, colItem).length / setUnion(rowItem, colItem).length)
 };
 
 const CompareNumberFunction: FunctionImplementation = {
@@ -67,8 +79,10 @@ const CompareNumberFunction: FunctionImplementation = {
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.number, input),
   specifyInput: compareInput,
-  evaluate: (input) => undefined, // TODO:
+  evaluate: vectorLoop((rowItem, colItem) => Math.abs(rowItem - colItem))
 };
+
+
 
 export const PropertyFunctions = [
   CompareStringFunction,

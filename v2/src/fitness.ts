@@ -1,6 +1,6 @@
 import { ProblemInstance } from "./interface/problem.interface";
 
-interface FitnessValue {
+export interface FitnessValue {
   recall: number;
   precision: number;
   fScore: number;
@@ -25,13 +25,13 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
       if (toFilter.indexOf(topIdx[i]) === -1) {
         // Recommendation is not filtered
         total++
-        if (toFind.indexOf(topIdx[i]) === -1) {
+        if (toFind.indexOf(topIdx[i]) >= 0) {
         // Recommendation is "correct"
           found++
         }
       }
       if (total >= RECOMMEND_SIZE) {
-        break; // TODO: Verify
+        break; // TODO: Verify this works
       }
     }
     const precision = total > 0 ? found / total : 0

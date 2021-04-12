@@ -1,9 +1,15 @@
-import { CONFIG } from './default.config';
-import { calcRecursive } from './evaluate';
-import { Functions } from './functions/function';
-import { readMovieLens } from './problems/movielens.problem';
-import { getTerminals } from './terminals/terminal';
-import { generateTree, generateTreeTables } from './tree';
+import {CONFIG} from './default.config';
+import {calcRecursive} from './evaluate';
+import {Functions} from './functions/function';
+import {readMovieLens} from './problems/movielens.problem';
+import {getTerminals} from './terminals/terminal';
+import {ConfigTree, generateTree, generateTreeTables} from './tree';
+import {fitnessScore} from "./fitness"
+import {appendFile} from "./utils/fs.utils";
+import {EvaluatedConfig, mutateConfigTree, produceOffspring} from "./reproduce";
+import {DTO} from "./interface/dto.interface";
+
+const filename = `Run_${new Date().toISOString()}_${CONFIG.GENERATION_SIZE}_${CONFIG.GENERATIONS}.csv`
 
 const main = async () => {
 
@@ -15,24 +21,43 @@ const main = async () => {
   const treeTablesGrowth = generateTreeTables(terminals, functions, 3, true)
   const treeTablesFull = generateTreeTables(terminals, functions, 3, false)
 
-  const treeGrowth = generateTree(problem.output, treeTablesGrowth, terminals, functions, CONFIG.MAX_DEPTH, true)
-  const treeFull = generateTree(problem.output, treeTablesGrowth, terminals, functions, CONFIG.MAX_DEPTH, false)
+  console.log("Generating initial population")
+  let generation = []
+  for (let i = 0; i < CONFIG.GENERATION_SIZE / 2; i++) {
+    generation.push(generateTree(problem.output, treeTablesGrowth, terminals, functions, CONFIG.MAX_DEPTH, true))
+    generation.push(generateTree(problem.output, treeTablesFull, terminals, functions, CONFIG.MAX_DEPTH, false))
+  }
 
-  console.log("GROWTH:")
-  console.log(treeTablesGrowth)
+  const mutateFn = (output: DTO) =>
+    generateTree(output, treeTablesGrowth, terminals, functions, CONFIG.MAX_DEPTH, true)
 
-  console.log("\n\nFULL:")
-  console.log(treeTablesFull)
+  console.log("Generating initial population - DONE")
+  for (let gen = 0; gen < CONFIG.GENERATIONS; gen++) {
+    console.log(`Evaluating generation #${gen}`)
+    const evaluated = evaluateGeneration(gen, generation, problem)
+    console.log(`Evaluating generation #${gen} - DONE`)
 
-  console.log("\n\nGROW TREE:")
-  console.log(JSON.stringify(treeGrowth, null, 2))
+    console.log(`Producing generation #${gen + 1}`)
+    generation = produceOffspring(evaluated, mutateFn)
+    console.log(`Producing generation #${gen + 1} - DONE`)
+  }
+}
 
-  console.log("\n\nFULL TREE:")
-  console.log(JSON.stringify(treeFull, null, 2))
+const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): EvaluatedConfig[] => {
+  return configs.map((config, idx) => {
+    console.log(`Evaluating generation #${gen} RS ${idx}`)
+    const res = calcRecursive(config, problem)
+    const fitness = fitnessScore(res, problem)
 
-  const res = calcRecursive(treeGrowth, problem)
-  console.log("\nResult:")
-  console.log(res)
+    const str = `${gen};${idx};${fitness.fScore};${fitness.recall};${fitness.precision};${JSON.stringify(config)}\n`;
+    appendFile(filename, str)
+
+    console.log(`Evaluating generation #${gen} RS ${idx} - DONE (${fitness.performance})`)
+    return {
+      config,
+      fitness: fitness.performance
+    }
+  })
 }
 
 main()

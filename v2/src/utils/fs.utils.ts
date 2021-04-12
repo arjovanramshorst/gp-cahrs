@@ -16,3 +16,10 @@ export const readCsvFile = <T>(filename: string): Promise<T[]> => {
       });
   });
 };
+
+export const appendFile = (filename: string, data: string) => {
+  fs.appendFile(`./output/${filename}`, data, (err) => {
+    if (err) throw err
+    console.log(`appended to file: ${filename}`)
+  })
+}

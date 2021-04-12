@@ -19,4 +19,9 @@ export const mulberry32 = (a: number) => {
   };
 };
 
-export const selectRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)] 
+export const selectRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)]
+
+
+export const pick = <T extends any>(k: number = 1) =>
+  (...from: T[]): T[] =>
+    [...new Array(k)].map((_) => from[Math.floor(Math.random() * from.length)]);

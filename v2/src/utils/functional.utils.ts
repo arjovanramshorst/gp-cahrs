@@ -3,7 +3,7 @@ type EntityId = string;
 export const groupBy = <A>(getIdentifier: (c: A) => EntityId) => (
   agg: Record<EntityId, A[]>,
   curr: A
-) => {
+): Record<EntityId, A[]> => {
   const id = getIdentifier(curr);
   if (!agg[id]) {
     agg[id] = [];
@@ -29,7 +29,7 @@ export const inputCombinations = (list: any[], amount: number) => {
   if (amount === 2) {
     return list.map((left) => list.map((right) => [left, right])).flat();
   }
-  throw Error("TODO: Turn inputCOmbinations in recursive function")
+  throw Error("TODO: Turn inputCombinations in recursive function")
 };
 
 export const filterUndefined = (obj: any) => {

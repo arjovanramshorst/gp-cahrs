@@ -1,4 +1,4 @@
-import {add, subtract, multiply} from "mathjs"
+import {add, subtract, dotMultiply} from "mathjs"
 import {FunctionImplementation} from "./function";
 import {
   DTO,
@@ -70,7 +70,7 @@ const MultiplyFunction: FunctionImplementation = {
   inputSize: 2,
   getOutput: mathMatrixOutput,
   evaluate: (config, input) => {
-    return multiply(input[0], input[1])
+    return dotMultiply(input[0], input[1])
   },
   specifyInput: mathMatrixInput,
 };

@@ -1,20 +1,25 @@
 import { TerminalImplementation } from "./terminal";
 import {DTOMatrix, DTOType, DTOVector} from "../interface/dto.interface";
 import { PropertyType } from "../interface/problem.interface";
+import {generateMulberrySeed, mulberry32} from "../utils/random.utils";
+import {CONFIG} from "../default.config";
 
 export const RandomMatrix: TerminalImplementation = {
   type: "randomMatrix",
   getOutput: () => ({
     dtoType: DTOType.matrix
   }),
-  createConfig: (output: DTOMatrix) => output,
-  evaluate: (config: DTOMatrix) => {
+  createConfig: (output: DTOMatrix) => ({
+    output,
+    seed: generateMulberrySeed()
+  }),
+  evaluate: (config: { output: DTOMatrix, seed: number }) => {
     const res = []
-    for(let row = 0; row < config.rows; row++) {
+    const random = mulberry32(config.seed)
+    for(let row = 0; row < config.output.rows; row++) {
       res.push([])
-      for(let col = 0; col < config.columns; col++) {
-        // TODO: Add seed
-        res[row].push(Math.random())
+      for(let col = 0; col < config.output.columns; col++) {
+        res[row].push(random())
       }
     }
     return res
@@ -27,12 +32,15 @@ export const RandomVector: TerminalImplementation = {
     dtoType: DTOType.vector,
     valueType: PropertyType.number,
   }),
-  createConfig: (output: DTOVector) => output,
-  evaluate: (config: DTOVector) => {
-    const res = Array(config.items)
-    for(let i = 0; i < config.items; i++) {
-      // TODO add seed
-      res.push(Math.random())
+  createConfig: (output: DTOVector) => ({
+    output,
+    seed: generateMulberrySeed()
+  }),
+  evaluate: (config: { output: DTOVector, seed: number }) => {
+    const res = []
+    const random = mulberry32(config.seed)
+    for(let i = 0; i < config.output.items; i++) {
+      res.push(random())
     }
 
     return res
@@ -44,9 +52,6 @@ export const RandomScalar: TerminalImplementation = {
   getOutput: () => ({
     dtoType: DTOType.scalar,
   }),
-  evaluate: (config: any) => {
-    // todo:
-    const res = Math.random()
-    return res
-  },
+  createConfig: () => ({ scalar: Math.floor(Math.random() * CONFIG.NODES.SCALAR.MAX) }),
+  evaluate: (config: any) => config.scalar,
 };

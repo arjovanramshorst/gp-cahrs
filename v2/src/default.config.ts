@@ -1,5 +1,15 @@
 
 export const CONFIG = {
+  GENERATION_SIZE: 20,
+  GENERATIONS: 20,
   GROWTH_FUNCTION_FRACTION: 0.5,
-  MAX_DEPTH: 3
+  MAX_DEPTH: 3,
+  REPRODUCTION: {
+    TOURNAMENT_SIZE: 4
+  },
+  NODES: {
+    SCALAR: {
+      MAX: 10
+    }
+  }
 }
