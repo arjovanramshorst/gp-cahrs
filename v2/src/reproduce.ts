@@ -47,18 +47,18 @@ const crossover = (parent1: ConfigTree, parent2: ConfigTree): [ConfigTree, Confi
 
   // Replace node in parent1 with selected node from parent2
   if (crossOver1.parent !== null) {
-    crossOver1.parent.input[crossOver1.childIndex] = crossOver2.child
+    crossOver1.parent.input[crossOver1.childIndex] = cloneConfig(crossOver2.child)
   } else {
     // Replace entire tree if root node is selected
-    parent1 = crossOver2.child
+    parent1 = cloneConfig(crossOver2.child)
   }
 
   // Replace node in parent2 with selected node from parent1
   if (crossOver2.parent !== null) {
-    crossOver2.parent.input[crossOver2.childIndex] = crossOver1.child
+    crossOver2.parent.input[crossOver2.childIndex] = cloneConfig(crossOver1.child)
   } else {
     // Replace entire tree if root node is selected
-    parent2 = crossOver1.child
+    parent2 = cloneConfig(crossOver1.child)
   }
 
   return [parent1, parent2]
@@ -96,3 +96,6 @@ const recursiveConfig = (config: ConfigTree, list: RecursiveConfig[] = []): Recu
 
   return list
 }
+
+// Used to make sure there are no circular references anywhere
+const cloneConfig = (config: ConfigTree) => JSON.parse(JSON.stringify(config))

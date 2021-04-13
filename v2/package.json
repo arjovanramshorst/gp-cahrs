@@ -15,6 +15,7 @@
   },
   "scripts": {
     "run": "ts-node src/main.ts",
+    "test": "ts-node src/test.config.ts",
     "run:gc": "node -r ts-node/register --inspect-brk --trace-gc src/main.ts",
     "scribble": "ts-node src/scribble.ts"
   },

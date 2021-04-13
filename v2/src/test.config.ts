@@ -1,100 +1,16 @@
-import { PossibleConfigs } from "./interface/config.interface";
-const SIZE = 10000;
+import {ConfigTree} from "./tree";
+import {readMovieLens} from "./problems/movielens.problem";
+import {calcRecursive} from "./evaluate";
+import {fitnessScore} from "./fitness";
 
-const sum = (
-  left: PossibleConfigs,
-  right: PossibleConfigs,
-): PossibleConfigs => ({
-  type: "sum",
-  config: {},
-  input: [left, right],
-});
+export const configTest1 = `{"config":{"type":"multiply"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"multiply"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"multiply"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"sum"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"subtract"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"randomScalar","scalar":8},"output":{"dtoType":"scalar"},"input":[]},{"config":{"type":"randomScalar","scalar":1},"output":{"dtoType":"scalar"},"input":[]}]},{"config":{"type":"subtract"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"multiply"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"randomScalar","scalar":4},"output":{"dtoType":"scalar"},"input":[]},{"config":{"type":"randomScalar","scalar":4},"output":{"dtoType":"scalar"},"input":[]}]},{"config":{"type":"randomScalar","scalar":5},"output":{"dtoType":"scalar"},"input":[]}]}]},{"config":{"type":"randomMatrix","output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"seed":742085764},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[]}]},{"config":{"type":"compareNumber"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"randomVector","output":{"dtoType":"vector","entity":"user","items":610,"valueType":"number"},"seed":2112209989},"output":{"dtoType":"vector","entity":"user","items":610,"valueType":"number"},"input":[]},{"config":{"type":"randomVector","output":{"dtoType":"vector","entity":"movie","items":9742,"valueType":"number"},"seed":156248497},"output":{"dtoType":"vector","entity":"movie","items":9742,"valueType":"number"},"input":[]}]}]},{"config":{"type":"subtract"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"randomScalar","scalar":1},"output":{"dtoType":"scalar"},"input":[]},{"config":{"type":"randomScalar","scalar":1},"output":{"dtoType":"scalar"},"input":[]}]}]}`
 
-const multiply = (
-  left: PossibleConfigs,
-  right: PossibleConfigs,
-): PossibleConfigs => ({
-  type: "multiply",
-  config: {},
-  input: [left, right],
-});
 
-const fill = (value): PossibleConfigs => ({
-  type: "fill",
-  config: {
-    rows: SIZE,
-    columns: SIZE,
-    value,
-  },
-});
+const test = async (config: ConfigTree) => {
+  const problem = await readMovieLens()
+  const res = calcRecursive(config, problem)
+  const fitness = fitnessScore(res, problem)
+  console.log(fitness)
+}
 
-export const basicConfig = sum(
-  sum(
-    multiply(
-      fill(3),
-      multiply(
-        fill(4),
-        sum(
-          multiply(
-            multiply(
-              fill(4),
-              sum(
-                fill(2),
-                fill(3),
-              ),
-            ),
-            sum(
-              sum(
-                multiply(
-                  fill(3),
-                  multiply(
-                    fill(4),
-                    sum(
-                      fill(2),
-                      fill(3),
-                    ),
-                  ),
-                ),
-                fill(2),
-              ),
-              fill(3),
-            ),
-          ),
-          multiply(
-            fill(4),
-            sum(
-              fill(2),
-              fill(3),
-            ),
-          ),
-        ),
-      ),
-    ),
-    fill(2),
-  ),
-  multiply(
-    multiply(
-      fill(4),
-      sum(
-        fill(2),
-        fill(3),
-      ),
-    ),
-    sum(
-      sum(
-        multiply(
-          fill(3),
-          multiply(
-            fill(4),
-            sum(
-              fill(2),
-              fill(3),
-            ),
-          ),
-        ),
-        fill(2),
-      ),
-      fill(3),
-    ),
-  ),
-);
+test(JSON.parse(configTest1))

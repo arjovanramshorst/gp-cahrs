@@ -35,9 +35,9 @@ export const readMovieLens: ReadProblemFunction = async (
     ratings.forEach((rating, index) => {
       if (index < 0.9 * ratings.length) {
         ratingMatrix.set([userToIdxMap[rating.userId], movieToIdxMap[rating.movieId]], rating.rating)
-        filter[userIndex].push(index)
+        filter[userIndex].push(movieToIdxMap[rating.movieId])
       } else if (rating.rating >= 3.5) {
-        validate[userIndex].push(index)
+        validate[userIndex].push(movieToIdxMap[rating.movieId])
       }
     })
   })
