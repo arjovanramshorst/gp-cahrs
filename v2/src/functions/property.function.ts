@@ -47,8 +47,8 @@ const compareInput = (
   ].map((it) => filterUndefined(it));
 };
 
-const vectorLoop = (fn: (rowItem, colItem) => number) => (config, input: any[]) => {
-  const res = []
+const vectorLoop = <T extends any>(fn: (rowItem: T, colItem: T) => number) => (config: any, input: [T[], T[]]) => {
+  const res: number[][] = []
   input[0].forEach((rowItem, idx) => {
     res.push([])
     input[1].forEach(colItem => {
@@ -63,7 +63,7 @@ const CompareStringFunction: FunctionImplementation = {
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.string, input),
   specifyInput: compareInput,
-  evaluate: vectorLoop((rowItem, colItem) => rowItem == colItem ? 1 : 0),
+  evaluate: vectorLoop<string>((rowItem, colItem) => rowItem == colItem ? 1 : 0),
 };
 
 const CompareArrayFunction: FunctionImplementation = {
@@ -71,7 +71,7 @@ const CompareArrayFunction: FunctionImplementation = {
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.array, input),
   specifyInput: compareInput,
-  evaluate: vectorLoop((rowItem, colItem) => 1 - setIntersect(rowItem, colItem).length / setUnion(rowItem, colItem).length)
+  evaluate: vectorLoop<string[]>((rowItem, colItem) => arrayDistance(rowItem, colItem))
 };
 
 const CompareNumberFunction: FunctionImplementation = {
@@ -79,13 +79,19 @@ const CompareNumberFunction: FunctionImplementation = {
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.number, input),
   specifyInput: compareInput,
-  evaluate: vectorLoop((rowItem, colItem) => Math.abs(rowItem - colItem))
+  evaluate: vectorLoop<number>((rowItem, colItem) => Math.abs(rowItem - colItem))
 };
-
-
 
 export const PropertyFunctions = [
   CompareStringFunction,
   CompareArrayFunction,
   CompareNumberFunction,
 ];
+
+const arrayDistance = (a: string[], b: string[]) => {
+  const l = intersection(a, b).length;
+  return l / (a.length + b.length - l);
+}
+const intersection = <T>(a: T[], b: T[]): T[] => {
+  return a.filter((it) => b.includes(it));
+}

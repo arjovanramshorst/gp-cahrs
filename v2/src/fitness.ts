@@ -1,4 +1,6 @@
 import { ProblemInstance } from "./interface/problem.interface";
+import {sortIdx} from "./utils/sort.utils";
+import {matrixRow} from "./utils/matrix.utils";
 
 export interface FitnessValue {
   recall: number;
@@ -15,7 +17,7 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
   let avgPrecision = 0;
 
   for (let userIdx = 0; userIdx < output.length; userIdx++) {
-    const topIdx = sortIdx(output[userIdx])
+    const topIdx = sortIdx(matrixRow(output, userIdx))
     const toFilter = problem.filter[userIdx]
     const toFind = problem.validate[userIdx]
     let total = 0;
@@ -49,10 +51,4 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
     fScore,
     performance: fScore
   }
-};
-
-export const sortIdx = (row: number[]) => {
-  return Array.from(Array(row.length).keys())
-    // sort descending ( TODO: Verify)
-    .sort((a, b) => row[a] - row[b]);
 };

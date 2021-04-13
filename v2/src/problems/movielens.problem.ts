@@ -25,8 +25,8 @@ export const readMovieLens: ReadProblemFunction = async (
   const ratingMatrix: any = zeros([userRefs.length, movieRefs.length], 'sparse')
   const tagMatrix: any = zeros([userRefs.length, movieRefs.length], 'sparse')
 
-  const filter = []
-  const validate = []
+  const filter: number[][] = []
+  const validate: number[][] = []
 
   Object.keys(ratingsByUser).forEach((userId, userIndex) => {
     const ratings = ratingsByUser[userId]
@@ -42,7 +42,7 @@ export const readMovieLens: ReadProblemFunction = async (
     })
   })
 
-  const movieTags = [...Array(movieRefs.length).keys()].map(_ => [])
+  const movieTags: string[][] = [...Array(movieRefs.length).keys()].map(_ => [])
   tags.forEach(tag => {
     tagMatrix.set([userToIdxMap[tag.userId], movieToIdxMap[tag.movieId]], 1)
     movieTags[movieToIdxMap[tag.movieId]].push(tag.tag)

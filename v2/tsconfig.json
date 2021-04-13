@@ -4,6 +4,7 @@
     "lib": ["dom", "ES2019"],
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "es2017"
+    "target": "es2017",
+
   }
 }

@@ -7,8 +7,8 @@ export const readCsvFile = <T>(filename: string): Promise<T[]> => {
     console.log(`Processing csv: ${filename}`)
     fs.createReadStream(filename)
       .pipe(csv())
-      .on("data", (row) => {
-        res.push(row as T);
+      .on("data", (row: T) => {
+        res.push(row);
       })
       .on("end", () => {
         console.log("CSV file successfully processed");
@@ -18,7 +18,7 @@ export const readCsvFile = <T>(filename: string): Promise<T[]> => {
 };
 
 export const appendFile = (filename: string, data: string) => {
-  fs.appendFile(`./output/${filename}`, data, (err) => {
+  fs.appendFile(`./output/${filename}`, data, (err: any) => {
     if (err) throw err
     console.log(`appended to file: ${filename}`)
   })

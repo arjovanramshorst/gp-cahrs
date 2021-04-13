@@ -6,7 +6,7 @@ import {
 } from "./fill.terminal";
 
 import { DTO } from "../interface/dto.interface";
-import { getPropertyTerminals } from "./property.terminal";
+import {getInteractionPropertyTerminals, getPropertyTerminals} from "./property.terminal";
 import { NodeImplementation } from "../interface/node.interface";
 import {NodeConfig} from "../tree";
 
@@ -32,14 +32,15 @@ export const TerminalFactory = (
 export const getTerminals = (
   problemInstance: ProblemInstance
 ): TerminalImplementation[] => [
-  RandomMatrix,
-  RandomScalar,
-  RandomVector,
-  ...getPropertyTerminals(problemInstance),
+  // RandomMatrix,
+  // RandomScalar,
+  // RandomVector,
+  // ...getPropertyTerminals(problemInstance),
+  ...getInteractionPropertyTerminals(problemInstance)
 ];
 
 export interface TerminalImplementation extends NodeImplementation {
-  getOutput: () => DTO | undefined;
+  getOutput: () => DTO;
   // TODO: problemInstance might not be necessary here?
   evaluate: (config: any, problemInstance: ProblemInstance) => any;
 }

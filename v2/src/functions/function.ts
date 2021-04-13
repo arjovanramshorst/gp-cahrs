@@ -3,6 +3,8 @@ import { MathFunctions } from "./math.function";
 import { DTO } from "../interface/dto.interface";
 import { NodeImplementation } from "../interface/node.interface";
 import {NodeConfig} from "../tree";
+import {SimilarityFunctions} from "./similarity.function";
+import {CFFunctions} from "./cf.function";
 
 
 export const calcFunction = (config: NodeConfig, input: any) => {
@@ -21,8 +23,10 @@ export const FunctionFactory = (type: string): FunctionImplementation => {
 };
 
 export const Functions: FunctionImplementation[] = [
-  ...MathFunctions,
+  // ...MathFunctions,
   ...PropertyFunctions,
+  ...SimilarityFunctions,
+  ...CFFunctions
 ];
 
 export interface FunctionImplementation extends NodeImplementation {

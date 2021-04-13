@@ -1,6 +1,8 @@
-import { DTOType } from '../interface/dto.interface';
-import { ProblemInstance } from '../interface/problem.interface';
-import { TerminalImplementation } from './terminal';
+import {size} from "mathjs"
+
+import {DTOMatrix, DTOType, DTOVector} from '../interface/dto.interface';
+import {ProblemInstance} from '../interface/problem.interface';
+import {TerminalImplementation} from './terminal';
 
 export const getPropertyTerminals = (problemInstance: ProblemInstance): TerminalImplementation[] => {
   return Object.keys(problemInstance.entities).flatMap(entityKey => {
@@ -14,10 +16,31 @@ export const getPropertyTerminals = (problemInstance: ProblemInstance): Terminal
           dtoType: DTOType.vector,
           valueType: property.type,
           entity: entityKey,
-          size: property.items.length
-        }),
+          items: property.items.length
+        }) as DTOVector,
         evaluate: () => property.items
       }
     })
+  })
+}
+
+export const getInteractionPropertyTerminals = (problemInstance: ProblemInstance): TerminalImplementation[] => {
+  return Object.keys(problemInstance.interactions).map(interactionKey => {
+    const interaction = problemInstance.interactions[interactionKey]
+    // @ts-ignore
+    const res = interaction.interactions.size()
+    const rows = res[0]
+    const cols = res[1]
+    return {
+      type: `interaction(${interaction.type})`,
+      getOutput: () => ({
+        dtoType: DTOType.matrix,
+        fromEntity: interaction.fromEntityType,
+        toEntity: interaction.toEntityType,
+        rows: rows,
+        columns: cols
+      }) as DTOMatrix,
+      evaluate: (config, problem) => interaction.interactions
+    }
   })
 }

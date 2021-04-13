@@ -9,8 +9,6 @@ import {
 } from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
 
-export type MatrixMathConfig = {};
-
 export const mathMatrixOutput = (input: DTO[]) => {
   const [left, right] = input;
   if (invalidVector(left) || invalidVector(right)) {

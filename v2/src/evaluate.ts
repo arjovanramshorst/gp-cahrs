@@ -2,6 +2,7 @@ import { ProblemInstance } from "./interface/problem.interface";
 import { calcFunction } from "./functions/function";
 import { calcTerminal } from "./terminals/terminal";
 import {ConfigTree} from "./tree";
+import {printNested} from "./utils/display.utils";
 
 let COUNT = 0
 
@@ -18,7 +19,7 @@ export const calcRecursive = (
   problemInstance: ProblemInstance,
   depth: number = 0,
 ) => {
-  print(depth, `Entered ${configFinger.config.type}, config: ${configFinger.config}`);
+  printNested(depth, `Entered ${configFinger.config.type}, config: ${configFinger.config}`);
   let input;
   if (isFunction(configFinger)) {
     input = [];
@@ -37,9 +38,9 @@ export const calcRecursive = (
   }
   // Depth first, so first calculate functions
 
-  print(depth, `Calculating ${configFinger.config.type}, config: ${JSON.stringify(configFinger.config)}`);
+  printNested(depth, `Calculating ${configFinger.config.type}, config: ${JSON.stringify(configFinger.config)}`);
   const res = calc(configFinger, input, problemInstance);
-  print(depth, `Finished ${configFinger.config.type}`);
+  printNested(depth, `Finished ${configFinger.config.type}`);
   return res;
 };
 
@@ -56,11 +57,6 @@ const calc = (
   }
 };
 
-const print = (depth: number, str: string) => {
-  const prefix = [...Array(depth)].map((it) => "  ").join("");
-
-  console.log(`${prefix}${str}`);
-};
 
 const isFunction = (config: ConfigTree) => config.input.length > 0
 const isTerminal = (config: ConfigTree) => !isFunction(config)
