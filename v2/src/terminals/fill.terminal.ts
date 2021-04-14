@@ -1,10 +1,16 @@
-import { TerminalImplementation } from "./terminal";
-import {DTOMatrix, DTOType, DTOVector} from "../interface/dto.interface";
-import { PropertyType } from "../interface/problem.interface";
+import {TerminalImplementation} from "./terminal";
+import {DTO, DTOMatrix, DTOScalar, DTOType, DTOVector} from "../interface/dto.interface";
+import {PropertyType} from "../interface/problem.interface";
 import {generateMulberrySeed, mulberry32} from "../utils/random.utils";
 import {CONFIG} from "../default.config";
+import {NodeConfig} from "../tree";
 
-export const RandomMatrix: TerminalImplementation = {
+interface FillConfig<T> {
+  output: T
+  seed: number
+}
+
+export const RandomMatrix: TerminalImplementation<FillConfig<DTOMatrix>> = {
   type: "randomMatrix",
   getOutput: () => ({
     dtoType: DTOType.matrix
@@ -16,9 +22,9 @@ export const RandomMatrix: TerminalImplementation = {
   evaluate: (config: { output: DTOMatrix, seed: number }) => {
     const res = []
     const random = mulberry32(config.seed)
-    for(let row = 0; row < config.output.rows; row++) {
+    for (let row = 0; row < config.output.rows; row++) {
       res.push([])
-      for(let col = 0; col < config.output.columns; col++) {
+      for (let col = 0; col < config.output.columns; col++) {
         res[row].push(random())
       }
     }
@@ -26,7 +32,7 @@ export const RandomMatrix: TerminalImplementation = {
   },
 };
 
-export const RandomVector: TerminalImplementation = {
+export const RandomVector: TerminalImplementation<FillConfig<DTOVector>> = {
   type: "randomVector",
   getOutput: () => ({
     dtoType: DTOType.vector,
@@ -39,7 +45,7 @@ export const RandomVector: TerminalImplementation = {
   evaluate: (config: { output: DTOVector, seed: number }) => {
     const res = []
     const random = mulberry32(config.seed)
-    for(let i = 0; i < config.output.items; i++) {
+    for (let i = 0; i < config.output.items; i++) {
       res.push(random())
     }
 
@@ -47,11 +53,14 @@ export const RandomVector: TerminalImplementation = {
   },
 };
 
-export const RandomScalar: TerminalImplementation = {
+export const RandomScalar: TerminalImplementation<FillConfig<DTOScalar>> = {
   type: "randomScalar",
   getOutput: () => ({
     dtoType: DTOType.scalar,
   }),
-  createConfig: () => ({ scalar: Math.floor(Math.random() * CONFIG.NODES.SCALAR.MAX) }),
-  evaluate: (config: any) => config.scalar,
+  createConfig: (output: DTOScalar) => ({
+    output,
+    seed: Math.floor(Math.random() * CONFIG.NODES.SCALAR.MAX)
+  }),
+  evaluate: (config, problem) => config.seed,
 };

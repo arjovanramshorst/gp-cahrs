@@ -17,7 +17,7 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
   let avgPrecision = 0;
 
   for (let userIdx = 0; userIdx < output.length; userIdx++) {
-    const topIdx = sortIdx(matrixRow(output, userIdx))
+    const topIdx = sortIdx(output[userIdx])
     const toFilter = problem.filter[userIdx]
     const toFind = problem.validate[userIdx]
     let total = 0;
@@ -33,7 +33,7 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
         }
       }
       if (total >= RECOMMEND_SIZE) {
-        break; // TODO: Verify this works
+        break;
       }
     }
     const precision = total > 0 ? found / total : 0

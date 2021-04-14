@@ -1,12 +1,11 @@
 import {Matrix} from "mathjs";
 import {vectorGet, vectorSize} from "./matrix.utils";
 
-export const sortIdx = (row: Matrix) => {
-  return Array.from(Array(vectorSize(row)).keys())
+export const sortIdx = (row: number[]) => {
+  return Array.from(Array(row.length).keys())
     // sort descending ( TODO: Verify)
     .sort((a, b) => {
-      const res = vectorGet(row, a) - vectorGet(row, b)
-      return res
+      return row[b] - row[a]
     });
 };
 

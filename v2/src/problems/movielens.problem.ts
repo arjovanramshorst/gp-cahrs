@@ -22,8 +22,8 @@ export const readMovieLens: ReadProblemFunction = async (
   const userRefs = Object.keys(ratingsByUser)
   const userToIdxMap = userRefs.reduce(toIdxMap, {})
 
-  const ratingMatrix: any = zeros([userRefs.length, movieRefs.length], 'sparse')
-  const tagMatrix: any = zeros([userRefs.length, movieRefs.length], 'sparse')
+  const ratingMatrix: number[][] = zeros([userRefs.length, movieRefs.length]) as number[][]
+  const tagMatrix: number[][] = zeros([userRefs.length, movieRefs.length]) as number[][]
 
   const filter: number[][] = []
   const validate: number[][] = []
@@ -34,7 +34,9 @@ export const readMovieLens: ReadProblemFunction = async (
     validate.push([])
     ratings.forEach((rating, index) => {
       if (index < 0.9 * ratings.length) {
-        ratingMatrix.set([userToIdxMap[rating.userId], movieToIdxMap[rating.movieId]], rating.rating)
+
+        ratingMatrix[userToIdxMap[rating.userId]][movieToIdxMap[rating.movieId]] = rating.rating
+
         filter[userIndex].push(movieToIdxMap[rating.movieId])
       } else if (rating.rating >= 3.5) {
         validate[userIndex].push(movieToIdxMap[rating.movieId])
@@ -44,7 +46,7 @@ export const readMovieLens: ReadProblemFunction = async (
 
   const movieTags: string[][] = [...Array(movieRefs.length).keys()].map(_ => [])
   tags.forEach(tag => {
-    tagMatrix.set([userToIdxMap[tag.userId], movieToIdxMap[tag.movieId]], 1)
+    tagMatrix[userToIdxMap[tag.userId]][movieToIdxMap[tag.movieId]] = 1
     movieTags[movieToIdxMap[tag.movieId]].push(tag.tag)
   })
 

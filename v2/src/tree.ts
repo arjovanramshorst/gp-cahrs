@@ -22,8 +22,8 @@ export interface NodeConfig {
 export const generateTree = (
   outputDTO: DTO,
   treeTable: TreeTable,
-  terminals: TerminalImplementation[],
-  functions: FunctionImplementation[],
+  terminals: TerminalImplementation<any>[],
+  functions: FunctionImplementation<any>[],
   maxDepth: number,
   grow: boolean = false
 ): ConfigTree => {
@@ -33,7 +33,7 @@ export const generateTree = (
     findMatchingType(outputDTO, it.getOutput())
   );
 
-  let selected: NodeImplementation;
+  let selected: NodeImplementation<any>;
   let input: DTO[] = [];
 
   if (maxDepth === 1) {
@@ -91,8 +91,8 @@ export const generateTree = (
 
 
 export const generateTreeTables = (
-  terminals: TerminalImplementation[],
-  functions: FunctionImplementation[],
+  terminals: TerminalImplementation<any>[],
+  functions: FunctionImplementation<any>[],
   maxDepth = 5,
   grow = false
 ): TreeTable => {

@@ -1,10 +1,9 @@
 import {FunctionImplementation} from "./function";
 import {DTOMatrix, DTOType} from "../interface/dto.interface";
-// @ts-ignore
-import {zeros, row, size, sum,dotPow, dotMultiply} from "mathjs";
-import {matrixSet, matrixSize, vectorSize} from "../utils/matrix.utils";
+import {zeros} from "mathjs";
+import {matrixSize} from "../utils/matrix.utils";
 
-const PearsonSimilarityFunction: FunctionImplementation = {
+export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
   type: "pearsonSimilarity",
   inputSize: 1,
   getOutput: (input) => {
@@ -22,47 +21,40 @@ const PearsonSimilarityFunction: FunctionImplementation = {
       columns: inputMatrix.rows
     }
   },
-  specifyInput: (output: DTOMatrix, input) => {
+  specifyInput: (output: DTOMatrix, input): [DTOMatrix] => {
     return [{
       dtoType: DTOType.matrix,
       fromEntity: output.fromEntity,
       rows: output.rows,
     }]
   },
-  evaluate: (config, input) => {
-    const [rows, cols] = matrixSize(input[0])
-    let res: any = zeros(matrixSize(input[0]))
-    for (let r1 = 0; r1 < rows - 1; r1++) {
-      console.log(`row #${r1} / ${rows}`)
-      for (let r2 = r1 + 1; r2 < rows; r2++) {
-        const similarity = corr(row(input[0], r1), row(input[0], r2))
-        res[r1][r2] = similarity
-        res[r2][r1] = similarity
+  evaluate: (config, [scores]) => {
+    const [rows, cols] = matrixSize(scores)
+    const res: any = zeros([rows, cols])
+    for (let idxR1 = 0; idxR1 < rows - 1; idxR1++) {
+      console.log(`row #${idxR1} / ${rows}`)
+      const row1 = scores[idxR1]
+      for (let idxR2 = idxR1 + 1; idxR2 < rows; idxR2++) {
+        const similarity = pearsonCorrelation(row1, scores[idxR2])
+        res[idxR1][idxR2] = similarity
+        res[idxR2][idxR1] = similarity
       }
     }
     return res
   },
 };
 
-/**
- * Based on the following gist: https://gist.github.com/matt-west/6500993#gistcomment-2743187
- * @param d1
- * @param d2
- */
-const corr = (d1: any, d2: any) => {
-  let {min, pow, sqrt} = Math
-  let n = min(vectorSize(d1), vectorSize(d2))
+export const pearsonCorrelation = (d1: any, d2: any) => {
+  let { min, pow, sqrt } = Math
+  let add = (a, b) => a + b
+  let n = min(d1.length, d2.length)
   if (n === 0) {
     return 0
   }
-
-  let [sum1, sum2] = [sum(d1), sum(d2)]
-  // @ts-ignore
-  let [pow1, pow2] = [sum(dotPow(d1, 2)), sum(dotPow(d2, 2))]
-
-  // @ts-ignore
-  let mulSum = sum(dotMultiply(d1, d2))
-
+  [d1, d2] = [d1.slice(0, n), d2.slice(0, n)]
+  let [sum1, sum2] = [d1, d2].map(l => l.reduce(add))
+  let [pow1, pow2] = [d1, d2].map(l => l.reduce((a, b) => a + pow(b, 2), 0))
+  let mulSum = d1.map((n, i) => n * d2[i]).reduce(add)
   let dense = sqrt((pow1 - pow(sum1, 2) / n) * (pow2 - pow(sum2, 2) / n))
   if (dense === 0) {
     return 0

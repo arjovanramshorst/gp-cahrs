@@ -58,7 +58,7 @@ const vectorLoop = <T extends any>(fn: (rowItem: T, colItem: T) => number) => (c
   return res
 }
 
-const CompareStringFunction: FunctionImplementation = {
+const CompareStringFunction: FunctionImplementation<{}> = {
   type: "compareString",
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.string, input),
@@ -66,7 +66,7 @@ const CompareStringFunction: FunctionImplementation = {
   evaluate: vectorLoop<string>((rowItem, colItem) => rowItem == colItem ? 1 : 0),
 };
 
-const CompareArrayFunction: FunctionImplementation = {
+const CompareArrayFunction: FunctionImplementation<{}> = {
   type: "compareArray",
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.array, input),
@@ -74,7 +74,7 @@ const CompareArrayFunction: FunctionImplementation = {
   evaluate: vectorLoop<string[]>((rowItem, colItem) => arrayDistance(rowItem, colItem))
 };
 
-const CompareNumberFunction: FunctionImplementation = {
+const CompareNumberFunction: FunctionImplementation<{}> = {
   type: "compareNumber",
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.number, input),

@@ -1,17 +1,14 @@
 import {FunctionImplementation} from "./function";
 import {DTOMatrix, DTOType} from "../interface/dto.interface";
 import {sortIdx} from "../utils/sort.utils";
-import {NodeConfig} from "../tree";
 import * as math from "mathjs";
-import {matrixSet} from "../utils/matrix.utils";
-import {Matrix} from "mathjs";
 
-export interface NNConfig extends NodeConfig {
+export interface NNConfig {
   output: DTOMatrix
   N: number
 }
 
-const NNRecommendFunction: FunctionImplementation = {
+export const NNRecommendFunction: FunctionImplementation<NNConfig> = {
   type: "nearestNeighbour",
   inputSize: 2,
   getOutput: (input: DTOMatrix[]) => {
@@ -29,9 +26,9 @@ const NNRecommendFunction: FunctionImplementation = {
     }
 
     // Returns input[1] if valid
-    return input[1]
+    return input[1] as DTOMatrix
   },
-  specifyInput: (output: DTOMatrix, input: DTOMatrix[]) => {
+  specifyInput: (output: DTOMatrix, input: DTOMatrix[]): [DTOMatrix, DTOMatrix] => {
     return [{
       dtoType: DTOType.matrix,
       fromEntity: output.fromEntity,
@@ -42,21 +39,27 @@ const NNRecommendFunction: FunctionImplementation = {
       ...output
     }]
   },
-  createConfig: (output) => ({
+  createConfig: (output: DTOMatrix) => ({
     // Number of neighbours to consider
     output,
     N: Math.floor(Math.random() * 10 + 2)
   }),
-  evaluate: (config: NNConfig, [similarity, scores]) => {
-    let res: any = math.zeros([config.output.rows, config.output.columns], "sparse")
+  evaluate: (config: NNConfig, [similarity, scores]: [number[][], number[][]]) => {
+    const [rows, cols] = [scores.length, scores[0].length]
+    let res: number[][] = math.zeros([rows, cols]) as number[][]
     // For each row in similarity
-    for(let row = 0; row < config.output.rows; row++) {
-      // @ts-ignore
-      const topIdx = sortIdx(math.row(similarity, row)).slice(0, config.N)
+    for (let idxRow = 0; idxRow < rows; idxRow++) {
+      console.log(`Row: #${idxRow}`)
+
+      const similarUserScores = similarity[idxRow]
       // For N nearest rows (sort idx in rows)
-      for (let col = 0; col < config.output.columns; col++) {
-        const score = topIdx.reduce((sum, idx) => sum + similarity[idx] * scores[row][col], 0) / topIdx.length
-        res = matrixSet(res, row, col, score)
+      const similarUserIdxs = sortIdx(similarUserScores).slice(0, config.N)
+      for (let idxCol = 0; idxCol < cols; idxCol++) {
+        res[idxRow][idxCol] = similarUserIdxs
+          .reduce((sum, userIdx) =>
+            sum + similarUserScores[userIdx] * scores[idxRow][idxCol],
+            0
+          ) / similarUserIdxs.length
       }
     }
 

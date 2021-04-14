@@ -59,5 +59,5 @@ interface Interaction {
   fromEntityType: string;
   toEntityType: string;
 
-  interactions: GPMatrix;
+  interactions: number[][];
 }

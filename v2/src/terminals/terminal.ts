@@ -17,9 +17,9 @@ export const calcTerminal = (config: NodeConfig, problemInstance) => {
 };
 
 export const TerminalFactory = (
-  terminals: TerminalImplementation[],
+  terminals: TerminalImplementation<any>[],
   type: string
-): TerminalImplementation => {
+): TerminalImplementation<any> => {
   const res = terminals.find((it) => it.type === type);
 
   if (!res) {
@@ -31,7 +31,7 @@ export const TerminalFactory = (
 
 export const getTerminals = (
   problemInstance: ProblemInstance
-): TerminalImplementation[] => [
+): TerminalImplementation<any>[] => [
   // RandomMatrix,
   // RandomScalar,
   // RandomVector,
@@ -39,10 +39,11 @@ export const getTerminals = (
   ...getInteractionPropertyTerminals(problemInstance)
 ];
 
-export interface TerminalImplementation extends NodeImplementation {
+
+export interface TerminalImplementation<T extends Omit<NodeConfig, "type">> extends NodeImplementation<T> {
   getOutput: () => DTO;
   // TODO: problemInstance might not be necessary here?
-  evaluate: (config: any, problemInstance: ProblemInstance) => any;
+  evaluate: (config: T, problemInstance: ProblemInstance) => any;
 }
 
 interface ConfigTree {

@@ -12,7 +12,7 @@ export const calcFunction = (config: NodeConfig, input: any) => {
   return Function.evaluate(config, input);
 };
 
-export const FunctionFactory = (type: string): FunctionImplementation => {
+export const FunctionFactory = (type: string): FunctionImplementation<any> => {
   const res = Functions.find((it) => it.type === type);
 
   if (!res) {
@@ -22,17 +22,17 @@ export const FunctionFactory = (type: string): FunctionImplementation => {
   return res;
 };
 
-export const Functions: FunctionImplementation[] = [
+export const Functions: FunctionImplementation<any>[] = [
   // ...MathFunctions,
   ...PropertyFunctions,
   ...SimilarityFunctions,
   ...CFFunctions
 ];
 
-export interface FunctionImplementation extends NodeImplementation {
+export interface FunctionImplementation<T extends Omit<NodeConfig, "type">> extends NodeImplementation<T> {
   type: string;
   inputSize: number;
   getOutput: (input: DTO[]) => DTO | undefined;
   specifyInput: (output: DTO, input: DTO[]) => DTO[];
-  evaluate: (config: NodeConfig, input: any) => any;
+  evaluate: (config: T, input: any) => any;
 }
