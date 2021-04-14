@@ -25,9 +25,10 @@ export const produceOffspring = (generation: EvaluatedConfig[], mutate: MutateFn
 }
 
 const tournamentSelection = (parents: EvaluatedConfig[], k = CONFIG.REPRODUCTION.TOURNAMENT_SIZE) => { // add K to config
-  const selected = pick<EvaluatedConfig>(k)(...parents).sort((a, b) => b.fitness - a.fitness);
+  const left = pick<EvaluatedConfig>(k)(...parents).sort((a, b) => b.fitness - a.fitness)[0];
+  const right = pick<EvaluatedConfig>(k)(...parents).sort((a, b) => b.fitness - a.fitness)[0];
 
-  return [selected[0].config, selected[1].config]
+  return [left.config, right.config]
 }
 
 const crossover = (parent1: ConfigTree, parent2: ConfigTree): ConfigTree[] => {

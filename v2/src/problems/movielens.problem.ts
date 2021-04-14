@@ -1,5 +1,5 @@
 import {Matrix, zeros} from "mathjs"
-import {generateMulberrySeed} from "../utils/random.utils";
+import {generateMulberrySeed, mulberry32, pick, sample} from "../utils/random.utils";
 import {PropertyType, ReadProblemFunction} from "../interface/problem.interface";
 import {readCsvFile} from "../utils/fs.utils";
 import {groupBy, toIdxMap} from "../utils/functional.utils";
@@ -13,13 +13,18 @@ export const readMovieLens: ReadProblemFunction = async (
   const ratings = await readRatings();
   const tags = await readTags();
 
+
+  const PRG = mulberry32(interleaveSeed)
+
   const ratingsByUser = ratings.reduce(groupBy((it) => it.userId), {})
+
+  const numberOfUsers = Math.floor(interleaveSize * Object.keys(ratingsByUser).length)
 
   const movieRefs = movies.map(it => it.movieId)
   const movieToIdxMap = movieRefs.reduce(toIdxMap, {})
 
-  // TODO: Add interleaved sampling here
-  const userRefs = Object.keys(ratingsByUser)
+  const userRefs = interleaveSize === 1 ? Object.keys(ratingsByUser) : sample(Object.keys(ratingsByUser), numberOfUsers, PRG)
+
   const userToIdxMap = userRefs.reduce(toIdxMap, {})
 
   const ratingMatrix: number[][] = zeros([userRefs.length, movieRefs.length]) as number[][]
@@ -28,27 +33,33 @@ export const readMovieLens: ReadProblemFunction = async (
   const filter: number[][] = []
   const validate: number[][] = []
 
-  Object.keys(ratingsByUser).forEach((userId, userIndex) => {
-    const ratings = ratingsByUser[userId]
-    filter.push([])
-    validate.push([])
-    ratings.forEach((rating, index) => {
-      if (index < 0.9 * ratings.length) {
+  Object.keys(ratingsByUser)
+    .filter(userId => userToIdxMap[userId] !== undefined)
+    .forEach((userId, userIndex) => {
+      const ratings = ratingsByUser[userId]
+      filter.push([])
+      validate.push([])
+      ratings
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .forEach((rating, index) => {
+          if (index < 0.9 * ratings.length) {
 
-        ratingMatrix[userToIdxMap[rating.userId]][movieToIdxMap[rating.movieId]] = rating.rating
+            ratingMatrix[userToIdxMap[rating.userId]][movieToIdxMap[rating.movieId]] = Number(rating.rating)
 
-        filter[userIndex].push(movieToIdxMap[rating.movieId])
-      } else if (rating.rating >= 3.5) {
-        validate[userIndex].push(movieToIdxMap[rating.movieId])
-      }
+            filter[userIndex].push(movieToIdxMap[rating.movieId])
+          } else if (rating.rating >= 3.5) {
+            validate[userIndex].push(movieToIdxMap[rating.movieId])
+          }
+        })
     })
-  })
 
   const movieTags: string[][] = [...Array(movieRefs.length).keys()].map(_ => [])
-  tags.forEach(tag => {
-    tagMatrix[userToIdxMap[tag.userId]][movieToIdxMap[tag.movieId]] = 1
-    movieTags[movieToIdxMap[tag.movieId]].push(tag.tag)
-  })
+  tags
+    .filter(it => userToIdxMap[it.userId] !== undefined)
+    .forEach(tag => {
+      tagMatrix[userToIdxMap[tag.userId]][movieToIdxMap[tag.movieId]] = 1
+      movieTags[movieToIdxMap[tag.movieId]].push(tag.tag)
+    })
 
   return {
     output: {

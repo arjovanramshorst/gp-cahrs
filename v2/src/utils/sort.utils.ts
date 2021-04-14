@@ -5,3 +5,6 @@ export const sortIdx = (row: number[]) => {
     });
 };
 
+export const takeTopNIdx = (row: number[], N: number) => {
+  return sortIdx(row).slice(0, N)
+}

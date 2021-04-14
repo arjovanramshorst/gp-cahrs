@@ -17,11 +17,15 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
 
   for (let userIdx = 0; userIdx < output.length; userIdx++) {
     const topIdx = sortIdx(output[userIdx])
+    const topScores = topIdx.map(idx => output[userIdx][idx])
     const toFilter = problem.filter[userIdx]
     const toFind = problem.validate[userIdx]
     let total = 0;
     let found = 0;
 
+    if (!toFilter) {
+      debugger
+    }
     for (let i = 0; i < topIdx.length; i++) {
       if (toFilter.indexOf(topIdx[i]) === -1) {
         // Recommendation is not filtered

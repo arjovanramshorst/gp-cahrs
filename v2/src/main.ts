@@ -6,20 +6,20 @@ import {getTerminals} from './terminals/terminal';
 import {ConfigTree, generateTree, generateTreeTables} from './tree';
 import {fitnessScore} from "./fitness"
 import {appendFile, writeFile} from "./utils/fs.utils";
-import {EvaluatedConfig, mutateConfigTree, produceOffspring} from "./reproduce";
+import {EvaluatedConfig, produceOffspring} from "./reproduce";
 import {DTO} from "./interface/dto.interface";
 
 const filename = `Run_${new Date().toISOString()}_${CONFIG.GENERATION_SIZE}_${CONFIG.GENERATIONS}.csv`
 
 const main = async () => {
 
-  const problem = await readMovieLens()
+  const problem = await readMovieLens(CONFIG.INTERLEAVE_SIZE)
 
   const functions = Functions
   const terminals = getTerminals(problem)
 
-  const treeTablesGrowth = generateTreeTables(terminals, functions, 3, true)
-  const treeTablesFull = generateTreeTables(terminals, functions, 3, false)
+  const treeTablesGrowth = generateTreeTables(terminals, functions, CONFIG.MAX_DEPTH, true)
+  const treeTablesFull = generateTreeTables(terminals, functions, CONFIG.MAX_DEPTH, false)
 
   console.log("Generating initial population")
   let generation = []
@@ -28,13 +28,20 @@ const main = async () => {
     generation.push(generateTree(problem.output, treeTablesFull, terminals, functions, CONFIG.MAX_DEPTH, false))
   }
 
-  const mutateFn = (output: DTO, maxDepth: number) =>
-    generateTree(output, treeTablesGrowth, terminals, functions, maxDepth, true)
 
   console.log("Generating initial population - DONE")
   for (let gen = 0; gen < CONFIG.GENERATIONS; gen++) {
+    console.log(`Sampling dataset for generation #${gen}`)
+    const sampledProblem = await readMovieLens(CONFIG.INTERLEAVE_SIZE)
+    console.log(`Sampling dataset for generation #${gen} - DONE`)
+
+    const treeTablesGrowth = generateTreeTables(terminals, functions, CONFIG.MAX_DEPTH, true)
+
+    const mutateFn = (output: DTO, maxDepth: number) =>
+      generateTree(output, treeTablesGrowth, terminals, functions, maxDepth, true)
+
     console.log(`Evaluating generation #${gen}`)
-    const evaluated = evaluateGeneration(gen, generation, problem)
+    const evaluated = evaluateGeneration(gen, generation, sampledProblem)
     console.log(`Evaluating generation #${gen} - DONE`)
 
     console.log(`Producing generation #${gen + 1}`)

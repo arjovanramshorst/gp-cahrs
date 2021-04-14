@@ -61,7 +61,7 @@ export const generateTree = (
       .filter((it) => it.possibleInput.length > 0);
 
     if (grow) {
-      if (validFunctions.length > 0 && Math.random() < CONFIG.GROWTH_FUNCTION_FRACTION) {
+      if (validTerminals.length === 0 || (validFunctions.length > 0 && Math.random() < CONFIG.GROWTH_FUNCTION_FRACTION)) {
         const randomFunction = selectRandom(validFunctions);
         selected = randomFunction.function;
         input = selectRandom(randomFunction.possibleInput);
@@ -73,6 +73,9 @@ export const generateTree = (
       selected = randomFunction.function;
       input = selectRandom(randomFunction.possibleInput);
     }
+  }
+  if (!selected) {
+    debugger
   }
   const config = {
     type: selected.type,
