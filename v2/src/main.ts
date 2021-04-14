@@ -28,8 +28,8 @@ const main = async () => {
     generation.push(generateTree(problem.output, treeTablesFull, terminals, functions, CONFIG.MAX_DEPTH, false))
   }
 
-  const mutateFn = (output: DTO) =>
-    generateTree(output, treeTablesGrowth, terminals, functions, CONFIG.MAX_DEPTH, true)
+  const mutateFn = (output: DTO, maxDepth: number) =>
+    generateTree(output, treeTablesGrowth, terminals, functions, maxDepth, true)
 
   console.log("Generating initial population - DONE")
   for (let gen = 0; gen < CONFIG.GENERATIONS; gen++) {

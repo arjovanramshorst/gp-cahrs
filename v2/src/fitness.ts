@@ -42,7 +42,11 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
     avgPrecision += precision / output.length
   }
 
-  const fScore = 2 * (avgPrecision * avgRecall) / (avgPrecision + avgRecall)
+  let fScore = 0
+
+  if (avgPrecision + avgRecall > 0) {
+    fScore = 2 * (avgPrecision * avgRecall) / (avgPrecision + avgRecall)
+  }
 
   return {
     recall: avgRecall,

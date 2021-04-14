@@ -5,6 +5,7 @@ import {generateMulberrySeed} from "./utils/random.utils";
 import {NNConfig, NNRecommendFunction} from "./functions/cf.function";
 import {PropertyType} from "./interface/problem.interface";
 import {generateTree} from "./tree";
+import {PearsonSimilarityFunction} from "./functions/similarity.function";
 
 const measure = (times: number, fn: () => void) => {
   const t = Date.now();
@@ -42,15 +43,15 @@ const createMatrix = (rows: number, cols: number) =>
 
 // const a = createVector(10000)
 // const b = createVector(10000)
-const users = 600
+const users = 100
 const matrix = createMatrix(users, 9000)
 const similarity = createMatrix(users, users)
 
 // measure(10, (() => mathZeros(10000)))
 // measure(10, () => empty(10000))
 
-// measure(1, () => PearsonSimilarityFunction.evaluate({type: "any"}, [matrix]))
+measure(1, () => PearsonSimilarityFunction.evaluate({type: "any"}, [matrix]))
 
-measure(1, () => {
-  NNRecommendFunction.evaluate({type: "any", N: 10} as NNConfig, [similarity, matrix])
-})
+// measure(1, () => {
+//   NNRecommendFunction.evaluate({type: "any", N: 10} as NNConfig, [similarity, matrix])
+// })

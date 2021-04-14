@@ -60,7 +60,7 @@ export const RandomScalar: TerminalImplementation<FillConfig<DTOScalar>> = {
   }),
   createConfig: (output: DTOScalar) => ({
     output,
-    seed: Math.floor(Math.random() * CONFIG.NODES.SCALAR.MAX)
+    seed: Math.floor(1 + Math.random() * CONFIG.NODES.SCALAR.MAX)
   }),
   evaluate: (config, problem) => config.seed,
 };
