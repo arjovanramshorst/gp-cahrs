@@ -18,12 +18,13 @@ export const readCsvFile = <T>(filename: string): Promise<T[]> => {
 };
 
 export const appendFile = (filename: string, data: string) => {
-  fs.appendFile(`./output/${filename}`, data, (err: any) => {
-    if (err) throw err
-    console.log(`appended to file: ${filename}`)
-  })
+  fs.appendFileSync(`./output/${filename}`, data)
 }
 
 export const writeFile = (filename: string, data: string) => {
   fs.writeFileSync(`./output/${filename}`, data)
+}
+
+export const readJson = (filename: string) => {
+  return JSON.parse(fs.readFileSync(`./output/${filename}`).toString())
 }

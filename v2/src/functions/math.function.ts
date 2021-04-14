@@ -30,6 +30,29 @@ export const mathMatrixOutput = (input: DTO[]) => {
 };
 
 export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
+  if (output.dtoType === DTOType.matrix && input[0].dtoType === DTOType.matrix && input[1].dtoType === DTOType.matrix) {
+
+    // Make sure that if output is not completely defined, inputs MUST be same size (
+    const [left, right] = input as DTOMatrix[]
+    // Set a default size? Maybe make this random?
+    const defaultSize = 1
+
+    const rows = output.rows || left.rows || right.rows || defaultSize
+    const columns = output.columns || left.columns || right.columns || defaultSize
+
+    return [{
+      ...output,
+      ...left,
+      rows,
+      columns
+    }, {
+      ...output,
+      ...right,
+      rows,
+      columns
+    }]
+  }
+
   const specific = input.map((it) => {
     if (it.dtoType === DTOType.matrix) {
       return output;

@@ -4,6 +4,7 @@ import {RandomMatrix, RandomVector} from "./terminals/fill.terminal";
 import {generateMulberrySeed} from "./utils/random.utils";
 import {NNConfig, NNRecommendFunction} from "./functions/cf.function";
 import {PropertyType} from "./interface/problem.interface";
+import {generateTree} from "./tree";
 
 const measure = (times: number, fn: () => void) => {
   const t = Date.now();
