@@ -29,7 +29,7 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
   },
   evaluate: (config, [scores]) => {
     const [rows, cols] = [scores.length, scores[0].length]
-    const res: any = zeros([rows, cols])
+    const res: any = zeros([rows, rows])
     for (let idxR1 = 0; idxR1 < rows - 1; idxR1++) {
       const row1 = scores[idxR1]
       for (let idxR2 = idxR1 + 1; idxR2 < rows; idxR2++) {

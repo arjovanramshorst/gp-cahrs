@@ -38,11 +38,11 @@ const testTree = async (output: DTO) => {
   console.log(fitness)
 }
 
-// testRecent()
+testRecent()
 
-testTree({
-  dtoType: DTOType.matrix,
-  fromEntity: "user",
-  rows: 610
-})
+// testTree({
+//   dtoType: DTOType.matrix,
+//   fromEntity: "user",
+//   rows: 610
+// })
 // test(JSON.parse(configTest1))
