@@ -31,7 +31,6 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
     const [rows, cols] = [scores.length, scores[0].length]
     const res: any = zeros([rows, cols])
     for (let idxR1 = 0; idxR1 < rows - 1; idxR1++) {
-      console.log(`row #${idxR1} / ${rows}`)
       const row1 = scores[idxR1]
       for (let idxR2 = idxR1 + 1; idxR2 < rows; idxR2++) {
         const similarity = pearsonCorrelation(row1, scores[idxR2])
@@ -43,6 +42,11 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
   },
 };
 
+/**
+ * From https://gist.github.com/matt-west/6500993#gistcomment-2743187
+ * @param d1
+ * @param d2
+ */
 export const pearsonCorrelation = (d1: any, d2: any) => {
   let { min, pow, sqrt } = Math
   let add = (a, b) => a + b

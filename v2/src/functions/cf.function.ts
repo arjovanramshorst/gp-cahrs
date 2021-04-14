@@ -49,8 +49,6 @@ export const NNRecommendFunction: FunctionImplementation<NNConfig> = {
     let res: number[][] = math.zeros([rows, cols]) as number[][]
     // For each row in similarity
     for (let idxRow = 0; idxRow < rows; idxRow++) {
-      console.log(`Row: #${idxRow}`)
-
       const similarUserScores = similarity[idxRow]
       // For N nearest rows (sort idx in rows)
       const similarUserIdxs = sortIdx(similarUserScores).slice(0, config.N)

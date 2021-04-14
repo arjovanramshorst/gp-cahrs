@@ -23,3 +23,7 @@ export const appendFile = (filename: string, data: string) => {
     console.log(`appended to file: ${filename}`)
   })
 }
+
+export const writeFile = (filename: string, data: string) => {
+  fs.writeFileSync(`./output/${filename}`, data)
+}

@@ -30,7 +30,7 @@ export const mathMatrixOutput = (input: DTO[]) => {
 };
 
 export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
-  return input.map((it) => {
+  const specific = input.map((it) => {
     if (it.dtoType === DTOType.matrix) {
       return output;
     }
@@ -48,6 +48,8 @@ export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
     }
     return it;
   });
+
+  return specific
 };
 
 const invalidVector = (vector: DTO) => {

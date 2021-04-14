@@ -5,7 +5,7 @@ import {readMovieLens} from './problems/movielens.problem';
 import {getTerminals} from './terminals/terminal';
 import {ConfigTree, generateTree, generateTreeTables} from './tree';
 import {fitnessScore} from "./fitness"
-import {appendFile} from "./utils/fs.utils";
+import {appendFile, writeFile} from "./utils/fs.utils";
 import {EvaluatedConfig, mutateConfigTree, produceOffspring} from "./reproduce";
 import {DTO} from "./interface/dto.interface";
 
@@ -46,6 +46,7 @@ const main = async () => {
 const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): EvaluatedConfig[] => {
   return configs.map((config, idx) => {
     console.log(`Evaluating generation #${gen} RS ${idx}`)
+    writeFile("most_recent.json", JSON.stringify(config))
     const res = calcRecursive(config, problem)
     const fitness = fitnessScore(res, problem)
 
