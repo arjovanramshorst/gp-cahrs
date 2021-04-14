@@ -50,7 +50,7 @@ const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): Evalua
     const res = calcRecursive(config, problem)
     const fitness = fitnessScore(res, problem)
 
-    const str = `${gen};${idx};${fitness.fScore};${fitness.recall};${fitness.precision};${JSON.stringify(config)}\n`;
+    const str = `${gen}\t${idx}\t${fitness.fScore}\t${fitness.recall}\t${fitness.precision}\t${JSON.stringify(config)}\n`;
     appendFile(filename, str)
 
     console.log(`Evaluating generation #${gen} RS ${idx} - DONE (${fitness.performance})`)

@@ -30,7 +30,7 @@ const tournamentSelection = (parents: EvaluatedConfig[], k = CONFIG.REPRODUCTION
   return [selected[0].config, selected[1].config]
 }
 
-const crossover = (parent1: ConfigTree, parent2: ConfigTree): [ConfigTree, ConfigTree] => {
+const crossover = (parent1: ConfigTree, parent2: ConfigTree): ConfigTree[] => {
   // Clone parents
   let child1 = cloneConfig(parent1)
   let child2 = cloneConfig(parent2)
@@ -114,4 +114,4 @@ const recursiveConfig = (config: ConfigTree, list: RecursiveConfig[] = [], depth
 const maxDepth = (config: ConfigTree) => recursiveConfig(config).reduce((max,curr) => curr.depth > max ? curr.depth : max, 0) + 1
 
 // Used to make sure there are no circular references anywhere
-const cloneConfig = (config: ConfigTree) => JSON.parse(JSON.stringify(config))
+const cloneConfig = (config: ConfigTree): ConfigTree => JSON.parse(JSON.stringify(config))
