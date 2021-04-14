@@ -1,7 +1,6 @@
 import {FunctionImplementation} from "./function";
 import {DTOMatrix, DTOType} from "../interface/dto.interface";
 import {zeros} from "mathjs";
-import {matrixSize} from "../utils/matrix.utils";
 
 export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
   type: "pearsonSimilarity",
@@ -29,7 +28,7 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
     }]
   },
   evaluate: (config, [scores]) => {
-    const [rows, cols] = matrixSize(scores)
+    const [rows, cols] = [scores.length, scores[0].length]
     const res: any = zeros([rows, cols])
     for (let idxR1 = 0; idxR1 < rows - 1; idxR1++) {
       console.log(`row #${idxR1} / ${rows}`)

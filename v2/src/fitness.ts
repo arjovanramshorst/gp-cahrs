@@ -1,6 +1,5 @@
 import { ProblemInstance } from "./interface/problem.interface";
 import {sortIdx} from "./utils/sort.utils";
-import {matrixRow} from "./utils/matrix.utils";
 
 export interface FitnessValue {
   recall: number;

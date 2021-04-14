@@ -2,8 +2,6 @@ import {zeros} from "mathjs"
 import {DTOType} from "./interface/dto.interface";
 import {RandomMatrix, RandomVector} from "./terminals/fill.terminal";
 import {generateMulberrySeed} from "./utils/random.utils";
-import {pearsonCorrelation, PearsonSimilarityFunction, SimilarityFunctions} from "./functions/similarity.function";
-import {matrixSize} from "./utils/matrix.utils";
 import {NNConfig, NNRecommendFunction} from "./functions/cf.function";
 import {PropertyType} from "./interface/problem.interface";
 
@@ -32,13 +30,11 @@ const empty = (size) => {
 
 const createVector = (size: number) =>
   RandomVector.evaluate({
-    type: "any",
     output: {dtoType: DTOType.vector, items: size, valueType: PropertyType.number},
     seed: generateMulberrySeed()
   }, undefined)
 const createMatrix = (rows: number, cols: number) =>
   RandomMatrix.evaluate({
-    type: "any",
     output: {dtoType: DTOType.matrix, rows: rows, columns: cols},
     seed: generateMulberrySeed()
   }, undefined)

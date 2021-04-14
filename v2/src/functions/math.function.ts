@@ -63,7 +63,7 @@ const invalidVector = (vector: DTO) => {
   return false;
 };
 
-const MultiplyFunction: FunctionImplementation = {
+const MultiplyFunction: FunctionImplementation<{}> = {
   type: "multiply",
   inputSize: 2,
   getOutput: mathMatrixOutput,
@@ -73,7 +73,7 @@ const MultiplyFunction: FunctionImplementation = {
   specifyInput: mathMatrixInput,
 };
 
-const SumFunction: FunctionImplementation = {
+const SumFunction: FunctionImplementation<{}> = {
   type: "sum",
   inputSize: 2,
   getOutput: mathMatrixOutput,
@@ -83,7 +83,7 @@ const SumFunction: FunctionImplementation = {
   specifyInput: mathMatrixInput,
 };
 
-const SubtractFunction: FunctionImplementation = {
+const SubtractFunction: FunctionImplementation<{}> = {
   type: "subtract",
   inputSize: 2,
   getOutput: mathMatrixOutput,
