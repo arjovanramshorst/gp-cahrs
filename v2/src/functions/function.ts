@@ -23,7 +23,7 @@ export const FunctionFactory = (type: string): FunctionImplementation<any> => {
 };
 
 export const Functions: FunctionImplementation<any>[] = [
-  // ...MathFunctions,
+  ...MathFunctions,
   ...PropertyFunctions,
   ...SimilarityFunctions,
   ...CFFunctions
