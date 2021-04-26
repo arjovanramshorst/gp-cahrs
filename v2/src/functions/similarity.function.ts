@@ -13,6 +13,11 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
 
     const inputMatrix = input[0] as DTOMatrix
 
+    if ((inputMatrix.fromEntity || inputMatrix.toEntity) && inputMatrix.fromEntity === inputMatrix.toEntity) {
+      // This only works on interactions between different entities, so we can ignore inputs where from/to is the same
+      return undefined
+    }
+
     return {
       dtoType: DTOType.matrix,
       fromEntity: inputMatrix.fromEntity,
@@ -21,11 +26,14 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
       columns: inputMatrix.rows
     }
   },
-  specifyInput: (output: DTOMatrix, input): [DTOMatrix] => {
+  specifyInput: (output: DTOMatrix, input: [DTOMatrix]): [DTOMatrix] => {
     return [{
       dtoType: DTOType.matrix,
       fromEntity: output.fromEntity,
       rows: output.rows,
+      toEntity: input[0].toEntity,
+      columns: input[0].columns
+
     }]
   },
   evaluate: (config, [scores]) => {
