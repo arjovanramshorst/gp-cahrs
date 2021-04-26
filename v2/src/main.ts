@@ -51,11 +51,20 @@ const main = async () => {
 }
 
 const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): EvaluatedConfig[] => {
+  const cache = {}
   return configs.map((config, idx) => {
+    const key = JSON.stringify(config)
     console.log(`Evaluating generation #${gen} RS ${idx}`)
     writeFile("most_recent.json", JSON.stringify(config))
-    const res = calcRecursive(config, problem)
-    const fitness = fitnessScore(res, problem)
+    let fitness
+    if (cache[key]){
+      console.log("Using cache..")
+      fitness = cache[key]
+    } else {
+      const res = calcRecursive(config, problem)
+      fitness = fitnessScore(res, problem)
+      cache[JSON.stringify(config)] = fitness
+    }
 
     const str = `${gen}\t${idx}\t${fitness.fScore}\t${fitness.recall}\t${fitness.precision}\t${JSON.stringify(config)}\n`;
     appendFile(filename, str)
