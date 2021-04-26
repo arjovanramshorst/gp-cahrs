@@ -6,6 +6,7 @@ import {NodeConfig} from "../tree";
 import {SimilarityFunctions} from "./similarity.function";
 import {CFFunctions} from "./cf.function";
 import {PopularityFunctions} from "./popularity.function";
+import {MatrixFunctions} from "./matrix.function";
 
 
 export const calcFunction = (config: NodeConfig, input: any) => {
@@ -28,7 +29,8 @@ export const Functions: FunctionImplementation<any>[] = [
   ...PropertyFunctions,
   ...SimilarityFunctions,
   ...CFFunctions,
-  ...PopularityFunctions
+  ...PopularityFunctions,
+  ...MatrixFunctions,
 ];
 
 export interface FunctionImplementation<T extends Omit<NodeConfig, "type">> extends NodeImplementation<T> {
