@@ -6,6 +6,7 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
   type: "pearsonSimilarity",
   inputSize: 1,
   getOutput: (input) => {
+    // TOOD: Only allow this for root model?
     if (input[0].dtoType !== DTOType.matrix) {
       return undefined
     }

@@ -5,7 +5,7 @@ import {
   DTOMatrix,
   DTOType,
   DTOVector,
-  findMatchingType,
+  findMatchingType, sameOrUndefined,
 } from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
 
@@ -24,8 +24,19 @@ export const mathMatrixOutput = (input: DTO[]) => {
   if (left.dtoType === right.dtoType) {
     return findMatchingType(left, right);
   }
-  // TODO: Add support for vectors?
+  if (
+    left.dtoType === DTOType.vector && right.dtoType === DTOType.matrix
+    && sameOrUndefined(left.items, right.columns) && sameOrUndefined(left.entity, right.toEntity)
+  ) {
+    return right
+  }
 
+  if (
+    right.dtoType === DTOType.vector && left.dtoType === DTOType.matrix
+    && sameOrUndefined(right.items, left.columns) && sameOrUndefined(right.entity, left.toEntity)
+  ) {
+    return left
+  }
   return undefined;
 };
 
@@ -62,11 +73,10 @@ export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
     }
 
     if (it.dtoType === DTOType.vector && output.dtoType === DTOType.matrix) {
-      // TODO: add possibility for column vectors as well?
       return {
         ...it,
         items: (output as DTOMatrix).columns,
-        entity: (output as DTOMatrix).fromEntity,
+        entity: (output as DTOMatrix).toEntity,
       } as DTO;
     }
     return it;
@@ -88,13 +98,26 @@ const invalidVector = (vector: DTO) => {
   return false;
 };
 
+const handleWithVectors = (func) => (config, input) => {
+  const matrixes = input.filter(it => it.dtoType === DTOType.matrix)
+  const vectors = input.filter(it => it.dtoType === DTOType.vector)
+  if (matrixes.length === 1 && vectors.length === 1) {
+    const matrix = matrixes[0]
+    const vector = vectors[0]
+    for (let i = 0; i < matrix.length; i++) {
+      matrix[i] = func(vector, matrix[i])
+    }
+    return matrix
+  } else {
+    return func(input[0], input[1])
+  }
+}
+
 const MultiplyFunction: FunctionImplementation<{}> = {
   type: "multiply",
   inputSize: 2,
   getOutput: mathMatrixOutput,
-  evaluate: (config, input) => {
-    return dotMultiply(input[0], input[1])
-  },
+  evaluate: handleWithVectors((left, right) => dotMultiply(left, right)),
   specifyInput: mathMatrixInput,
 };
 
@@ -102,9 +125,7 @@ const SumFunction: FunctionImplementation<{}> = {
   type: "sum",
   inputSize: 2,
   getOutput: mathMatrixOutput,
-  evaluate: (config, input) => {
-    return add(input[0], input[1])
-  },
+  evaluate: handleWithVectors((left, right) => add(left, right)),
   specifyInput: mathMatrixInput,
 };
 
@@ -112,11 +133,13 @@ const SubtractFunction: FunctionImplementation<{}> = {
   type: "subtract",
   inputSize: 2,
   getOutput: mathMatrixOutput,
-  evaluate: (config, input) => {
-    return subtract(input[0], input[1])
-  },
+  evaluate: handleWithVectors((left, right) => subtract(left, right)),
   specifyInput: mathMatrixInput,
 };
 
 
-export const MathFunctions = [MultiplyFunction, SumFunction, SubtractFunction];
+export const MathFunctions = [
+  MultiplyFunction,
+  SumFunction,
+  // SubtractFunction
+];

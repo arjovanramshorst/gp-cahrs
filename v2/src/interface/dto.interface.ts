@@ -53,6 +53,14 @@ export const findMatchingType = <T extends DTO>(left?: T, right?: T): T | undefi
   }
 };
 
+export const sameOrUndefined = <T>(left?: T, right?: T) => {
+  if (!left || !right) {
+    return true
+  } else {
+    return left === right
+  }
+}
+
 export interface DTOMatrix {
   dtoType: DTOType.matrix;
   fromEntity?: string;
