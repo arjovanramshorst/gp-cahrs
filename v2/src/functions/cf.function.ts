@@ -109,7 +109,8 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
     // find N similar entityIdx given similarity:
     const similarIdx: number[][] = []
     for (let idxRow = 0; idxRow < similarity.length; idxRow++) {
-      similarIdx.push(takeTopNIdx(similarity[idxRow], config.N))
+      const row = similarity[idxRow]
+      similarIdx.push(takeTopNIdx(row, config.N))
     }
 
     // For each row in similarity

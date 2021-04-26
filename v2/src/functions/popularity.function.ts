@@ -26,11 +26,12 @@ const PopularityFunction: FunctionImplementation<{}> = {
       toEntity: output.entity,
     }] as DTOMatrix[]
   },
-  evaluate: (config, input) => {
-    const res = zeros(input[0].length) as number[]
+  evaluate: (config, [input]) => {
+    const res: number[] = zeros([input[0].length]) as number[]
     for (let rowIdx = 0; rowIdx < input.length; rowIdx++) {
       for (let colIdx = 0; colIdx < input[0].length; colIdx++) {
-        res[colIdx] += input[0][rowIdx][colIdx]
+        const val = input[rowIdx][colIdx]
+        res[colIdx] = (res[colIdx] ?? 0) + val
       }
     }
 

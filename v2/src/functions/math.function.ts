@@ -99,8 +99,8 @@ const invalidVector = (vector: DTO) => {
 };
 
 const handleWithVectors = (func) => (config, input) => {
-  const matrixes = input.filter(it => it.dtoType === DTOType.matrix)
-  const vectors = input.filter(it => it.dtoType === DTOType.vector)
+  const matrixes = input.filter(it => Array.isArray(it) && Array.isArray(it[0]))
+  const vectors = input.filter(it => Array.isArray(it) && !Array.isArray(it[0]))
   if (matrixes.length === 1 && vectors.length === 1) {
     const matrix = matrixes[0]
     const vector = vectors[0]
