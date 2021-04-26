@@ -8,9 +8,11 @@ export const CONFIG = {
   REPRODUCTION: {
     TOURNAMENT_SIZE: 4
   },
+  DEBUG_MODE: process.env.CAHRS_DEBUG_MODE !== "false",
   NODES: {
     SCALAR: {
       MAX: 5
     }
   }
 }
+console.log(CONFIG)
