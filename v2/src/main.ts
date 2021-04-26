@@ -8,6 +8,7 @@ import {fitnessScore} from "./fitness"
 import {appendFile, writeFile} from "./utils/fs.utils";
 import {EvaluatedConfig, produceOffspring} from "./reproduce";
 import {DTO} from "./interface/dto.interface";
+import {printConfig} from "./utils/display.utils";
 
 const filename = `Run_${new Date().toISOString()}_${CONFIG.GENERATION_SIZE}_${CONFIG.GENERATIONS}.csv`
 
@@ -54,7 +55,8 @@ const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): Evalua
   const cache = {}
   return configs.map((config, idx) => {
     const key = JSON.stringify(config)
-    console.log(`Evaluating generation #${gen} RS ${idx}`)
+    console.log(`Evaluating generation #${gen} RS ${idx}:`)
+    printConfig(config)
     writeFile("most_recent.json", JSON.stringify(config))
     let fitness
     if (cache[key]){

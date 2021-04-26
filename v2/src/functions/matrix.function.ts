@@ -6,7 +6,7 @@ const TransposeFunction: FunctionImplementation<{}> = {
   type: "transpose",
   inputSize: 1,
   getOutput: ([input]) => {
-    if (input.dtoType !== DTOType.matrix) {
+    if (input.dtoType !== DTOType.matrix || input.fromEntity === input.toEntity) {
       return undefined
     }
     return {
