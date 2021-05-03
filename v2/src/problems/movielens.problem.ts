@@ -1,9 +1,10 @@
-import {Matrix, zeros} from "mathjs"
+import {zeros} from "mathjs"
 import {generateMulberrySeed, mulberry32, pick, sample} from "../utils/random.utils";
 import {PropertyType, ReadProblemFunction} from "../interface/problem.interface";
 import {readCsvFile} from "../utils/fs.utils";
 import {groupBy, toIdxMap} from "../utils/functional.utils";
 import {DTOMatrix, DTOType} from '../interface/dto.interface';
+import {ConfigTree, fun} from "../tree";
 
 export const readMovieLens: ReadProblemFunction = async (
   interleaveSize: number = 1,
@@ -16,7 +17,7 @@ export const readMovieLens: ReadProblemFunction = async (
 
   const PRG = mulberry32(interleaveSeed)
 
-  const ratingsByUser = ratings.reduce(groupBy((it) => it.userId), {})
+  const ratingsByUser = groupBy(ratings, (it) => it.userId)
 
   const numberOfUsers = Math.floor(interleaveSize * Object.keys(ratingsByUser).length)
 
@@ -116,7 +117,9 @@ export const readMovieLens: ReadProblemFunction = async (
         toEntityType: "movie",
         interactions: tagMatrix
       }
-    }
+    },
+
+    baseline: baseline(userRefs.length, movieRefs.length)
   }
 };
 
@@ -137,3 +140,16 @@ const readTags = async () => {
     "../resources/ml-latest-small/tags.csv",
   )
 }
+
+const baseline = (users: number, movies: number): ConfigTree => fun(
+  "addVector",
+  {},
+  [
+    fun("randomMatrix", {seed: 0, output: {dtoType: DTOType.matrix, rows: users, columns: movies}}),
+    fun("popularity", {}, [fun(
+      "interaction(rating)",
+      {},
+      []
+    )])
+  ]
+)

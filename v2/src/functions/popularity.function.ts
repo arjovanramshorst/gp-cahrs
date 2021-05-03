@@ -12,7 +12,7 @@ const PopularityFunction: FunctionImplementation<{}> = {
     }
     return {
       dtoType: DTOType.vector,
-      entity: input.fromEntity,
+      entity: input.toEntity,
       items: input.columns,
       valueType: PropertyType.number
     } as DTOVector

@@ -1,12 +1,6 @@
-import {add, subtract, dotMultiply} from "mathjs"
+import {add, dotMultiply, subtract} from "mathjs"
 import {FunctionImplementation} from "./function";
-import {
-  DTO,
-  DTOMatrix,
-  DTOType,
-  DTOVector,
-  findMatchingType, sameOrUndefined,
-} from "../interface/dto.interface";
+import {DTO, DTOMatrix, DTOType, DTOVector, findMatchingType, sameOrUndefined,} from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
 
 export const mathMatrixOutput = (input: DTO[]) => {
@@ -137,9 +131,36 @@ const SubtractFunction: FunctionImplementation<{}> = {
   specifyInput: mathMatrixInput,
 };
 
+const AddVector: FunctionImplementation<{}> = {
+  type: "addVector",
+  inputSize: 2,
+  getOutput: ([matrix, vector]: DTO[]) => {
+    if (matrix.dtoType === DTOType.matrix && vector.dtoType === DTOType.vector) {
+      if (matrix.columns === vector.items) {
+        return matrix
+      }
+    }
+
+    return undefined
+  },
+  evaluate: handleWithVectors((left, right) => add(left, right)),
+  specifyInput: (output: DTOMatrix, input: DTO[]) => {
+    return [
+      output,
+      {
+        dtoType: DTOType.vector,
+        items: output.columns,
+        entity: output.toEntity,
+        valueType: PropertyType.number
+      }] as DTO[]
+  }
+}
+
+// TODO: Add MultiplyScalar here, remove multiply/sum
 
 export const MathFunctions = [
   MultiplyFunction,
-  SumFunction,
+  // SumFunction,
+  AddVector
   // SubtractFunction
 ];

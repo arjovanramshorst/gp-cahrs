@@ -1,5 +1,6 @@
 import { ProblemInstance } from "../interface/problem.interface";
 import {
+  EmptyTerminal,
   RandomMatrix,
   RandomScalar,
   RandomVector,
@@ -11,19 +12,22 @@ import { NodeImplementation } from "../interface/node.interface";
 import {NodeConfig} from "../tree";
 
 
-export const calcTerminal = (config: NodeConfig, problemInstance) => {
-  const Terminal = TerminalFactory(getTerminals(problemInstance), config.type)
+export const calcTerminal = (config: NodeConfig, problemInstance, defaultOutput: DTO) => {
+  const Terminal = TerminalFactory(getTerminals(problemInstance), config.type, defaultOutput)
   return Terminal.evaluate(config, problemInstance)
 };
 
 export const TerminalFactory = (
   terminals: TerminalImplementation<any>[],
-  type: string
+  type: string,
+  output: DTO
 ): TerminalImplementation<any> => {
   const res = terminals.find((it) => it.type === type);
 
   if (!res) {
-    throw Error(`Invalid function type: ${type}`);
+    console.warn(`Terminal does not exist for current sample dataset`)
+
+    return EmptyTerminal(output)
   }
 
   return res;
@@ -32,7 +36,7 @@ export const TerminalFactory = (
 export const getTerminals = (
   problemInstance: ProblemInstance
 ): TerminalImplementation<any>[] => [
-  // RandomMatrix,
+  RandomMatrix,
   RandomScalar,
   // RandomVector,
   ...getPropertyTerminals(problemInstance),

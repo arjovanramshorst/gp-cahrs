@@ -83,10 +83,12 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
       return undefined
     }
 
+    // TODO: THIS APPEARS TO BE INCORRECT!!!!
     // Returns input[1] if valid
     return input[1] as DTOMatrix
   },
   specifyInput: (output: DTOMatrix, input: DTOMatrix[]): [DTOMatrix, DTOMatrix] => {
+    // TODO: OR THIS!!!!
     return [{
       dtoType: DTOType.matrix,
       fromEntity: output.toEntity,
@@ -136,5 +138,5 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
 
 export const CFFunctions = [
   NNRecommendFunction,
-  InvertedNNRecommendFunction
+  // InvertedNNRecommendFunction
 ]

@@ -1,5 +1,3 @@
-import {size} from "mathjs"
-
 import {DTOMatrix, DTOType, DTOVector} from '../interface/dto.interface';
 import {ProblemInstance} from '../interface/problem.interface';
 import {TerminalImplementation} from './terminal';

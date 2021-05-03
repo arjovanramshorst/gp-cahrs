@@ -53,7 +53,7 @@ const calc = (
   if (isFunction(config)) {
     return calcFunction(config.config, input);
   } else {
-    return calcTerminal(config.config, problemInstance);
+    return calcTerminal(config.config, problemInstance, config.output);
   }
 };
 

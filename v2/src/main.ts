@@ -4,17 +4,28 @@ import {Functions} from './functions/function';
 import {readMovieLens} from './problems/movielens.problem';
 import {getTerminals} from './terminals/terminal';
 import {ConfigTree, generateTree, generateTreeTables} from './tree';
-import {fitnessScore} from "./fitness"
+import {fitnessScore, Score} from "./fitness"
 import {appendFile, writeFile} from "./utils/fs.utils";
 import {EvaluatedConfig, produceOffspring} from "./reproduce";
 import {DTO} from "./interface/dto.interface";
 import {printConfig} from "./utils/display.utils";
+import {csvHeader, produceCsvLine} from "./utils/output.utils";
 
-const filename = `Run_${new Date().toISOString()}_${CONFIG.GENERATION_SIZE}_${CONFIG.GENERATIONS}.csv`
+const filename = `${CONFIG.PROBLEM.name}_${new Date().toISOString()}_${CONFIG.GENERATION_SIZE}_${CONFIG.GENERATIONS}.csv`
 
-const main = async () => {
+const main = async (readProblem = readMovieLens) => {
 
-  const problem = await readMovieLens(CONFIG.INTERLEAVE_SIZE)
+  appendFile(filename, csvHeader)
+  /*************************************************************************
+   *************************************************************************
+   *************************************************************************
+   * TODO: Add git-lfs for large files
+   *************************************************************************
+   *************************************************************************
+   *************************************************************************
+   */
+
+  const problem = await readProblem(CONFIG.INTERLEAVE_SIZE)
 
   const functions = Functions
   const terminals = getTerminals(problem)
@@ -33,7 +44,7 @@ const main = async () => {
   console.log("Generating initial population - DONE")
   for (let gen = 0; gen < CONFIG.GENERATIONS; gen++) {
     console.log(`Sampling dataset for generation #${gen}`)
-    const sampledProblem = await readMovieLens(CONFIG.INTERLEAVE_SIZE)
+    const sampledProblem = await readProblem(CONFIG.INTERLEAVE_SIZE)
     console.log(`Sampling dataset for generation #${gen} - DONE`)
 
     const treeTablesGrowth = generateTreeTables(terminals, functions, CONFIG.MAX_DEPTH, true)
@@ -53,30 +64,38 @@ const main = async () => {
 
 const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): EvaluatedConfig[] => {
   const cache = {}
+  const baselineFitness = fitnessScore(calcRecursive(problem.baseline, problem), problem).raw
+  console.log(`Evaluating generation #${gen} Baseline`)
+  const str = produceCsvLine(`${gen}`, "baseline", baselineFitness, baselineFitness, problem.baseline)
+  appendFile(filename, str)
+  console.log(`Evaluating generation #${gen} Baseline - DONE (${baselineFitness.performance})`)
+
   return configs.map((config, idx) => {
     const key = JSON.stringify(config)
     console.log(`Evaluating generation #${gen} RS ${idx}:`)
     printConfig(config)
     writeFile("most_recent.json", JSON.stringify(config))
-    let fitness
+    let fitness: Score
     if (cache[key]){
       console.log("Using cache..")
       fitness = cache[key]
     } else {
       const res = calcRecursive(config, problem)
-      fitness = fitnessScore(res, problem)
+      fitness = fitnessScore(res, problem, baselineFitness)
       cache[JSON.stringify(config)] = fitness
     }
 
-    const str = `${gen}\t${idx}\t${fitness.fScore}\t${fitness.recall}\t${fitness.precision}\t${JSON.stringify(config)}\n`;
+    const str = produceCsvLine(`${gen}`, `${idx}`, fitness.raw, fitness.normalized, config);
+
     appendFile(filename, str)
 
-    console.log(`Evaluating generation #${gen} RS ${idx} - DONE (${fitness.performance})`)
+    const score = CONFIG.NORMALIZE ? fitness.normalized.performance : fitness.raw.performance
+    console.log(`Evaluating generation #${gen} RS ${idx} - DONE (${score})`)
     return {
       config,
-      fitness: fitness.performance
+      fitness: score
     }
   })
 }
 
-main()
+main(CONFIG.PROBLEM.read)

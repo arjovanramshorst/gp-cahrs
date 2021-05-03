@@ -8,9 +8,14 @@ export interface FitnessValue {
   performance: number;
 }
 
+export interface Score {
+  raw: FitnessValue,
+  normalized?: FitnessValue
+}
+
 const RECOMMEND_SIZE = 10
 
-export const fitnessScore = (output: number[][], problem: ProblemInstance): FitnessValue => {
+export const fitnessScore = (output: number[][], problem: ProblemInstance, baseline?: FitnessValue): Score => {
 
   let avgRecall = 0;
   let avgPrecision = 0;
@@ -52,10 +57,22 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance): Fitn
     fScore = 2 * (avgPrecision * avgRecall) / (avgPrecision + avgRecall)
   }
 
-  return {
+  const raw = {
     recall: avgRecall,
     precision: avgPrecision,
     fScore,
     performance: fScore
+  }
+
+  const normalized = baseline ? {
+    recall: raw.recall - baseline.recall,
+    precision: raw.precision - baseline.precision,
+    fScore: raw.fScore - baseline.fScore,
+    performance: raw.performance - baseline.performance
+  } : undefined
+
+  return {
+    raw,
+    normalized
   }
 };

@@ -1,5 +1,5 @@
 import { DTO } from "./dto.interface";
-import { GPMatrix, Vector } from "./util.interface";
+import {ConfigTree} from "../tree";
 
 export type ReadProblemFunction = (
   interleaveSize?: number,
@@ -19,6 +19,8 @@ export interface ProblemInstance {
   entities: Record<string, Entity>;
 
   interactions: Record<string, Interaction>;
+
+  baseline: ConfigTree
 }
 
 export enum PropertyType {
@@ -36,22 +38,7 @@ interface Entity {
 interface Property {
   type: PropertyType,
   property: string;
-  items: Vector<any>
-}
-
-interface StringProperty extends Property {
-  type: PropertyType.string;
-  items: Vector<string>;
-}
-
-interface NumberProperty extends Property {
-  type: PropertyType.number;
-  items: Vector<number>;
-}
-
-interface StringArrayProperty extends Property {
-  type: PropertyType.array;
-  items: Vector<string[]>;
+  items: any[]
 }
 
 interface Interaction {

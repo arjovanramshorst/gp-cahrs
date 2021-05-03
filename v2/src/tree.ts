@@ -1,11 +1,11 @@
 import {NodeImplementation} from "./interface/node.interface";
 import {FunctionImplementation} from "./functions/function";
-import {DTO, findMatchingType} from "./interface/dto.interface";
+import {DTO, DTOType, findMatchingType} from "./interface/dto.interface";
 import {TerminalImplementation} from "./terminals/terminal";
 import {inputCombinations} from "./utils/functional.utils";
 import {selectRandom} from "./utils/random.utils";
 import {CONFIG} from "./default.config";
-import {printNested} from "./utils/display.utils";
+import {dtoToString, printNested} from "./utils/display.utils";
 
 type TreeTable = DTO[][];
 
@@ -36,6 +36,9 @@ export const generateTree = (
   let selected: NodeImplementation<any>;
   let input: DTO[] = [];
 
+  if (outputDTO.dtoType === DTOType.matrix && outputDTO.rows === 811 && outputDTO.columns === 811) {
+    debugger
+  }
   if (maxDepth === 1) {
     // Terminal is the only possibility
     selected = selectRandom(validTerminals);
@@ -59,6 +62,10 @@ export const generateTree = (
       })
       // Filter functions that have no valid input configuration
       .filter((it) => it.possibleInput.length > 0);
+    if (validTerminals.length + validFunctions.length === 0) {
+      debugger
+      throw Error("Should never happen")
+    }
 
     if (grow) {
       if (validTerminals.length === 0 || (validFunctions.length > 0 && Math.random() < CONFIG.GROWTH_FUNCTION_FRACTION)) {
@@ -68,10 +75,12 @@ export const generateTree = (
       } else {
         selected = selectRandom(validTerminals);
       }
-    } else {
+    } else if (validFunctions.length > 0) {
       const randomFunction = selectRandom(validFunctions);
       selected = randomFunction.function;
       input = selectRandom(randomFunction.possibleInput);
+    } else {
+      debugger
     }
   }
   if (!selected) {
@@ -81,7 +90,11 @@ export const generateTree = (
     type: selected.type,
     ...(selected.createConfig ? selected.createConfig(outputDTO) : {}),
   };
-  printNested(CONFIG.MAX_DEPTH - maxDepth, `Picked: ${selected.type}`)
+  printNested(CONFIG.MAX_DEPTH - maxDepth, `Picked: ${selected.type}, with input: ${input.map(it => dtoToString(it)).join(", ")}`)
+
+  if (maxDepth === 3 && input.some(it => it.dtoType === DTOType.matrix && it.rows === 811 && it.columns === 811)) {
+    debugger
+  }
 
   return {
     config,
@@ -128,7 +141,17 @@ export const generateTreeTables = (
 };
 
 const isSame = (left: DTO, right: DTO) =>
-  // @ts-ignore
   Object.keys(left).every((key) => (left[key] ?? undefined) === (right[key] ?? undefined)) &&
-  // @ts-ignore
   Object.keys(right).every((key) => (left[key] ?? undefined) === (right[key] ?? undefined));
+
+export const fun = (type: string, config: any = {}, input: ConfigTree[] = []): ConfigTree => ({
+  config: {
+    type,
+    ...config
+  },
+  input: input,
+  output: {
+    dtoType: DTOType.matrix // doesn't matter for baseline
+  }
+})
+

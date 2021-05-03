@@ -78,7 +78,6 @@ const testCorrelation = async () => {
   const same = pearsonCorrelation(interactions[2],interactions[2])
 
   console.log(`correlation: ${correlation} - same: ${same}`)
-
 }
 
 // testCorrelation()

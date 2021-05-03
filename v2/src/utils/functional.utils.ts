@@ -1,17 +1,33 @@
 type EntityId = string;
 
-export const groupBy = <A>(getIdentifier: (c: A) => EntityId) => (
-  agg: Record<EntityId, A[]>,
-  curr: A
-): Record<EntityId, A[]> => {
-  const id = getIdentifier(curr);
-  if (!agg[id]) {
-    agg[id] = [];
-  }
-  agg[id].push(curr);
+export const groupBy = <A>(
+  interactions: A[],
+  getIdentifier: (c: A) => EntityId
+): Record<EntityId, A[]> => interactions
+  .reduce((agg: Record<EntityId, A[]>, curr: A) => {
+    const id = getIdentifier(curr);
+    if (!agg[id]) {
+      agg[id] = [] as A[];
+    }
+    agg[id].push(curr);
 
-  return agg;
-};
+    return agg;
+  }, {});
+
+export const distinct = <A>(
+  entities: A[],
+  getIdentifier: (c: A) => EntityId,
+) => {
+  const res: Record<string, boolean> = {}
+  entities.forEach(it => {
+    const id = getIdentifier(it)
+    if (!res[id]) {
+      res[id] = true
+    }
+  })
+
+  return Object.keys(res)
+}
 
 export const toIdxMap = (
   agg: Record<EntityId, number>,

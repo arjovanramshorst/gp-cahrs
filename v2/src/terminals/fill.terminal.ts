@@ -1,9 +1,9 @@
+import {zeros} from "mathjs"
 import {TerminalImplementation} from "./terminal";
 import {DTO, DTOMatrix, DTOScalar, DTOType, DTOVector} from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
 import {generateMulberrySeed, mulberry32} from "../utils/random.utils";
 import {CONFIG} from "../default.config";
-import {NodeConfig} from "../tree";
 
 interface FillConfig<T> {
   output: T
@@ -17,15 +17,14 @@ export const RandomMatrix: TerminalImplementation<FillConfig<DTOMatrix>> = {
   }),
   createConfig: (output: DTOMatrix) => ({
     output,
-    seed: generateMulberrySeed()
+    seed: Math.floor(1 + Math.random() * CONFIG.NODES.SCALAR.MAX)
   }),
   evaluate: (config: { output: DTOMatrix, seed: number }) => {
     const res = []
-    const random = mulberry32(config.seed)
     for (let row = 0; row < config.output.rows; row++) {
       res.push([])
       for (let col = 0; col < config.output.columns; col++) {
-        res[row].push(random())
+        res[row].push(config.seed)
       }
     }
     return res
@@ -64,3 +63,19 @@ export const RandomScalar: TerminalImplementation<FillConfig<DTOScalar>> = {
   }),
   evaluate: (config, problem) => config.seed,
 };
+
+export const EmptyTerminal = (defaultDTO: DTO): TerminalImplementation<any> => {
+  return {
+    type: "empty",
+    getOutput: () => defaultDTO,
+    evaluate: (config, problem) => {
+      if (defaultDTO.dtoType === DTOType.matrix) {
+        return zeros([defaultDTO.rows, defaultDTO.columns])
+      } else if (defaultDTO.dtoType === DTOType.vector) {
+        return zeros([defaultDTO.items])
+      } else {
+        return 0
+      }
+    }
+  }
+}
