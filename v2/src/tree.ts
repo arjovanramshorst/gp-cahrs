@@ -4,7 +4,7 @@ import {DTO, DTOType, findMatchingType} from "./interface/dto.interface";
 import {TerminalImplementation} from "./terminals/terminal";
 import {inputCombinations} from "./utils/functional.utils";
 import {selectRandom} from "./utils/random.utils";
-import {CONFIG} from "./default.config";
+import {CONFIG} from "./config";
 import {dtoToString, printNested} from "./utils/display.utils";
 
 type TreeTable = DTO[][];
@@ -37,7 +37,7 @@ export const generateTree = (
   let input: DTO[] = [];
 
   if (outputDTO.dtoType === DTOType.matrix && outputDTO.rows === 811 && outputDTO.columns === 811) {
-    debugger
+    // debugger
   }
   if (maxDepth === 1) {
     // Terminal is the only possibility

@@ -2,6 +2,7 @@ import {add, dotMultiply, subtract} from "mathjs"
 import {FunctionImplementation} from "./function";
 import {DTO, DTOMatrix, DTOType, DTOVector, findMatchingType, sameOrUndefined,} from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
+import {CONFIG} from "../config";
 
 export const mathMatrixOutput = (input: DTO[]) => {
   const [left, right] = input;
@@ -131,6 +132,25 @@ const SubtractFunction: FunctionImplementation<{}> = {
   specifyInput: mathMatrixInput,
 };
 
+const SumMatrix: FunctionImplementation<{}> = {
+  type: "sumMatrix",
+  inputSize: 2,
+  getOutput: ([left, right]: DTO[]) => {
+    if (left.dtoType === DTOType.matrix && right.dtoType === DTOType.matrix) {
+      return findMatchingType(left, right)
+    }
+
+    return undefined
+  },
+  evaluate: handleWithVectors((left, right) => add(left, right)),
+  specifyInput: (output: DTOMatrix, input: DTO[]) => {
+    return [
+      output,
+      output
+    ] as DTO[]
+  }
+}
+
 const AddVector: FunctionImplementation<{}> = {
   type: "addVector",
   inputSize: 2,
@@ -156,11 +176,32 @@ const AddVector: FunctionImplementation<{}> = {
   }
 }
 
+const ScaleMatrix: FunctionImplementation<{ scale: number }> = {
+  type: "scaleMatrix",
+  inputSize: 1,
+  getOutput: ([matrix]: DTO[]) => {
+    if (matrix.dtoType === DTOType.matrix) {
+      return matrix
+    }
+
+    return undefined
+  },
+  createConfig: (output) => ({
+    scale: Math.floor(1 + Math.random() * CONFIG.NODES.SCALAR.MAX)
+  }),
+  evaluate: (config, input) => dotMultiply(config.scale, input[0]),
+  specifyInput: (output: DTOMatrix, input: DTO[]) => {
+    return [output] as DTO[]
+  }
+}
+
 // TODO: Add MultiplyScalar here, remove multiply/sum
 
 export const MathFunctions = [
-  MultiplyFunction,
+  // MultiplyFunction,
+  AddVector,
+  ScaleMatrix,
+  SumMatrix,
   // SumFunction,
-  AddVector
   // SubtractFunction
 ];

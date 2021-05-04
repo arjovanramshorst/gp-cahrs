@@ -120,7 +120,7 @@ export const readSobazaar: ReadProblemFunction = async (
       }
       return agg
     }, {}),
-    baseline: baseline(userRefs.length, productRefs.length)
+    baseline: baseline(sampledUserRefs.length, productRefs.length)
   }
 }
 

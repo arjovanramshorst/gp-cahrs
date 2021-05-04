@@ -2,7 +2,7 @@ import {readSobazaar} from "./problems/sobazaar.problem";
 import {Functions} from "./functions/function";
 import {getTerminals} from "./terminals/terminal";
 import {generateTree, generateTreeTables} from "./tree";
-import {CONFIG} from "./default.config";
+import {CONFIG} from "./config";
 import {calcRecursive} from "./evaluate";
 import {fitnessScore} from "./fitness";
 

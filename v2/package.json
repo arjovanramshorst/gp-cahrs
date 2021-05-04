@@ -18,7 +18,7 @@
     "run:mem": "CAHRS_DEBUG_MODE=false node -r ts-node/register --max-old-space-size=32768 src/main.ts",
     "run:movielens": "CAHRS_PROBLEM=movielens CAHRS_DEBUG_MODE=false node -r ts-node/register --max-old-space-size=16784 src/main.ts",
     "run:sobazaar": "CAHRS_PROBLEM=sobazaar CAHRS_DEBUG_MODE=false node -r ts-node/register --max-old-space-size=16784 src/main.ts",
-    "test": "ts-node src/test.config.ts",
+    "test": "ts-node src/test.ts",
     "test:sobazaar": "ts-node src/test.sobazaar.ts",
     "run:gc": "node -r ts-node/register --inspect-brk --trace-gc src/main.ts",
     "scribble": "ts-node src/scribble.ts"

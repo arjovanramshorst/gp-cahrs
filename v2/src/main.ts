@@ -1,4 +1,4 @@
-import {CONFIG} from './default.config';
+import {CONFIG} from './config';
 import {calcRecursive} from './evaluate';
 import {Functions} from './functions/function';
 import {readMovieLens} from './problems/movielens.problem';
@@ -19,7 +19,7 @@ const main = async (readProblem = readMovieLens) => {
   /*************************************************************************
    *************************************************************************
    *************************************************************************
-   * TODO: Add git-lfs for large files
+   * TODO: Replace multiply by "scale",
    *************************************************************************
    *************************************************************************
    *************************************************************************
@@ -64,11 +64,12 @@ const main = async (readProblem = readMovieLens) => {
 
 const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): EvaluatedConfig[] => {
   const cache = {}
-  const baselineFitness = fitnessScore(calcRecursive(problem.baseline, problem), problem).raw
   console.log(`Evaluating generation #${gen} Baseline`)
+  const baselineFitness = fitnessScore(calcRecursive(problem.baseline, problem), problem).raw
+  console.log(`Evaluating generation #${gen} Baseline - DONE (${baselineFitness.performance})`)
+
   const str = produceCsvLine(`${gen}`, "baseline", baselineFitness, baselineFitness, problem.baseline)
   appendFile(filename, str)
-  console.log(`Evaluating generation #${gen} Baseline - DONE (${baselineFitness.performance})`)
 
   return configs.map((config, idx) => {
     const key = JSON.stringify(config)

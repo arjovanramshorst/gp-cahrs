@@ -3,7 +3,7 @@ import {TerminalImplementation} from "./terminal";
 import {DTO, DTOMatrix, DTOScalar, DTOType, DTOVector} from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
 import {generateMulberrySeed, mulberry32} from "../utils/random.utils";
-import {CONFIG} from "../default.config";
+import {CONFIG} from "../config";
 
 interface FillConfig<T> {
   output: T

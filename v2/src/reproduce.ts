@@ -1,6 +1,6 @@
 import {ConfigTree} from "./tree";
 import {pick, selectRandom} from "./utils/random.utils";
-import {CONFIG} from "./default.config";
+import {CONFIG} from "./config";
 import {DTO, findMatchingType} from "./interface/dto.interface";
 
 export interface EvaluatedConfig {

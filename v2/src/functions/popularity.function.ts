@@ -2,6 +2,7 @@ import { zeros } from "mathjs";
 import {FunctionImplementation} from "./function";
 import {DTOMatrix, DTOType, DTOVector} from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
+import {filterUndefined} from "../utils/functional.utils";
 
 const PopularityFunction: FunctionImplementation<{}> = {
   type: "popularity",
@@ -10,12 +11,12 @@ const PopularityFunction: FunctionImplementation<{}> = {
     if (input.dtoType !== DTOType.matrix) {
       return undefined
     }
-    return {
+    return filterUndefined({
       dtoType: DTOType.vector,
       entity: input.toEntity,
       items: input.columns,
       valueType: PropertyType.number
-    } as DTOVector
+    }) as DTOVector
   },
   specifyInput: (output: DTOVector, input: DTOMatrix[]) => {
     return [{

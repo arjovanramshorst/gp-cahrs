@@ -1,4 +1,4 @@
-import {CONFIG} from "../default.config";
+import {CONFIG} from "../config";
 import {ConfigTree} from "../tree";
 import {DTO, DTOType} from "../interface/dto.interface";
 
