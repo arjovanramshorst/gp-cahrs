@@ -1,7 +1,8 @@
-import {ConfigTree} from "./tree";
+import {ConfigTree, generateTree} from "./tree";
 import {pick, selectRandom} from "./utils/random.utils";
 import {CONFIG} from "./config";
 import {DTO, findMatchingType} from "./interface/dto.interface";
+import {printConfig} from "./utils/display.utils";
 
 export interface EvaluatedConfig {
   config: ConfigTree,
@@ -82,13 +83,36 @@ export const mutateConfigTree = (config: ConfigTree, mutate: MutateFn): ConfigTr
   const items = recursiveConfig(config)
   const toMutate = selectRandom(items)
 
+  if (CONFIG.DEBUG_MODE) {
+    console.log("Mutating:")
+    printConfig(toMutate.child)
+  }
+
   if (toMutate.parent === null) {
     // Replace entire tree
     return mutate(config.output, CONFIG.MAX_DEPTH)
   } else {
     // Replace subset of tree (make sure that resulting program is not bigger than max-depth
-    toMutate.parent.input[toMutate.childIndex] = mutate(toMutate.child.output, CONFIG.MAX_DEPTH - toMutate.depth)
+    const mutation = mutate(toMutate.child.output, CONFIG.MAX_DEPTH - toMutate.depth)
+    if (mutation) {
+      // mutate can be undefined if no valid mutation is found (which is weird)
+      toMutate.parent.input[toMutate.childIndex] = mutation
+    } else {
+      console.log("Can not find a mutation for: ")
+      printConfig(toMutate.child)
+    }
     return config
+  }
+}
+
+export const getMutateFunction = (treeTablesGrowth, terminals, functions) => {
+  return (output: DTO, maxDepth: number) => {
+    try {
+      return generateTree(output, treeTablesGrowth, terminals, functions, maxDepth, true)
+    } catch (e) {
+      // Return undefined if there is no valid mutation
+      return undefined
+    }
   }
 }
 
@@ -112,7 +136,7 @@ const recursiveConfig = (config: ConfigTree, list: RecursiveConfig[] = [], depth
   return list
 }
 
-const maxDepth = (config: ConfigTree) => recursiveConfig(config).reduce((max,curr) => curr.depth > max ? curr.depth : max, 0) + 1
+const maxDepth = (config: ConfigTree) => recursiveConfig(config).reduce((max, curr) => curr.depth > max ? curr.depth : max, 0) + 1
 
 // Used to make sure there are no circular references anywhere
 const cloneConfig = (config: ConfigTree): ConfigTree => JSON.parse(JSON.stringify(config))

@@ -8,6 +8,7 @@ import {CONFIG} from "./config";
 import {DTO, DTOType} from "./interface/dto.interface";
 import {readJson, writeFile} from "./utils/fs.utils";
 import {pearsonCorrelation} from "./functions/similarity.function";
+import {getMutateFunction, produceOffspring} from "./reproduce";
 
 export const configTest1 = `{"config":{"type":"multiply"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"multiply"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"multiply"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"sum"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"subtract"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"randomScalar","scalar":8},"output":{"dtoType":"scalar"},"input":[]},{"config":{"type":"randomScalar","scalar":1},"output":{"dtoType":"scalar"},"input":[]}]},{"config":{"type":"subtract"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"multiply"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"randomScalar","scalar":4},"output":{"dtoType":"scalar"},"input":[]},{"config":{"type":"randomScalar","scalar":4},"output":{"dtoType":"scalar"},"input":[]}]},{"config":{"type":"randomScalar","scalar":5},"output":{"dtoType":"scalar"},"input":[]}]}]},{"config":{"type":"randomMatrix","output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"seed":742085764},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[]}]},{"config":{"type":"compareNumber"},"output":{"dtoType":"matrix","fromEntity":"user","toEntity":"movie","rows":610,"columns":9742},"input":[{"config":{"type":"randomVector","output":{"dtoType":"vector","entity":"user","items":610,"valueType":"number"},"seed":2112209989},"output":{"dtoType":"vector","entity":"user","items":610,"valueType":"number"},"input":[]},{"config":{"type":"randomVector","output":{"dtoType":"vector","entity":"movie","items":9742,"valueType":"number"},"seed":156248497},"output":{"dtoType":"vector","entity":"movie","items":9742,"valueType":"number"},"input":[]}]}]},{"config":{"type":"subtract"},"output":{"dtoType":"scalar"},"input":[{"config":{"type":"randomScalar","scalar":1},"output":{"dtoType":"scalar"},"input":[]},{"config":{"type":"randomScalar","scalar":1},"output":{"dtoType":"scalar"},"input":[]}]}]}`
 
@@ -34,6 +35,27 @@ const testRecentTest = async () => {
   console.log(fitness)
 }
 
+const testTreeGeneration = async () => {
+  const problem = await readMovieLens()
+  const functions = Functions
+  const terminals = getTerminals(problem)
+  const treeTablesGrowth = generateTreeTables(terminals, functions, CONFIG.MAX_DEPTH, true)
+  let generation = []
+  for (let i = 0; i < 40; i++) {
+    generation.push(generateTree(problem.output, treeTablesGrowth, terminals, functions, CONFIG.MAX_DEPTH, true))
+  }
+  while (true) {
+    const mutateFn = getMutateFunction(treeTablesGrowth, terminals, functions)
+
+    const evaluated = generation.map(it => ({
+      config: it,
+      fitness: Math.random()
+    }))
+
+    generation = produceOffspring(evaluated, mutateFn)
+  }
+}
+
 const testTree = async (output?: DTO) => {
   const problem = await readMovieLens()
 
@@ -51,7 +73,12 @@ const testTree = async (output?: DTO) => {
 /**
  * Test most recent
  */
-testRecent()
+// testRecent()
+
+/**
+ * Test tree generation
+ */
+testTreeGeneration()
 
 /**
  * Test specific tree
@@ -74,7 +101,7 @@ const testCorrelation = async () => {
 
   const interactions = problem.interactions["rating"].interactions
   const correlation = pearsonCorrelation(interactions[0], interactions[1])
-  const same = pearsonCorrelation(interactions[2],interactions[2])
+  const same = pearsonCorrelation(interactions[2], interactions[2])
 
   console.log(`correlation: ${correlation} - same: ${same}`)
 }

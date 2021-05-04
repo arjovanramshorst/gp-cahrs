@@ -6,7 +6,7 @@ import {getTerminals} from './terminals/terminal';
 import {ConfigTree, generateTree, generateTreeTables} from './tree';
 import {fitnessScore, FitnessValue, Score} from "./fitness"
 import {appendFile, writeFile} from "./utils/fs.utils";
-import {EvaluatedConfig, produceOffspring} from "./reproduce";
+import {EvaluatedConfig, getMutateFunction, produceOffspring} from "./reproduce";
 import {DTO} from "./interface/dto.interface";
 import {printConfig} from "./utils/display.utils";
 import {csvHeader, produceCsvLine} from "./utils/output.utils";
@@ -49,8 +49,7 @@ const main = async (readProblem = readMovieLens) => {
 
     const treeTablesGrowth = generateTreeTables(terminals, functions, CONFIG.MAX_DEPTH, true)
 
-    const mutateFn = (output: DTO, maxDepth: number) =>
-      generateTree(output, treeTablesGrowth, terminals, functions, maxDepth, true)
+    const mutateFn = getMutateFunction(treeTablesGrowth, terminals, functions)
 
     console.log(`Evaluating generation #${gen}`)
     const evaluated = evaluateGeneration(gen, generation, sampledProblem)
