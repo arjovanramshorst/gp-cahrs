@@ -30,7 +30,7 @@ export const CONFIG = {
     TOURNAMENT_SIZE: 4
   },
   NORMALIZE: process.env.CAHRS_NORMALIZE === "true", // default false
-  DEBUG_MODE: process.env.CAHRS_DEBUG_MODE !== "false", // default true
+  DEBUG_MODE: process.env.CAHRS_DEBUG_MODE === "true", // default false
   NODES: {
     SCALAR: {
       MAX: 5

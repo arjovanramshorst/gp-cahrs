@@ -155,7 +155,7 @@ const AddVector: FunctionImplementation<{}> = {
   type: "addVector",
   inputSize: 2,
   getOutput: ([matrix, vector]: DTO[]) => {
-    if (matrix.dtoType === DTOType.matrix && vector.dtoType === DTOType.vector) {
+    if (matrix.dtoType === DTOType.matrix && vector.dtoType === DTOType.vector && vector.valueType === PropertyType.number) {
       if (matrix.columns === vector.items) {
         return matrix
       }
