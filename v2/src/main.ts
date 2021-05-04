@@ -4,7 +4,7 @@ import {Functions} from './functions/function';
 import {readMovieLens} from './problems/movielens.problem';
 import {getTerminals} from './terminals/terminal';
 import {ConfigTree, generateTree, generateTreeTables} from './tree';
-import {fitnessScore, Score} from "./fitness"
+import {fitnessScore, FitnessValue, Score} from "./fitness"
 import {appendFile, writeFile} from "./utils/fs.utils";
 import {EvaluatedConfig, produceOffspring} from "./reproduce";
 import {DTO} from "./interface/dto.interface";
@@ -39,7 +39,7 @@ const main = async (readProblem = readMovieLens) => {
     generation.push(generateTree(problem.output, treeTablesGrowth, terminals, functions, CONFIG.MAX_DEPTH, true))
     generation.push(generateTree(problem.output, treeTablesFull, terminals, functions, CONFIG.MAX_DEPTH, false))
   }
-
+  let bestEver: EvaluatedConfig
 
   console.log("Generating initial population - DONE")
   for (let gen = 0; gen < CONFIG.GENERATIONS; gen++) {
@@ -55,6 +55,13 @@ const main = async (readProblem = readMovieLens) => {
     console.log(`Evaluating generation #${gen}`)
     const evaluated = evaluateGeneration(gen, generation, sampledProblem)
     console.log(`Evaluating generation #${gen} - DONE`)
+    const bestForGeneration = evaluated.sort((a, b) => b.fitness - a.fitness)[0]
+    console.log(`Best for generation: (${bestForGeneration.fitness})`)
+    printConfig(bestForGeneration.config)
+    if (!bestEver || bestEver.fitness < bestForGeneration.fitness) {
+      console.log("Improvement found!")
+      bestEver = bestForGeneration
+    }
 
     console.log(`Producing generation #${gen + 1}`)
     generation = produceOffspring(evaluated, mutateFn)
