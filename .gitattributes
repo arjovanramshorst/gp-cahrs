@@ -1,0 +1,2 @@
+resources/ml-latest-small filter=lfs diff=lfs merge=lfs -text
+resources/sobazaar filter=lfs diff=lfs merge=lfs -text
