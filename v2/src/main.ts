@@ -67,6 +67,9 @@ const main = async (readProblem = readMovieLens) => {
     generation = produceOffspring(evaluated, mutateFn)
     console.log(`Producing generation #${gen + 1} - DONE`)
   }
+
+  console.log(`Finished, best RS found: (${bestEver.fitness})`)
+  printConfig(bestEver.config)
 }
 
 const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): EvaluatedConfig[] => {
