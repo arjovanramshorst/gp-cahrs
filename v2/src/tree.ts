@@ -92,9 +92,6 @@ export const generateTree = (
   };
   printNested(CONFIG.MAX_DEPTH - maxDepth, `Picked: ${selected.type}, with input: ${input.map(it => dtoToString(it)).join(", ")}`)
 
-  if (maxDepth === 3 && input.some(it => it.dtoType === DTOType.matrix && it.rows === 811 && it.columns === 811)) {
-    debugger
-  }
 
   return {
     config,

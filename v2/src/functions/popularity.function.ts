@@ -8,7 +8,8 @@ const PopularityFunction: FunctionImplementation<{}> = {
   type: "popularity",
   inputSize: 1,
   getOutput: ([input]) => {
-    if (input.dtoType !== DTOType.matrix) {
+    // Popularity only works on defined matrices
+    if (input.dtoType !== DTOType.matrix || !input.rows || !input.columns) {
       return undefined
     }
     return filterUndefined({
