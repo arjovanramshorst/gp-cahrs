@@ -22,8 +22,8 @@ const getProblem = (): { read: ReadProblemFunction, name: string } => {
 export const CONFIG = {
   EXPERIMENT_NAME: process.env.CAHRS_EXPERIMENT_NAME ?? null,
   PROBLEM: getProblem(),
-  GENERATION_SIZE: process.env.CAHRS_GENERATION_SIZE ?? 40,
-  GENERATIONS: process.env.CAHRS_GENERATIONS ?? 40,
+  GENERATION_SIZE: Number(process.env.CAHRS_GENERATION_SIZE) ?? 40,
+  GENERATIONS: Number(process.env.CAHRS_GENERATIONS) ?? 40,
   GROWTH_FUNCTION_FRACTION: 0.5,
   MAX_DEPTH: 4,
   INTERLEAVE_SIZE: 0.1,
