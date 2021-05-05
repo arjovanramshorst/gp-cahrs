@@ -11,7 +11,14 @@ import {DTO} from "./interface/dto.interface";
 import {printConfig} from "./utils/display.utils";
 import {csvHeader, produceCsvLine} from "./utils/output.utils";
 
-const filename = `${CONFIG.PROBLEM.name}_${new Date().toISOString()}_${CONFIG.GENERATION_SIZE}_${CONFIG.GENERATIONS}.csv`
+const filename = [
+  CONFIG.EXPERIMENT_NAME,
+  CONFIG.PROBLEM.name,
+  new Date().toISOString(),
+  CONFIG.GENERATION_SIZE,
+  CONFIG.GENERATIONS
+].filter(it => !!it)
+  .join("_") + ".csv"
 
 const main = async (readProblem = readMovieLens) => {
 
@@ -86,7 +93,7 @@ const evaluateGeneration = (gen: number, configs: ConfigTree[], problem): Evalua
     printConfig(config)
     writeFile("most_recent.json", JSON.stringify(config))
     let fitness: Score
-    if (cache[key]){
+    if (cache[key]) {
       console.log("Using cache..")
       fitness = cache[key]
     } else {
