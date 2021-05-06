@@ -30,6 +30,7 @@ export const CONFIG = {
   REPRODUCTION: {
     TOURNAMENT_SIZE: 4
   },
+  VERIFICATION_SEED: 1751426601,
   NORMALIZE: process.env.CAHRS_NORMALIZE === "true", // default false
   DEBUG_MODE: process.env.CAHRS_DEBUG === "true", // default false
   NODES: {

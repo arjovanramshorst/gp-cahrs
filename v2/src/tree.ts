@@ -64,7 +64,6 @@ export const  generateTree = (
       .filter((it) => it.possibleInput.length > 0);
     if (validTerminals.length + validFunctions.length === 0) {
       debugger
-      // TODO: This throws in production, figure out why (gen 7)
       throw Error("Should never happen")
     }
 

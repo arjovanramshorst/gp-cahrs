@@ -2,19 +2,21 @@ import {FitnessValue} from "../fitness";
 import {ConfigTree} from "../tree";
 
 export const csvHeader = [
-  "Gen #",
-  "Individual",
-  "fScore",
+  "type",
+  "generation",
+  "individual",
+  "f_score",
   "recall",
   "precision",
-  "fScore (normalized)",
-  "recall (normalized)",
-  "precision (normalized)",
+  "f_score_normalized",
+  "recall_normalized",
+  "precision_normalized",
   "config",
 ].join("\t") + "\n"
 
-export const produceCsvLine = (gen: string, individual: string, fitness: FitnessValue, normalized: FitnessValue, config: ConfigTree) => {
+export const produceCsvLine = (gen: string, type: string, individual: string, fitness: FitnessValue, normalized: FitnessValue, config: ConfigTree) => {
   return [
+    type,
     gen,
     individual,
     fitness.fScore,
