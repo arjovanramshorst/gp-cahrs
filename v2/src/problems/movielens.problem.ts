@@ -119,7 +119,7 @@ export const readMovieLens: ReadProblemFunction = async (
       }
     },
 
-    baseline: baseline(userRefs.length, movieRefs.length)
+    baseline: baseline2(userRefs.length, movieRefs.length)
   }
 };
 
@@ -151,5 +151,16 @@ const baseline = (users: number, movies: number): ConfigTree => fun(
       {},
       []
     )])
+  ]
+)
+
+const baseline2 = (users: number, movies: number): ConfigTree => fun(
+  "nearestNeighbour",
+  {N: 5},
+  [
+    fun("pearsonSimilarity", {N: 10}, [
+      fun("interaction(rating)", {}, [])
+    ]),
+    fun("interaction(rating)", {}, [])
   ]
 )

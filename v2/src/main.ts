@@ -11,8 +11,10 @@ import {csvHeader, produceCsvLine} from "./utils/output.utils";
 
 const filename = [
   CONFIG.EXPERIMENT_NAME,
+  new Date().toDateString(),
   CONFIG.PROBLEM.name,
-  new Date().toISOString(),
+  CONFIG.MAX_DEPTH,
+  CONFIG.INTERLEAVE_SIZE,
   CONFIG.GENERATION_SIZE,
   CONFIG.GENERATIONS
 ].filter(it => !!it)
