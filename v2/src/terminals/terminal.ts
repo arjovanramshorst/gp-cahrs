@@ -25,7 +25,7 @@ export const TerminalFactory = (
   const res = terminals.find((it) => it.type === type);
 
   if (!res) {
-    console.warn(`Terminal does not exist for current sample dataset`)
+    console.warn(`Terminal does not exist for current sample dataset: ${type}`)
 
     return EmptyTerminal(output)
   }

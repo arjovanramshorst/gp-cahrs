@@ -78,7 +78,7 @@ const testTree = async (output?: DTO) => {
 /**
  * Test tree generation
  */
-testTreeGeneration()
+// testTreeGeneration()
 
 /**
  * Test specific tree
@@ -97,15 +97,18 @@ testTreeGeneration()
 // testRecentTest()
 
 const testCorrelation = async () => {
-  const problem = await readMovieLens()
-
-  const interactions = problem.interactions["rating"].interactions
-  const correlation = pearsonCorrelation(interactions[0], interactions[1])
-  const same = pearsonCorrelation(interactions[2], interactions[2])
-
-  console.log(`correlation: ${correlation} - same: ${same}`)
+  // const problem = await readMovieLens()
+  //
+  // const interactions = problem.interactions["rating"].interactions
+  // const correlation = pearsonCorrelation(interactions[0], interactions[1])
+  console.log(`${pearsonCorrelation([0, 0, 0], [0, 0, 0])}`)
+  console.log(`${pearsonCorrelation([1, 0, 0], [1, 0, 0])}`)
+  console.log(`${pearsonCorrelation([1, 0, 0], [0, 1, 0])}`)
+  console.log(`${pearsonCorrelation([1, 0, 0, 0], [1, 1, 0, 0])}`)
+  console.log(`${pearsonCorrelation([1, 0, 0, 0], [1, 1, 1, 0])}`)
 }
 
-// testCorrelation()
+
+testCorrelation()
 // test(bestConfig as ConfigTree)
 // test(JSON.parse(configTest1))

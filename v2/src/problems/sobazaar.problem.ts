@@ -5,7 +5,7 @@ import {generateMulberrySeed, mulberry32, sample} from "../utils/random.utils";
 import {DTOMatrix, DTOType} from "../interface/dto.interface";
 import {readCsvFile} from "../utils/fs.utils";
 import {distinct, groupBy, toIdxMap} from "../utils/functional.utils";
-import {fun} from "../tree";
+import {ConfigTree, fun} from "../tree";
 
 const ACTION_TO_RECOMMEND = "purchase:buy_clicked"
 
@@ -69,8 +69,8 @@ export const readSobazaar: ReadProblemFunction = async (
                 const userIdx = userToIdxMap[it.UserID]
                 const productIdx = productToIdxMap[it.ItemID]
                 if (idx < actions.length - 1) {
-                  interactionMatrices[it.Action][userIdx][productIdx] = 1
-                  filter[userIdx].push(productIdx)
+                  interactionMatrices[it.Action][userIdx][productIdx] += 1
+                  // filter[userIdx].push(productIdx)
                 } else {
                   validate[userIdx].push(productIdx)
                 }
@@ -80,7 +80,7 @@ export const readSobazaar: ReadProblemFunction = async (
         filteredByAction[action].forEach(it => {
           const userIdx = userToIdxMap[it.UserID]
           const productIdx = productToIdxMap[it.ItemID]
-          interactionMatrices[it.Action][userIdx][productIdx] = 1
+          interactionMatrices[it.Action][userIdx][productIdx] += 1
         })
       }
     })
@@ -120,7 +120,7 @@ export const readSobazaar: ReadProblemFunction = async (
       }
       return agg
     }, {}),
-    baseline: baseline(sampledUserRefs.length, productRefs.length)
+    baseline: baseline2(sampledUserRefs.length, productRefs.length)
   }
 }
 
@@ -138,6 +138,16 @@ const baseline = (rows, columns) => {
     ]
   )
 }
+const baseline2 = (users: number, movies: number): ConfigTree => fun(
+  "nearestNeighbour",
+  {N: 5},
+  [
+    fun("pearsonSimilarity", {N: 10}, [
+      fun("interaction(product_detail_clicked)", {}, [])
+    ]),
+    fun("interaction(purchase:buy_clicked)", {}, [])
+  ]
+)
 
 const readInteractions = async () => {
   return await readCsvFile<{ Action: string, Timestamp: string, ItemID: string, UserID: string }>(

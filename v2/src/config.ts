@@ -37,5 +37,6 @@ export const CONFIG = {
     SCALAR: {
       MAX: 5
     }
-  }
+  },
+  ONLY_BASELINE: process.env.CAHRS_ONLY_BASELINE === "true" // default false
 }
