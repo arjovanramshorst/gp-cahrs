@@ -80,7 +80,9 @@ export const readSobazaar: ReadProblemFunction = async (
         filteredByAction[action].forEach(it => {
           const userIdx = userToIdxMap[it.UserID]
           const productIdx = productToIdxMap[it.ItemID]
-          interactionMatrices[it.Action][userIdx][productIdx] += 1
+          if (validate[userIdx].indexOf(productIdx) === -1) {
+            interactionMatrices[it.Action][userIdx][productIdx] += 1
+          }
         })
       }
     })

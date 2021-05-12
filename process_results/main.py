@@ -32,12 +32,9 @@ def plot(filename, column, title):
     config_best = result[result.type == TYPE_BEST]
     config_max = config_best[config_best.f_score == config_best.f_score.max()]
 
-    config_str = config_max[COL_CONFIG].iloc[-1]
+    config_str = config_max[COL_CONFIG].iloc[0]
     print(title + ' - best config:')
     print(config_str)
-    # config = json.load(config_str)
-    # print(json.dumps(config, indent=4))
-
 
     x = result_generations[COL_GEN].unique().astype(int)
 
@@ -72,9 +69,9 @@ def plot(filename, column, title):
     axs[1].set_xlabel('generation')
     axs[1].set_ylabel('f score')
     axs[1].grid(True)
-    fig.tight_layout()
 
     plt.title(title)
+    plt.savefig('output/' + filename + '.pdf')
     plt.show()
 
     # plt.plot(x, unique, label='# unique')
@@ -93,20 +90,18 @@ columns = [
 ]
 
 files = {
-    # '2021-05-05_movielens.csv',
-    # '2021-05-05_sobazaar.csv',
-    # '2021-05-07_movielens_80_60.csv',
-    # '2021-05-07_movielens_320_60.csv',
-    # '2021-05-07_sobazaar_80_60.csv',
-    # '2021-05-07_sobazaar_320_60.csv',
-    'DEPTH_Fri May 07 2021_Movielens_3_0.2_40_60.csv': 'Movielens depth=3',
-    'DEPTH_Fri May 07 2021_Movielens_4_0.2_40_60.csv': 'Movielens depth=4',
-    'DEPTH_Fri May 07 2021_Movielens_5_0.2_40_60.csv': 'Movielens depth=5',
-    'DEPTH_Sat May 08 2021_Movielens_6_0.2_40_60.csv': 'Movielens depth=6',
-    'DEPTH_Sat May 08 2021_Sobazaar_3_0.2_40_60.csv': 'Sobazaar depth=3',
-    'DEPTH_Sat May 08 2021_Sobazaar_4_0.2_40_60.csv': 'Sobazaar depth=4',
-    'DEPTH_Sat May 08 2021_Sobazaar_5_0.2_40_60.csv': 'Sobazaar depth=5',
-    'DEPTH_Sat May 08 2021_Sobazaar_6_0.2_40_60.csv': 'Sobazaar depth=6',
+    # 'DEPTH_Fri May 07 2021_Movielens_3_0.2_40_60.csv': 'Movielens depth=3',
+    # 'DEPTH_Fri May 07 2021_Movielens_4_0.2_40_60.csv': 'Movielens depth=4',
+    # 'DEPTH_Fri May 07 2021_Movielens_5_0.2_40_60.csv': 'Movielens depth=5',
+    # 'DEPTH_Sat May 08 2021_Movielens_6_0.2_40_60.csv': 'Movielens depth=6',
+    # 'sobazaarfix_2021-05-10_Sobazaar_3_0.2_40_60.csv': 'Sobazaar depth=3',
+    # 'sobazaarfix_2021-05-10_Sobazaar_4_0.2_40_60.csv': 'Sobazaar depth=4',
+    # 'sobazaarfix_2021-05-10_Sobazaar_5_0.2_40_60.csv': 'Sobazaar depth=5',
+    # 'sobazaarfix_2021-05-10_Sobazaar_6_0.2_40_60.csv':'Sobazaar depth=6',
+    'large_2021-05-11_Movielens_3_0.5_300_30.csv': 'Movielens p=0.5 d=3 g=300',
+    'large_2021-05-11_Movielens_4_0.5_300_30.csv': 'Movielens p=0.5 d=4 g=300',
+    'large_2021-05-11_Sobazaar_3_0.5_300_30.csv': 'Sobazaar p=0.5 d=3 g=300',
+    'large_2021-05-11_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300'
 }
 
 for file, title in files.items():

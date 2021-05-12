@@ -58,8 +58,13 @@ export const readMovieLens: ReadProblemFunction = async (
   tags
     .filter(it => userToIdxMap[it.userId] !== undefined)
     .forEach(tag => {
-      tagMatrix[userToIdxMap[tag.userId]][movieToIdxMap[tag.movieId]] = 1
-      movieTags[movieToIdxMap[tag.movieId]].push(tag.tag)
+      const userIdx = userToIdxMap[tag.userId]
+      const movieIdx = movieToIdxMap[tag.movieId]
+      // Only add tags for movies a user has not yet rated to the matrix
+      if (validate[userIdx].indexOf(movieIdx) === -1) {
+        tagMatrix[userIdx][movieIdx] = 1
+        movieTags[movieToIdxMap[tag.movieId]].push(tag.tag)
+      }
     })
 
   return {
