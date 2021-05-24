@@ -1,12 +1,14 @@
+import * as csvParser from "csv-parser";
+
 const csv = require("csv-parser");
 const fs = require("fs");
 
-export const readCsvFile = <T>(filename: string): Promise<T[]> => {
+export const readCsvFile = <T>(filename: string, options: csvParser.Options = {}): Promise<T[]> => {
   return new Promise((resolve) => {
     const res: T[] = [];
     console.log(`Processing csv: ${filename}`)
     fs.createReadStream(filename)
-      .pipe(csv())
+      .pipe(csv(options))
       .on("data", (row: T) => {
         res.push(row);
       })

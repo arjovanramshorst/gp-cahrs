@@ -16,9 +16,16 @@ export const produceOffspring = (generation: EvaluatedConfig[], mutate: MutateFn
   while (offspring.length < generation.length) {
 
     const [parent1, parent2] = tournamentSelection(generation)
-    const children = crossover(parent1, parent2)
-      .map(child => mutateConfigTree(child, mutate))
 
+    const children = crossover(parent1, parent2)
+
+    console.log("Children:")
+    children.forEach(it => { printConfig(it); console.log() })
+
+    const mutatedChildren = children.map(child => mutateConfigTree(child, mutate))
+
+    console.log("Children after mutation:")
+    mutatedChildren.forEach(it => { printConfig(it); console.log() })
     offspring.push(...children);
   }
 
@@ -26,8 +33,17 @@ export const produceOffspring = (generation: EvaluatedConfig[], mutate: MutateFn
 }
 
 const tournamentSelection = (parents: EvaluatedConfig[], k = CONFIG.REPRODUCTION.TOURNAMENT_SIZE) => { // add K to config
-  const left = pick<EvaluatedConfig>(k)(...parents).sort((a, b) => b.fitness - a.fitness)[0];
-  const right = pick<EvaluatedConfig>(k)(...parents).sort((a, b) => b.fitness - a.fitness)[0];
+  const tournamentLeft = pick<EvaluatedConfig>(k)(...parents)
+  const left = tournamentLeft.sort((a, b) => b.fitness - a.fitness)[0];
+
+  const tournamentRight = pick<EvaluatedConfig>(k)(...parents)
+  const right = tournamentRight.sort((a, b) => b.fitness - a.fitness)[0];
+
+  console.log(`Parent left (${left.fitness}):`)
+  printConfig(left.config)
+
+  console.log(`Parent right (${right.fitness}):`)
+  printConfig(right.config)
 
   return [left.config, right.config]
 }
@@ -43,6 +59,8 @@ const crossover = (parent1: ConfigTree, parent2: ConfigTree): ConfigTree[] => {
 
   // Select random node from child1
   const crossOver1 = selectRandom(child1Nodes)
+  console.log("Replacing in left:")
+  printConfig(crossOver1.child)
 
   // Filter for matching types
   const availableMatches = child2Nodes.filter(it => findMatchingType(it.child.output, crossOver1.child.output))
@@ -52,6 +70,8 @@ const crossover = (parent1: ConfigTree, parent2: ConfigTree): ConfigTree[] => {
     return [child1, child2]
   }
   const crossOver2 = selectRandom(availableMatches)
+  console.log("With from right:")
+  printConfig(crossOver2.child)
 
   // Replace node in parent1 with selected node from parent2
   if (crossOver1.parent !== null) {
@@ -90,13 +110,18 @@ export const mutateConfigTree = (config: ConfigTree, mutate: MutateFn): ConfigTr
 
   if (toMutate.parent === null) {
     // Replace entire tree
+    console.log("Entire tree is randomly generated during mutation")
     return mutate(config.output, CONFIG.MAX_DEPTH)
   } else {
     // Replace subset of tree (make sure that resulting program is not bigger than max-depth
     const mutation = mutate(toMutate.child.output, CONFIG.MAX_DEPTH - toMutate.depth)
     if (mutation) {
       // mutate can be undefined if no valid mutation is found (which is weird)
+      console.log(`Mutating at depth: ${toMutate.depth}, with mutation tree: `)
+      printConfig(toMutate.child)
+
       toMutate.parent.input[toMutate.childIndex] = mutation
+
     } else {
       console.log("Can not find a mutation for: ")
       printConfig(toMutate.child)

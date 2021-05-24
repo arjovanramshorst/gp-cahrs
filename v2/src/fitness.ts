@@ -6,6 +6,10 @@ export interface FitnessValue {
   precision: number;
   fScore: number;
   performance: number;
+  precision1: number;
+  precision5: number;
+  precision10: number;
+  mrr: number;
 }
 
 export interface Score {
@@ -20,6 +24,13 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
   let avgRecall = 0;
   let avgPrecision = 0;
 
+  let avgScores = {
+    precision1: 0,
+    precision5: 0,
+    precision10: 0,
+    mrr: 0,
+  }
+
   for (let userIdx = 0; userIdx < output.length; userIdx++) {
     const topIdx = sortIdx(output[userIdx])
     const topScores = topIdx.map(idx => output[userIdx][idx])
@@ -27,6 +38,13 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
     const toFind = problem.validate[userIdx]
     let total = 0;
     let found = 0;
+
+    let scores = {
+      precision1: 0,
+      precision5: 0,
+      precision10: 0,
+      mrr: 0,
+    }
 
     if (!toFilter) {
       debugger
@@ -38,8 +56,19 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
         if (toFind.indexOf(topIdx[i]) >= 0) {
         // Recommendation is "correct"
           found++
+          scores.mrr += (found / total)
         }
       }
+      if (total === 1) {
+        scores.precision1 = found
+      }
+      if (total === 5) {
+        scores.precision5 = found / 5
+      }
+      if (total === 10) {
+        scores.precision10 = found / 10
+      }
+
       if (total >= RECOMMEND_SIZE) {
         break;
       }
@@ -49,6 +78,11 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
 
     avgRecall += recall / output.length
     avgPrecision += precision / output.length
+
+    avgScores.mrr += scores.mrr / output.length
+    avgScores.precision1 += scores.precision1 / output.length
+    avgScores.precision5 += scores.precision5 / output.length
+    avgScores.precision10 += scores.precision10 / output.length
   }
 
   let fScore = 0
@@ -61,14 +95,21 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
     recall: avgRecall,
     precision: avgPrecision,
     fScore,
-    performance: fScore
+    performance: avgScores.mrr,
+    scores: avgScores,
+    ...avgScores
   }
 
   const normalized = baseline ? {
     recall: raw.recall - baseline.recall,
     precision: raw.precision - baseline.precision,
     fScore: raw.fScore - baseline.fScore,
-    performance: raw.performance - baseline.performance
+    performance: raw.performance - baseline.performance,
+    precision1: raw.precision1 - baseline.precision1,
+    precision5: raw.precision5 - baseline.precision5,
+    precision10: raw.precision10 - baseline.precision10,
+    mrr: raw.mrr - baseline.mrr
+
   } : undefined
 
   return {

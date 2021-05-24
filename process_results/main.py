@@ -4,6 +4,7 @@ import pandas as pd
 import json
 
 # Column names:
+COL_SCORE = 'mrr10'
 COL_TYPE = 'type'
 COL_GEN = 'generation'
 COL_INDIVIDUAL = 'individual'
@@ -85,7 +86,7 @@ def trend(x, range):
 
 
 columns = [
-    COL_F_SCORE,
+    COL_SCORE
     # COL_F_SCORE_NORMALIZED,
 ]
 
@@ -98,10 +99,15 @@ files = {
     # 'sobazaarfix_2021-05-10_Sobazaar_4_0.2_40_60.csv': 'Sobazaar depth=4',
     # 'sobazaarfix_2021-05-10_Sobazaar_5_0.2_40_60.csv': 'Sobazaar depth=5',
     # 'sobazaarfix_2021-05-10_Sobazaar_6_0.2_40_60.csv':'Sobazaar depth=6',
-    'large_2021-05-11_Movielens_3_0.5_300_30.csv': 'Movielens p=0.5 d=3 g=300',
-    'large_2021-05-11_Movielens_4_0.5_300_30.csv': 'Movielens p=0.5 d=4 g=300',
-    'large_2021-05-11_Sobazaar_3_0.5_300_30.csv': 'Sobazaar p=0.5 d=3 g=300',
-    'large_2021-05-11_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300'
+    # 'large_2021-05-11_Movielens_3_0.5_300_30.csv': 'Movielens p=0.5 d=3 g=300',
+    # 'large_2021-05-11_Movielens_4_0.5_300_30.csv': 'Movielens p=0.5 d=4 g=300',
+    # 'large_2021-05-11_Sobazaar_3_0.5_300_30.csv': 'Sobazaar p=0.5 d=3 g=300',
+    # 'large_2021-05-11_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300',
+    # 'fix-validation_2021-05-12_Movielens_4_0.5_300_30.csv': 'Movielens p=0.5 d=4 g=300',
+    # 'fix-validation_2021-05-12_Movielens_5_0.5_300_30.csv': 'Movielens p=0.5 d=5 g=300',
+    # 'fix-validation_2021-05-12_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300',
+    # 'fix-validation_2021-05-12_Sobazaar_5_0.5_300_30.csv': 'Sobazaar p=0.5 d=5 g=300'
+    '2021-05-24_Movielens V2_4_0.1_40_40.csv': 'Movielens v2 p=0.1, d=4'
 }
 
 for file, title in files.items():

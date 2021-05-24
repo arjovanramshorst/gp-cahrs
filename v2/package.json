@@ -17,6 +17,7 @@
     "run": "ts-node src/main.ts",
     "run:mem": "node -r ts-node/register --max-old-space-size=32768 src/main.ts",
     "run:movielens": "CAHRS_PROBLEM=movielens node -r ts-node/register --max-old-space-size=16784 src/main.ts",
+    "run:movielens2": "CAHRS_PROBLEM=movielens2 node -r ts-node/register src/main.ts",
     "run:sobazaar": "CAHRS_PROBLEM=sobazaar CAHRS_INTERLEAVE_SIZE=0.2 node -r ts-node/register --max-old-space-size=16784 src/main.ts",
     "pretty": "ts-node src/pretty.ts",
     "test": "ts-node src/test.ts",

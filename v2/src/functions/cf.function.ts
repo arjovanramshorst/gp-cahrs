@@ -138,5 +138,5 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
 
 export const CFFunctions = [
   NNRecommendFunction,
-  // InvertedNNRecommendFunction
+  InvertedNNRecommendFunction
 ]

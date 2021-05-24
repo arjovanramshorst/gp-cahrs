@@ -172,6 +172,10 @@ const evaluateGeneration = (
       precision: 0,
       recall: 0,
       performance: 0,
+      precision10: 0,
+      precision5: 0,
+      precision1: 0,
+      mrr: 0
     },
     problem.baseline
   );
@@ -217,7 +221,7 @@ const evaluateGeneration = (
 const evaluateBaseline = async () => {
   console.log(`Evaluating baseline on verification sample`);
   const problem = await CONFIG.PROBLEM.read(
-    CONFIG.INTERLEAVE_SIZE,
+    Number(CONFIG.INTERLEAVE_SIZE),
     CONFIG.VERIFICATION_SEED
   );
   const baselineFitness = fitnessScore(
