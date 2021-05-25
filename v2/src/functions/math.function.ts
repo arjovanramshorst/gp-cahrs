@@ -132,7 +132,7 @@ const SubtractFunction: FunctionImplementation<{}> = {
   specifyInput: mathMatrixInput,
 };
 
-const SumMatrix: FunctionImplementation<{}> = {
+const SumMatrix: FunctionImplementation<{weight: number}> = {
   type: "sumMatrix",
   inputSize: 2,
   getOutput: ([left, right]: DTO[]) => {
@@ -142,7 +142,10 @@ const SumMatrix: FunctionImplementation<{}> = {
 
     return undefined
   },
-  evaluate: handleWithVectors((left, right) => add(left, right)),
+  createConfig: () => ({
+    weight: Math.random()
+  }),
+  evaluate: (config, [left, right]) => add(dotMultiply(config.weight ?? 0.5, left), dotMultiply(1 - config.weight ?? 0.5, right)),
   specifyInput: (output: DTOMatrix, input: DTO[]) => {
     return [
       output,

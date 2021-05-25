@@ -4,7 +4,6 @@ import {sortIdx, takeTopNIdx} from "../utils/sort.utils";
 import * as math from "mathjs";
 
 export interface NNConfig {
-  output: DTOMatrix
   N: number
 }
 
@@ -40,9 +39,8 @@ export const NNRecommendFunction: FunctionImplementation<NNConfig> = {
     }]
   },
   createConfig: (output: DTOMatrix) => ({
-    // Number of neighbours to consider
-    output,
-    N: Math.floor(Math.random() * 10 + 2)
+    // Number of neighbours to consider (number of rows / 20 is max, chosen experimentally)
+    N: Math.floor(Math.random() * (output.rows / 20) + 2)
   }),
   evaluate: (config: NNConfig, [similarity, scores]: [number[][], number[][]]) => {
     const [rows, cols] = [scores.length, scores[0].length]
@@ -54,8 +52,9 @@ export const NNRecommendFunction: FunctionImplementation<NNConfig> = {
       const similarUserIdxs = sortIdx(similarUserScores).slice(0, config.N)
       for (let idxCol = 0; idxCol < cols; idxCol++) {
         res[idxRow][idxCol] = similarUserIdxs
-          .reduce((sum, userIdx) =>
-            sum + similarUserScores[userIdx] * scores[idxRow][idxCol],
+          .reduce((sum, userIdx) => {
+              return sum + (similarUserScores[userIdx] * scores[userIdx][idxCol])
+            },
             0
           ) / similarUserIdxs.length
       }
@@ -101,8 +100,7 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
   },
   createConfig: (output: DTOMatrix) => ({
     // Number of neighbours to consider
-    output,
-    N: Math.floor(Math.random() * 10 + 2)
+    N: Math.floor(Math.random() * (output.rows / 20) + 2)
   }),
   evaluate: (config: NNConfig, [similarity, scores]: [number[][], number[][]]) => {
     const [rows, cols] = [scores.length, scores[0].length]
@@ -120,16 +118,16 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
       const fromScores = scores[idxRow]
 
       // For N highest recommended nearest columns (sort idx in row) (take N instead)
-      sortIdx(fromScores).slice(0, config.N)
-        .forEach(idxCol => {
-          const scoreToCompare = fromScores[idxCol]
+      for (let idxCol = 0; idxCol < cols; idxCol++) {
+        const scoreToCompare = fromScores[idxCol]
+        if (scoreToCompare > 0) {
           const similarCols = similarIdx[idxCol]
-
           similarCols.forEach(similarCol => {
             const similarityScore = similarity[idxCol][similarCol]
             res[idxRow][similarCol] += similarityScore * scoreToCompare
           })
-        })
+        }
+      }
     }
 
     return res

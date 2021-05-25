@@ -71,7 +71,7 @@ const CompareArrayFunction: FunctionImplementation<{}> = {
   inputSize: 2,
   getOutput: (input) => compareOutput(PropertyType.array, input),
   specifyInput: compareInput,
-  evaluate: vectorLoop<string[]>((rowItem, colItem) => arrayDistance(rowItem, colItem))
+  evaluate: vectorLoop<string[]>((rowItem, colItem) => arraySimilarity(rowItem, colItem))
 };
 
 const CompareNumberFunction: FunctionImplementation<{}> = {
@@ -88,7 +88,7 @@ export const PropertyFunctions = [
   CompareNumberFunction,
 ];
 
-const arrayDistance = (a: string[], b: string[]) => {
+const arraySimilarity = (a: string[], b: string[]) => {
   const l = intersection(a, b).length;
   return l / (a.length + b.length - l);
 }
