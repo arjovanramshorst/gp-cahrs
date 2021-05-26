@@ -56,7 +56,7 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
         if (toFind.indexOf(topIdx[i]) >= 0) {
         // Recommendation is "correct"
           found++
-          scores.mrr += (found / total)
+          scores.mrr += (1 / total)
         }
       }
       if (total === 1) {
