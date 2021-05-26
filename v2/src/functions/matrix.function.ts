@@ -12,17 +12,13 @@ const TransposeFunction: FunctionImplementation<{}> = {
     return {
       dtoType: DTOType.matrix,
       fromEntity: input.toEntity,
-      rows: input.columns,
       toEntity: input.fromEntity,
-      columns: input.rows
     } as DTOMatrix
   },
   specifyInput: (output: DTOMatrix, input: DTOMatrix[]) => {
     return [{
       dtoType: DTOType.matrix,
-      rows: output.columns,
       fromEntity: output.toEntity,
-      columns: output.rows,
       toEntity: output.fromEntity,
     }] as DTOMatrix[]
   },

@@ -30,3 +30,19 @@ export const writeFile = (filename: string, data: string) => {
 export const readJson = (filename: string) => {
   return JSON.parse(fs.readFileSync(`./output/${filename}`).toString())
 }
+
+export const readJsonCache = (filename: string) => {
+  const path = `./cache/${filename}`
+  if (fs.existsSync(path)) {
+    return JSON.parse(fs.readFileSync(path))
+  }
+
+  return null
+}
+
+export const writeJsonCache = (filename: string, obj: any) => {
+  const path = `./cache/${filename}`
+  if (!fs.existsSync(path)) {
+    fs.writeFileSync(path, JSON.stringify(obj))
+  }
+}

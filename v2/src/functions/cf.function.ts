@@ -1,5 +1,5 @@
 import {FunctionImplementation} from "./function";
-import {DTOMatrix, DTOType} from "../interface/dto.interface";
+import {DTOMatrix, DTOType, sameOrUndefined} from "../interface/dto.interface";
 import {sortIdx, takeTopNIdx} from "../utils/sort.utils";
 import * as math from "mathjs";
 
@@ -15,32 +15,44 @@ export const NNRecommendFunction: FunctionImplementation<NNConfig> = {
       // Both inputs should be matrices
       return undefined
     }
-    if (input[0].rows !== input[0].columns) {
-      // input[0] should be square
-      return undefined
-    }
-    if (input[1].rows !== input[0].rows) {
-      // input[1] should have the same amount of rows as input[0] has rows/columns
+
+    const [similarity, relevancy] = input
+
+    if (!similarity.fromEntity || !similarity.toEntity || !relevancy.toEntity || !relevancy.fromEntity) {
       return undefined
     }
 
-    // Returns input[1] if valid
-    return input[1] as DTOMatrix
+    if (!sameOrUndefined(similarity.fromEntity, similarity.toEntity)) {
+      // input[0] should be square
+      return undefined
+    }
+    if (!sameOrUndefined(relevancy.fromEntity, similarity.fromEntity)) {
+      // input[1] should have the same amount of rows as input[0] has rows/columns
+      return undefined
+    }
+    if (relevancy.toEntity === relevancy.fromEntity) {
+      // TODO: Test is this is okay?
+      return undefined
+    }
+
+    return {
+      ...relevancy,
+      fromEntity: similarity.fromEntity ?? similarity.toEntity ?? relevancy.fromEntity,
+    }
   },
   specifyInput: (output: DTOMatrix, input: DTOMatrix[]): [DTOMatrix, DTOMatrix] => {
     return [{
       dtoType: DTOType.matrix,
       fromEntity: output.fromEntity,
       toEntity: output.fromEntity,
-      rows: output.rows,
-      columns: output.rows,
     }, {
       ...output
     }]
   },
   createConfig: (output: DTOMatrix) => ({
     // Number of neighbours to consider (number of rows / 20 is max, chosen experimentally)
-    N: Math.floor(Math.random() * (output.rows / 20) + 2)
+    // TODO: N: Math.floor(Math.random() * (output.rows / 20) + 2)
+    N: Math.floor(Math.random() * (20) + 2)
   }),
   evaluate: (config: NNConfig, [similarity, scores]: [number[][], number[][]]) => {
     const [rows, cols] = [scores.length, scores[0].length]
@@ -73,18 +85,29 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
       // Both inputs should be matrices
       return undefined
     }
-    if (input[0].rows !== input[0].columns) {
-      // input[0] should be square
-      return undefined
-    }
-    if (input[1].rows !== input[0].columns) {
-      // input[1] should have the same amount of columns as input[0] has rows/columns
+    const [itemSimilarity, relevancy]: DTOMatrix[] = input
+
+    if (!itemSimilarity.fromEntity || !itemSimilarity.toEntity || !relevancy.toEntity || !relevancy.fromEntity) {
       return undefined
     }
 
-    // TODO: THIS APPEARS TO BE INCORRECT!!!!
-    // Returns input[1] if valid
-    return input[1] as DTOMatrix
+    if (!sameOrUndefined(itemSimilarity.fromEntity, itemSimilarity.toEntity)) {
+      // input[0] should be square
+      return undefined
+    }
+    if (!sameOrUndefined(itemSimilarity.fromEntity, relevancy.toEntity)) {
+      // input[1] should have the same amount of columns as input[0] has rows/columns
+      return undefined
+    }
+    if (relevancy.toEntity === relevancy.fromEntity) {
+      // TEST
+      return undefined
+    }
+
+    return {
+      ...relevancy,
+      toEntity: itemSimilarity.fromEntity ?? itemSimilarity.toEntity ?? relevancy.toEntity
+    }
   },
   specifyInput: (output: DTOMatrix, input: DTOMatrix[]): [DTOMatrix, DTOMatrix] => {
     // TODO: OR THIS!!!!
@@ -92,15 +115,14 @@ export const InvertedNNRecommendFunction: FunctionImplementation<NNConfig> = {
       dtoType: DTOType.matrix,
       fromEntity: output.toEntity,
       toEntity: output.toEntity,
-      rows: output.columns,
-      columns: output.columns,
     }, {
       ...output
     }]
   },
   createConfig: (output: DTOMatrix) => ({
     // Number of neighbours to consider
-    N: Math.floor(Math.random() * (output.rows / 20) + 2)
+    // TODO: N: Math.floor(Math.random() * (output.rows / 20) + 2)
+    N: Math.floor(Math.random() * (20) + 2)
   }),
   evaluate: (config: NNConfig, [similarity, scores]: [number[][], number[][]]) => {
     const [rows, cols] = [scores.length, scores[0].length]

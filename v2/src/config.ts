@@ -31,7 +31,7 @@ export const CONFIG = {
   GENERATION_SIZE: process.env.CAHRS_GENERATION_SIZE ? Number(process.env.CAHRS_GENERATION_SIZE) : 40,
   GENERATIONS: process.env.CAHRS_GENERATIONS ? Number(process.env.CAHRS_GENERATIONS) : 40,
   GROWTH_FUNCTION_FRACTION: 0.5,
-  MAX_DEPTH: process.env.CAHRS_MAX_DEPTH ? Number(process.env.CAHRS_MAX_DEPTH) : 4,
+  MAX_DEPTH: process.env.CAHRS_MAX_DEPTH ? Number(process.env.CAHRS_MAX_DEPTH) : 6,
   INTERLEAVE_SIZE: process.env.CAHRS_INTERLEAVE_SIZE ? Number(process.env.CAHRS_INTERLEAVE_SIZE) : 0.1,
   REPRODUCTION: {
     TOURNAMENT_SIZE: 4
@@ -44,5 +44,6 @@ export const CONFIG = {
       MAX: 5
     }
   },
-  ONLY_BASELINE: process.env.CAHRS_ONLY_BASELINE === "true" // default false
+  ONLY_BASELINE: process.env.CAHRS_ONLY_BASELINE === "true", // default false,
+  ENABLE_CACHE: process.env.CAHRS_ENABLE_CACHE === "true"
 }

@@ -9,22 +9,19 @@ const PopularityFunction: FunctionImplementation<{}> = {
   inputSize: 1,
   getOutput: ([input]) => {
     // Popularity only works on defined matrices
-    if (input.dtoType !== DTOType.matrix || !input.rows || !input.columns) {
+    if (input.dtoType !== DTOType.matrix || !input.fromEntity|| !input.toEntity) {
       return undefined
     }
     return filterUndefined({
       dtoType: DTOType.vector,
       entity: input.toEntity,
-      items: input.columns,
       valueType: PropertyType.number
     }) as DTOVector
   },
   specifyInput: (output: DTOVector, input: DTOMatrix[]) => {
     return [{
       dtoType: DTOType.matrix,
-      rows: input[0].rows,
       fromEntity: input[0].fromEntity,
-      columns: output.items,
       toEntity: output.entity,
     }] as DTOMatrix[]
   },

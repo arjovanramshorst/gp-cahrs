@@ -3,7 +3,6 @@ import {
   EmptyTerminal,
   RandomMatrix,
   RandomScalar,
-  RandomVector,
 } from "./fill.terminal";
 
 import { DTO } from "../interface/dto.interface";
@@ -14,7 +13,7 @@ import {NodeConfig} from "../tree";
 
 export const calcTerminal = (config: NodeConfig, problemInstance, defaultOutput: DTO) => {
   const Terminal = TerminalFactory(getTerminals(problemInstance), config.type, defaultOutput)
-  return Terminal.evaluate(config, problemInstance)
+  return Terminal.evaluate(config, problemInstance, defaultOutput)
 };
 
 export const TerminalFactory = (
@@ -47,7 +46,7 @@ export const getTerminals = (
 export interface TerminalImplementation<T extends Omit<NodeConfig, "type">> extends NodeImplementation<T> {
   getOutput: () => DTO;
   // TODO: problemInstance might not be necessary here?
-  evaluate: (config: T, problemInstance: ProblemInstance) => any;
+  evaluate: (config: T, problemInstance: ProblemInstance, output: DTO) => any;
 }
 
 interface ConfigTree {

@@ -1,8 +1,7 @@
-import {ConfigTree, fun} from "../tree";
+import {fun} from "../tree";
+import {DTOType} from "../interface/dto.interface";
 
-export type TrialConfig = Record<string, number>
-
-export const FUNCTIONS = (trialConfig: TrialConfig) => ({
+export const FUNCTIONS = {
   addVector: () => (input) => fun('addVector', {}, input),
   sum: (weight: number) => (input) => fun('sumMatrix', {weight}, input),
   popularity: () => (input) => fun('popularity', {}, input),
@@ -17,5 +16,5 @@ export const FUNCTIONS = (trialConfig: TrialConfig) => ({
   // Terminals:
   interaction: (i: string) => fun(`interaction(${i})`, {}, []),
   property: (entity: string, property: string) => fun(`property(${entity}.${property})`, {}, []),
-  fillMatrix: (from: string, to: string, val: number) => fun('randomMatrix', {seed: val, output: { from, to, rows: trialConfig[from], columns: trialConfig[to]}})
-})
+  fillMatrix: (from: string, to: string, val: number) => fun('randomMatrix', {seed: val}, [], { dtoType: DTOType.matrix, fromEntity: from, toEntity: to})
+}

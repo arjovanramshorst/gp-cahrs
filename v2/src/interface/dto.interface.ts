@@ -65,14 +65,14 @@ export interface DTOMatrix {
   dtoType: DTOType.matrix;
   fromEntity?: string;
   toEntity?: string;
-  rows?: number;
-  columns?: number;
+  // rows?: number;
+  // columns?: number;
 }
 
 export interface DTOVector {
   dtoType: DTOType.vector;
   entity?: string;
-  items?: number;
+  // items?: number;
   valueType: PropertyType;
 }
 

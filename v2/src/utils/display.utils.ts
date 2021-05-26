@@ -20,9 +20,9 @@ export const printConfig = (config: ConfigTree, depth = 0) => {
 
 export const dtoToString = (dto: DTO) => {
   if (dto.dtoType === DTOType.matrix) {
-    return `matrix[${dto.rows},${dto.columns}]`
+    return `matrix[${dto.fromEntity},${dto.toEntity}]`
   } else if (dto.dtoType === DTOType.vector) {
-    return `vector<${dto.valueType}>[${dto.items}]`
+    return `vector<${dto.valueType}>[${dto.entity}]`
   } else {
     return `scalar`
   }

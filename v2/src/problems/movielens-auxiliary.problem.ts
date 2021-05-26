@@ -74,12 +74,14 @@ export const readMovieLensV2: ReadProblemFunction = async (
   //   })
 
   return {
+    problemName: "movielens2",
+    interleaveSize,
+    interleaveSeed,
+
     output: {
       dtoType: DTOType.matrix,
       fromEntity: "user",
       toEntity: "movie",
-      rows: userRefs.length,
-      columns: movieRefs.length
     } as DTOMatrix,
 
     validate: validate,
@@ -133,8 +135,8 @@ const readMovies = async () => {
     "./data/ml/auxiliary-mapping.txt",
     {
       headers: ['movieId', 'genres', 'director', 'actors'],
-      mapValues: ({ header, value }) => {
-        switch(header) {
+      mapValues: ({header, value}) => {
+        switch (header) {
           case 'genres':
           case 'actors':
             return value.split(",")
@@ -153,7 +155,7 @@ const readRatings = async () => {
     {
       headers: ['userId', 'movieId', 'rating', 'timestamp'],
       mapValues: ({header, value}) => {
-        switch(header) {
+        switch (header) {
           case 'rating':
           case 'timestamp':
             return Number(value)

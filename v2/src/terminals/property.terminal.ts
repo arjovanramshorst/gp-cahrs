@@ -14,7 +14,6 @@ export const getPropertyTerminals = (problemInstance: ProblemInstance): Terminal
           dtoType: DTOType.vector,
           valueType: property.type,
           entity: entityKey,
-          items: property.items.length
         }) as DTOVector,
         evaluate: () => property.items
       }
@@ -32,8 +31,6 @@ export const getInteractionPropertyTerminals = (problemInstance: ProblemInstance
         dtoType: DTOType.matrix,
         fromEntity: interaction.fromEntityType,
         toEntity: interaction.toEntityType,
-        rows: rows,
-        columns: cols
       }) as DTOMatrix,
       evaluate: (config, problem) => interaction.interactions
     }

@@ -7,6 +7,9 @@ export type ReadProblemFunction = (
 ) => Promise<ProblemInstance>;
 
 export interface ProblemInstance {
+  problemName: string,
+  interleaveSize: number,
+  interleaveSeed: number,
 
   output: DTO;
 

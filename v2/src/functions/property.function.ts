@@ -2,7 +2,6 @@ import {DTO, DTOMatrix, DTOType, DTOVector} from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
 import {filterUndefined} from "../utils/functional.utils";
 import {FunctionImplementation} from "./function";
-import {setUnion, setIntersect} from "mathjs"
 
 const compareOutput = (
   type: PropertyType,
@@ -22,8 +21,6 @@ const compareOutput = (
     dtoType: DTOType.matrix,
     fromEntity: leftVector.entity,
     toEntity: rightVector.entity,
-    rows: leftVector.items,
-    columns: rightVector.items,
   });
 };
 
@@ -35,13 +32,11 @@ const compareInput = (
     {
       dtoType: DTOType.vector,
       entity: output.fromEntity,
-      items: output.rows,
       valueType: left.valueType,
     },
     {
       dtoType: DTOType.vector,
       entity: output.toEntity,
-      items: output.columns,
       valueType: right.valueType,
     },
   ].map((it) => filterUndefined(it));

@@ -1,8 +1,9 @@
 import { ProblemInstance } from "./interface/problem.interface";
-import { calcFunction } from "./functions/function";
+import {calcFunction} from "./functions/function";
 import { calcTerminal } from "./terminals/terminal";
 import {ConfigTree} from "./tree";
 import {printNested} from "./utils/display.utils";
+import {readCache, writeCache} from "./utils/cache.utils";
 
 let COUNT = 0
 
@@ -17,12 +18,18 @@ export const subCount = () => {
 export const calcRecursive = (
   configFinger: ConfigTree,
   problemInstance: ProblemInstance,
-  depth: number = 0,
+  depth: number = 0
+  // output: DTO
 ) => {
+  const cache = readCache(problemInstance, configFinger)
+  if (cache) {
+    return cache
+  }
   printNested(depth, `Entered ${configFinger.config.type}, config: ${configFinger.config}`);
   let input;
   if (isFunction(configFinger)) {
     input = [];
+    // const specificInputDTO = specifyInputDto(configFinger.config, output, configFinger.input.map(it => it.output))
 
     configFinger.input.forEach((inputConfig, idx) => {
       if (isFunction(inputConfig)) {
@@ -41,6 +48,7 @@ export const calcRecursive = (
   printNested(depth, `Calculating ${configFinger.config.type}, config: ${JSON.stringify(configFinger.config)}`);
   const res = calc(configFinger, input, problemInstance);
   printNested(depth, `Finished ${configFinger.config.type}`);
+  writeCache(problemInstance, configFinger, res)
   return res;
 };
 

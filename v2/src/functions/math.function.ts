@@ -21,14 +21,14 @@ export const mathMatrixOutput = (input: DTO[]) => {
   }
   if (
     left.dtoType === DTOType.vector && right.dtoType === DTOType.matrix
-    && sameOrUndefined(left.items, right.columns) && sameOrUndefined(left.entity, right.toEntity)
+    && sameOrUndefined(left.entity, right.toEntity)
   ) {
     return right
   }
 
   if (
     right.dtoType === DTOType.vector && left.dtoType === DTOType.matrix
-    && sameOrUndefined(right.items, left.columns) && sameOrUndefined(right.entity, left.toEntity)
+    && sameOrUndefined(right.entity, left.toEntity)
   ) {
     return left
   }
@@ -43,19 +43,12 @@ export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
     // Set a default size? Maybe make this random?
     const defaultSize = 1
 
-    const rows = output.rows || left.rows || right.rows || defaultSize
-    const columns = output.columns || left.columns || right.columns || defaultSize
-
     return [{
       ...output,
       ...left,
-      rows,
-      columns
     }, {
       ...output,
       ...right,
-      rows,
-      columns
     }]
   }
 
@@ -70,7 +63,6 @@ export const mathMatrixInput = (output: DTO, input: DTO[]): DTO[] => {
     if (it.dtoType === DTOType.vector && output.dtoType === DTOType.matrix) {
       return {
         ...it,
-        items: (output as DTOMatrix).columns,
         entity: (output as DTOMatrix).toEntity,
       } as DTO;
     }
@@ -132,7 +124,7 @@ const SubtractFunction: FunctionImplementation<{}> = {
   specifyInput: mathMatrixInput,
 };
 
-const SumMatrix: FunctionImplementation<{weight: number}> = {
+const SumMatrix: FunctionImplementation<{ weight: number }> = {
   type: "sumMatrix",
   inputSize: 2,
   getOutput: ([left, right]: DTO[]) => {
@@ -159,8 +151,15 @@ const AddVector: FunctionImplementation<{}> = {
   inputSize: 2,
   getOutput: ([matrix, vector]: DTO[]) => {
     if (matrix.dtoType === DTOType.matrix && vector.dtoType === DTOType.vector && vector.valueType === PropertyType.number) {
-      if (matrix.columns === vector.items) {
-        return matrix
+      if (sameOrUndefined(matrix.toEntity, vector.entity)) {
+        if (vector.entity) {
+          return {
+            ...matrix,
+            toEntity: vector.entity
+          }
+        } else {
+          return matrix
+        }
       }
     }
 
@@ -172,7 +171,6 @@ const AddVector: FunctionImplementation<{}> = {
       output,
       {
         dtoType: DTOType.vector,
-        items: output.columns,
         entity: output.toEntity,
         valueType: PropertyType.number
       }] as DTO[]

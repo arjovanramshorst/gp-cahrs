@@ -89,6 +89,10 @@ export const readSobazaar: ReadProblemFunction = async (
 
 
   return {
+    problemName: "sobazaar",
+    interleaveSize,
+    interleaveSeed,
+
     output: {
       dtoType: DTOType.matrix,
       fromEntity: "user",

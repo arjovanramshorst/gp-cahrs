@@ -9,6 +9,11 @@ import {PopularityFunctions} from "./popularity.function";
 import {MatrixFunctions} from "./matrix.function";
 
 
+export const specifyInputDto = (config: NodeConfig, output: DTO, input: any) => {
+  const Function = FunctionFactory(config.type);
+  return Function.specifyInput(output, input);
+}
+
 export const calcFunction = (config: NodeConfig, input: any) => {
   const Function = FunctionFactory(config.type);
   return Function.evaluate(config, input);

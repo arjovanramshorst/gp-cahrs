@@ -30,27 +30,27 @@ const empty = (size) => {
   }
 }
 
-const createVector = (size: number) =>
-  RandomVector.evaluate({
-    output: {dtoType: DTOType.vector, items: size, valueType: PropertyType.number},
-    seed: generateMulberrySeed()
-  }, undefined)
-const createMatrix = (rows: number, cols: number) =>
-  RandomMatrix.evaluate({
-    output: {dtoType: DTOType.matrix, rows: rows, columns: cols},
-    seed: generateMulberrySeed()
-  }, undefined)
+// const createVector = (size: number) =>
+//   RandomVector.evaluate({
+//     output: {dtoType: DTOType.vector, items: size, valueType: PropertyType.number},
+//     seed: generateMulberrySeed()
+//   }, undefined)
+// const createMatrix = (rows: number, cols: number) =>
+//   RandomMatrix.evaluate({
+//     output: {dtoType: DTOType.matrix, rows: rows, columns: cols},
+//     seed: generateMulberrySeed()
+//   }, undefined)
 
 // const a = createVector(10000)
 // const b = createVector(10000)
-const users = 100
-const matrix = createMatrix(users, 9000)
-const similarity = createMatrix(users, users)
+// const users = 100
+// const matrix = createMatrix(users, 9000)
+// const similarity = createMatrix(users, users)
 
 // measure(10, (() => mathZeros(10000)))
 // measure(10, () => empty(10000))
 
-measure(1, () => PearsonSimilarityFunction.evaluate({type: "any"}, [matrix]))
+// measure(1, () => PearsonSimilarityFunction.evaluate({type: "any"}, [matrix]))
 
 // measure(1, () => {
 //   NNRecommendFunction.evaluate({type: "any", N: 10} as NNConfig, [similarity, matrix])

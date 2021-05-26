@@ -36,9 +36,6 @@ export const  generateTree = (
   let selected: NodeImplementation<any>;
   let input: DTO[] = [];
 
-  if (outputDTO.dtoType === DTOType.matrix && outputDTO.rows === 811 && outputDTO.columns === 811) {
-    // debugger
-  }
   if (maxDepth === 1) {
     // Terminal is the only possibility
     selected = selectRandom(validTerminals);
@@ -141,14 +138,12 @@ const isSame = (left: DTO, right: DTO) =>
   Object.keys(left).every((key) => (left[key] ?? undefined) === (right[key] ?? undefined)) &&
   Object.keys(right).every((key) => (left[key] ?? undefined) === (right[key] ?? undefined));
 
-export const fun = (type: string, config: any = {}, input: ConfigTree[] = []): ConfigTree => ({
+export const fun = (type: string, config: any = {}, input: ConfigTree[] = [], output: DTO = { dtoType: DTOType.matrix }): ConfigTree => ({
   config: {
     type,
     ...config
   },
   input: input,
-  output: {
-    dtoType: DTOType.matrix // doesn't matter for baseline
-  }
+  output
 })
 

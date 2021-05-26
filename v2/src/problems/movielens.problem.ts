@@ -68,12 +68,14 @@ export const readMovieLens: ReadProblemFunction = async (
     })
 
   return {
+    problemName: "movielens",
+    interleaveSize,
+    interleaveSeed,
+
     output: {
       dtoType: DTOType.matrix,
       fromEntity: "user",
       toEntity: "movie",
-      rows: userRefs.length,
-      columns: movieRefs.length
     } as DTOMatrix,
 
     validate: validate,

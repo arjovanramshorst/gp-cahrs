@@ -22,18 +22,13 @@ export const PearsonSimilarityFunction: FunctionImplementation<{}> = {
       dtoType: DTOType.matrix,
       fromEntity: inputMatrix.fromEntity,
       toEntity: inputMatrix.fromEntity,
-      rows: inputMatrix.rows,
-      columns: inputMatrix.rows
     }
   },
   specifyInput: (output: DTOMatrix, input: [DTOMatrix]): [DTOMatrix] => {
     return [{
       dtoType: DTOType.matrix,
       fromEntity: output.fromEntity,
-      rows: output.rows,
       toEntity: input[0].toEntity,
-      columns: input[0].columns
-
     }]
   },
   evaluate: (config, [scores]) => {

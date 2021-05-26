@@ -10,7 +10,7 @@ import {ConfigTree, fun} from "./tree";
 const main = async () => {
   const configs = await getConfigs()
 
-  const problem = await readMovieLensV2(0.5, CONFIG.VERIFICATION_SEED)
+  const problem = await readMovieLensV2(1, CONFIG.VERIFICATION_SEED)
 
   configs.forEach(([name, it]) => {
     console.log(`\n===================\n ${name}:\n===================`)
@@ -26,19 +26,19 @@ const main = async () => {
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
-    ['recent', await readJson("../src/pretty.json")],
+    // ['recent', await readJson("../src/pretty.json")],
     ['popularity', popularity],
     ['basic CF', basicCF],
     ['empty', empty],
     ['Item CF', itemCF],
     ['CF + popular', cfPlusPopular],
-    ['Director', director],
-    ['Actors', actors],
-    ['Genres', genres]
+    // ['Director', director],
+    // ['Actors', actors],
+    // ['Genres', genres],
   ]
 }
 
-const f = FUNCTIONS({movie: 1674, user: 471})
+const f = FUNCTIONS
 
 const popularity = f.addVector()([
   f.fillMatrix('user', 'movie', 0),

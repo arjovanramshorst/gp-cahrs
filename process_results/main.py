@@ -108,7 +108,10 @@ files = {
     # 'fix-validation_2021-05-12_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300',
     # 'fix-validation_2021-05-12_Sobazaar_5_0.5_300_30.csv': 'Sobazaar p=0.5 d=5 g=300'
     # '2021-05-24_Movielens V2_4_0.1_40_40.csv': 'Movielens v2 p=0.1, d=4',
-    'movielens2-tournament_2021-05-24_Movielens V2_4_0.5_100_30.csv': 'Movielens v2 p=0.5 d=4 g=100'
+    'cf-rework_2021-05-25_Movielens V2_4_0.2_800_30.csv': 'Movielens CF p=0.2 d=4 g=800',
+    'cf-rework_2021-05-25_Movielens V2_5_0.2_800_30.csv': 'Movielens CF p=0.2 d=5 g=800',
+    'movielens2-tournament_2021-05-24_Movielens V2_4_0.5_100_30.csv': 'Movielens v2 p=0.5 d=4 g=100',
+    'movielens2-tournament_2021-05-24_Movielens_6_0.5_100_30.csv': 'Movielens p=0.5 d=6 g=100',
 }
 
 for file, title in files.items():
