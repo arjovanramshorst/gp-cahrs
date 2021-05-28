@@ -22,6 +22,7 @@ COLOR_MAX = 'xkcd:lightish green'
 COLOR_MEAN = 'xkcd:faded blue'
 COLOR_BASE = 'xkcd:dull red'
 
+
 def plot(filename, column, title):
     result = pd.read_csv('data/' + filename, delimiter="\t")
     result_generations = result[result.type == TYPE_INDIVIDUAL]
@@ -61,10 +62,10 @@ def plot(filename, column, title):
     axs[0].legend(),
     axs[0].grid(True)
 
-
     axs[1].plot(x, fitness_best, label='Best performance (validation)', color=COLOR_MAX)
     axs[1].plot(x, trend(x, fitness_best), label='Best performance (trend)', color=COLOR_MAX, linestyle='dotted')
-    axs[1].plot(x, np.maximum.accumulate(fitness_best), label='Best performance (cumulative)', color='xkcd:pumpkin orange')
+    axs[1].plot(x, np.maximum.accumulate(fitness_best), label='Best performance (cumulative)',
+                color='xkcd:pumpkin orange')
     axs[1].plot(x, np.full(x.shape, fitness_baseline), label='baseline (validation)', color=COLOR_BASE)
     axs[1].legend()
     axs[1].set_xlabel('generation')
@@ -108,10 +109,12 @@ files = {
     # 'fix-validation_2021-05-12_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300',
     # 'fix-validation_2021-05-12_Sobazaar_5_0.5_300_30.csv': 'Sobazaar p=0.5 d=5 g=300'
     # '2021-05-24_Movielens V2_4_0.1_40_40.csv': 'Movielens v2 p=0.1, d=4',
-    'cf-rework_2021-05-25_Movielens V2_4_0.2_800_30.csv': 'Movielens CF p=0.2 d=4 g=800',
-    'cf-rework_2021-05-25_Movielens V2_5_0.2_800_30.csv': 'Movielens CF p=0.2 d=5 g=800',
-    'movielens2-tournament_2021-05-24_Movielens V2_4_0.5_100_30.csv': 'Movielens v2 p=0.5 d=4 g=100',
-    'movielens2-tournament_2021-05-24_Movielens_6_0.5_100_30.csv': 'Movielens p=0.5 d=6 g=100',
+    # 'cf-rework_2021-05-25_Movielens V2_4_0.2_800_30.csv': 'Movielens CF p=0.2 d=4 g=800',
+    # 'cf-rework_2021-05-25_Movielens V2_5_0.2_800_30.csv': 'Movielens CF p=0.2 d=5 g=800',
+    # 'movielens2-tournament_2021-05-24_Movielens V2_4_0.5_100_30.csv': 'Movielens v2 p=0.5 d=4 g=100',
+    # 'movielens2-tournament_2021-05-24_Movielens_6_0.5_100_30.csv': 'Movielens p=0.5 d=6 g=100',
+    'FULL_2021-05-26_Movielens V2_4_1_40_30.csv': 'Movielens v2 d=4 p=1',
+    'FULL_2021-05-26_Movielens V2_5_1_40_30.csv': 'Movielens v2 d=5 p=1'
 }
 
 for file, title in files.items():

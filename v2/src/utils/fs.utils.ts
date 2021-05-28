@@ -34,6 +34,7 @@ export const readJson = (filename: string) => {
 export const readJsonCache = (filename: string) => {
   const path = `./cache/${filename}`
   if (fs.existsSync(path)) {
+    console.log("CACHE HIT!")
     return JSON.parse(fs.readFileSync(path))
   }
 

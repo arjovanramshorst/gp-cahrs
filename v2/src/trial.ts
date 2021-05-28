@@ -10,7 +10,7 @@ import {ConfigTree, fun} from "./tree";
 const main = async () => {
   const configs = await getConfigs()
 
-  const problem = await readMovieLensV2(1, CONFIG.VERIFICATION_SEED)
+  const problem = await readMovieLensV2(1)
 
   configs.forEach(([name, it]) => {
     console.log(`\n===================\n ${name}:\n===================`)
@@ -23,18 +23,19 @@ const main = async () => {
     console.log("MRR: ", baselineFitness.mrr)
   })
 }
+// MRR:  0.5531329428201107
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
     // ['recent', await readJson("../src/pretty.json")],
-    ['popularity', popularity],
-    ['basic CF', basicCF],
-    ['empty', empty],
-    ['Item CF', itemCF],
-    ['CF + popular', cfPlusPopular],
+    // ['popularity', popularity],
+    // ['basic CF', basicCF],
+    // ['empty', empty],
+    // ['Item CF', itemCF],
+    // ['CF + popular', cfPlusPopular],
     // ['Director', director],
     // ['Actors', actors],
-    // ['Genres', genres],
+    ['Genres', genres],
   ]
 }
 

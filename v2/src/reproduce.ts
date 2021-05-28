@@ -53,6 +53,9 @@ const crossover = (parent1: ConfigTree, parent2: ConfigTree): ConfigTree[] => {
   let child1 = cloneConfig(parent1)
   let child2 = cloneConfig(parent2)
 
+  if (Math.random() > CONFIG.REPRODUCTION.CROSSOVER_RATE) {
+    return [child1, child2]
+  }
   // Make list of nodes for child
   const child1Nodes = recursiveConfig(child1)
   const child2Nodes = recursiveConfig(child2)
@@ -100,6 +103,10 @@ const crossover = (parent1: ConfigTree, parent2: ConfigTree): ConfigTree[] => {
 }
 
 export const mutateConfigTree = (config: ConfigTree, mutate: MutateFn): ConfigTree => {
+  if (Math.random() > CONFIG.REPRODUCTION.MUTATION_RATE) {
+    return config
+  }
+
   const items = recursiveConfig(config)
   const toMutate = selectRandom(items)
 

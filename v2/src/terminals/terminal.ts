@@ -35,7 +35,7 @@ export const TerminalFactory = (
 export const getTerminals = (
   problemInstance: ProblemInstance
 ): TerminalImplementation<any>[] => [
-  RandomMatrix,
+  // RandomMatrix,
   RandomScalar,
   // RandomVector,
   ...getPropertyTerminals(problemInstance),

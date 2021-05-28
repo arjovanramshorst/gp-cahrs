@@ -15,13 +15,15 @@ import { csvHeader, produceCsvLine } from "./utils/output.utils";
 
 const filename =
   [
-    CONFIG.EXPERIMENT_NAME,
     new Date().toISOString().substring(0, 10),
+    CONFIG.EXPERIMENT_NAME,
     CONFIG.PROBLEM.name,
-    CONFIG.MAX_DEPTH,
-    CONFIG.INTERLEAVE_SIZE,
-    CONFIG.GENERATION_SIZE,
-    CONFIG.GENERATIONS,
+    `d${CONFIG.MAX_DEPTH}`,
+    `i${CONFIG.INTERLEAVE_SIZE}`,
+    `gs${CONFIG.GENERATION_SIZE}`,
+    `m${CONFIG.REPRODUCTION.MUTATION_RATE}`,
+    `c${CONFIG.REPRODUCTION.CROSSOVER_RATE}`,
+    `ts${CONFIG.REPRODUCTION.TOURNAMENT_SIZE}`
   ]
     .filter((it) => !!it)
     .join("_") + ".csv";
@@ -221,7 +223,7 @@ const evaluateGeneration = (
 const evaluateBaseline = async () => {
   console.log(`Evaluating baseline on verification sample`);
   const problem = await CONFIG.PROBLEM.read(
-    Number(CONFIG.INTERLEAVE_SIZE),
+    CONFIG.INTERLEAVE_SIZE,
     CONFIG.VERIFICATION_SEED
   );
   const baselineFitness = fitnessScore(

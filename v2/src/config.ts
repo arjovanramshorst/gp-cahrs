@@ -30,11 +30,17 @@ export const CONFIG = {
   PROBLEM: getProblem(),
   GENERATION_SIZE: process.env.CAHRS_GENERATION_SIZE ? Number(process.env.CAHRS_GENERATION_SIZE) : 40,
   GENERATIONS: process.env.CAHRS_GENERATIONS ? Number(process.env.CAHRS_GENERATIONS) : 40,
+
   GROWTH_FUNCTION_FRACTION: 0.5,
+
   MAX_DEPTH: process.env.CAHRS_MAX_DEPTH ? Number(process.env.CAHRS_MAX_DEPTH) : 6,
+
   INTERLEAVE_SIZE: process.env.CAHRS_INTERLEAVE_SIZE ? Number(process.env.CAHRS_INTERLEAVE_SIZE) : 0.1,
+
   REPRODUCTION: {
-    TOURNAMENT_SIZE: 4
+    TOURNAMENT_SIZE: process.env.CAHRS_TOURNAMENT_SIZE ? Number(process.env.CAHRS_TOURNAMENT_SIZE) : 4,
+    MUTATION_RATE: process.env.CAHRS_MUTATION_RATE ? Number(process.env.CAHRS_MUTATION_RATE) : 0.1,
+    CROSSOVER_RATE: process.env.CAHRS_CROSSOVER_RATE ? Number(process.env.CAHRS_CROSSOVER_RATE) : 0.9
   },
   VERIFICATION_SEED: 1751426601,
   NORMALIZE: process.env.CAHRS_NORMALIZE === "true", // default false

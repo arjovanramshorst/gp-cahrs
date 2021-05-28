@@ -80,7 +80,7 @@ const CompareNumberFunction: FunctionImplementation<{}> = {
 export const PropertyFunctions = [
   CompareStringFunction,
   CompareArrayFunction,
-  CompareNumberFunction,
+  // CompareNumberFunction,
 ];
 
 const arraySimilarity = (a: string[], b: string[]) => {

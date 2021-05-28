@@ -134,10 +134,7 @@ const SumMatrix: FunctionImplementation<{ weight: number }> = {
 
     return undefined
   },
-  createConfig: () => ({
-    weight: Math.random()
-  }),
-  evaluate: (config, [left, right]) => add(dotMultiply(config.weight ?? 0.5, left), dotMultiply(1 - config.weight ?? 0.5, right)),
+  evaluate: (config, [left, right]) => add(left, right),
   specifyInput: (output: DTOMatrix, input: DTO[]) => {
     return [
       output,
