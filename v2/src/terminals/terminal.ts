@@ -38,7 +38,7 @@ export const getTerminals = (
   // RandomMatrix,
   RandomScalar,
   // RandomVector,
-  EmptyTerminal,
+  // EmptyTerminal,
   ...getPropertyTerminals(problemInstance),
   ...getInteractionPropertyTerminals(problemInstance)
 ];

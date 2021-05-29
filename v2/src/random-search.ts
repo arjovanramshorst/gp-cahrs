@@ -37,17 +37,17 @@ const main = async () => {
     try {
       console.log(`Evaluating #${i}`)
       printConfig(config)
-      const fitness = fitnessScore(
-        calcRecursive(config, problem),
-        problem
-      ).raw;
-      console.log(`Evaluated #${i}, MRR: ${fitness.performance}`)
-      if (!best || fitness.performance > best.performance) {
-        best = fitness
-        console.log(`Found improvement after ${i} tries, MRR: ${fitness.performance}`)
-        printConfig(config)
-        console.log(JSON.stringify(config))
-      }
+      // const fitness = fitnessScore(
+      //   calcRecursive(config, problem),
+      //   problem
+      // ).raw;
+      // console.log(`Evaluated #${i}, MRR: ${fitness.performance}`)
+      // if (!best || fitness.performance > best.performance) {
+      //   best = fitness
+      //   console.log(`Found improvement after ${i} tries, MRR: ${fitness.performance}`)
+      //   printConfig(config)
+      //   console.log(JSON.stringify(config))
+      // }
       i++
     } catch(e) {
       console.log(e)

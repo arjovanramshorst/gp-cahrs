@@ -2,7 +2,7 @@ import {zeros} from "mathjs"
 import {generateMulberrySeed, mulberry32, pick, sample} from "../utils/random.utils";
 import {PropertyType, ReadProblemFunction} from "../interface/problem.interface";
 import {readCsvFile} from "../utils/fs.utils";
-import {groupBy, toIdxMap} from "../utils/functional.utils";
+import {asMatrix, associateWithMany, groupBy, toIdxMap} from "../utils/functional.utils";
 import {DTOMatrix, DTOType} from '../interface/dto.interface';
 import {ConfigTree, fun} from "../tree";
 
@@ -22,14 +22,43 @@ export const readMovieLensV2: ReadProblemFunction = async (
 
   const movieRefs = movies.map(it => it.movieId)
   const movieToIdxMap = movieRefs.reduce(toIdxMap, {})
+  const movieParams = {
+    refs: movieRefs,
+    refsToIdx: movieToIdxMap
+  }
+  const genreMap = associateWithMany(movies, it => it.genres, it => it.movieId)
+  const genreRefs = Object.keys(genreMap)
+  const genreToIdxMap = genreRefs.reduce(toIdxMap, {})
+  const genreParams = {
+    refs: genreRefs,
+    refsToIdx: genreToIdxMap
+  }
+  const genreMatrix = asMatrix({
+    from: genreParams,
+    to: movieParams,
+    interactionMap: genreMap
+  })
 
+  const actorMap = associateWithMany(movies, it => it.actors, it => it.movieId)
+  const actorRefs = Object.keys(actorMap)
+  const actorToIdxMap = actorRefs.reduce(toIdxMap, {})
+  const actorParams = {
+    refs: actorRefs,
+    refsToIdx: actorToIdxMap
+  }
+  const actorMatrix = asMatrix({
+    from: actorParams,
+    to: movieParams,
+    interactionMap: actorMap
+  })
 
   const userRefs = interleaveSize === 1 ? Object.keys(ratingsByUser) : sample(Object.keys(ratingsByUser), numberOfUsers, PRG)
 
   const userToIdxMap = userRefs.reduce(toIdxMap, {})
 
   const ratingMatrix: number[][] = zeros([userRefs.length, movieRefs.length]) as number[][]
-  const tagMatrix: number[][] = zeros([userRefs.length, movieRefs.length]) as number[][]
+  // const tagMatrix: number[][] = zeros([userRefs.length, movieRefs.length]) as number[][]
+
 
   const filter: number[][] = []
   const validate: number[][] = []
@@ -94,6 +123,16 @@ export const readMovieLensV2: ReadProblemFunction = async (
         refsToIdx: userToIdxMap,
         properties: {}
       },
+      actor: {
+        type: "actor",
+        refsToIdx: actorToIdxMap,
+        properties: {}
+      },
+      genre: {
+        type: "genre",
+        refsToIdx: genreToIdxMap,
+        properties: {}
+      },
       movie: {
         type: "movie",
         refsToIdx: movieToIdxMap,
@@ -124,6 +163,18 @@ export const readMovieLensV2: ReadProblemFunction = async (
         toEntityType: "movie",
         interactions: ratingMatrix
       },
+      acts: {
+        type: "acts",
+        fromEntityType: "actor",
+        toEntityType: "movie",
+        interactions: actorMatrix
+      },
+      genre: {
+        type: "genre",
+        fromEntityType: "genre",
+        toEntityType: "movie",
+        interactions: genreMatrix
+      }
     },
 
     baseline: baseline2(userRefs.length, movieRefs.length)

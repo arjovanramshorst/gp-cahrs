@@ -1,3 +1,6 @@
+import {zeros} from "mathjs";
+import {InteractionParams} from "../interface/problem.interface";
+
 type EntityId = string;
 
 export const groupBy = <A>(
@@ -13,6 +16,33 @@ export const groupBy = <A>(
 
     return agg;
   }, {});
+
+export const associateWithMany = <A>(
+  entities: A[],
+  getMany: (c: A) => EntityId[],
+  getOriginal: (c: A) => EntityId
+): Record<EntityId, EntityId[]> => entities
+  .reduce((agg: Record<EntityId, EntityId[]>, curr: A) => {
+    getMany(curr).forEach(it => {
+      if (!agg[it]) {
+        agg[it] = [] as EntityId[]
+      }
+      agg[it].push(getOriginal(curr))
+    })
+    return agg
+}, {})
+
+export const asMatrix = <A>(
+  params: InteractionParams,
+) => {
+  const matrix: number[][] = zeros([params.from.refs.length, params.to.refs.length]) as number[][]
+  Object.keys(params.interactionMap).forEach(fromRef => {
+    params.interactionMap[fromRef].forEach(toRef => {
+      matrix[params.from.refsToIdx[fromRef]][params.to.refsToIdx[toRef]] = 1
+    })
+  })
+  return matrix
+}
 
 export const distinct = <A>(
   entities: A[],

@@ -1,4 +1,4 @@
-import {add, dotMultiply, subtract} from "mathjs"
+import {add, dotMultiply, multiply, subtract} from "mathjs"
 import {FunctionImplementation} from "./function";
 import {DTO, DTOMatrix, DTOType, DTOVector, findMatchingType, sameOrUndefined,} from "../interface/dto.interface";
 import {PropertyType} from "../interface/problem.interface";
@@ -124,7 +124,34 @@ const SubtractFunction: FunctionImplementation<{}> = {
   specifyInput: mathMatrixInput,
 };
 
-const SumMatrix: FunctionImplementation<{ weight: number }> = {
+const ProductMatrix: FunctionImplementation<{}> = {
+  type: "productMatrix",
+  inputSize: 2,
+  getOutput: ([left, right]: DTO[]) => {
+    if (left.dtoType === DTOType.matrix && right.dtoType === DTOType.matrix) {
+      if (left.toEntity && right.fromEntity && left.toEntity == right.fromEntity) {
+        return {
+          dtoType: DTOType.matrix,
+          fromEntity: left.fromEntity,
+          toEntity: right.toEntity
+        }
+      }
+    }
+    return undefined
+  },
+  evaluate: (config, [left, right]) => multiply(left, right),
+  specifyInput: (output: DTOMatrix, [left, right]: DTOMatrix[]) => {
+    return [{
+      ...left,
+      fromEntity: left.fromEntity ?? output.fromEntity
+    }, {
+      ...right,
+      toEntity: right.toEntity ?? output.toEntity
+    }]
+  }
+}
+
+const SumMatrix: FunctionImplementation<{ }> = {
   type: "sumMatrix",
   inputSize: 2,
   getOutput: ([left, right]: DTO[]) => {
@@ -200,6 +227,7 @@ export const MathFunctions = [
   AddVector,
   ScaleMatrix,
   SumMatrix,
+  ProductMatrix
   // SumFunction,
   // SubtractFunction
 ];

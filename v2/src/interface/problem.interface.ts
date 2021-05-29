@@ -51,3 +51,14 @@ interface Interaction {
 
   interactions: number[][];
 }
+
+export interface EntityParams {
+  refs: string[],
+  refsToIdx: Record<string, number>
+}
+
+export interface InteractionParams{
+  from: EntityParams,
+  to: EntityParams,
+  interactionMap: Record<string, string[]>
+}
