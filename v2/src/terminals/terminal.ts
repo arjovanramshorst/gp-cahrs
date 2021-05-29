@@ -26,7 +26,7 @@ export const TerminalFactory = (
   if (!res) {
     console.warn(`Terminal does not exist for current sample dataset: ${type}`)
 
-    return EmptyTerminal(output)
+    return EmptyTerminal
   }
 
   return res;
@@ -38,6 +38,7 @@ export const getTerminals = (
   // RandomMatrix,
   RandomScalar,
   // RandomVector,
+  EmptyTerminal,
   ...getPropertyTerminals(problemInstance),
   ...getInteractionPropertyTerminals(problemInstance)
 ];

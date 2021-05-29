@@ -66,22 +66,20 @@ export const RandomScalar: TerminalImplementation<FillConfig> = {
   evaluate: (config, problem) => config.seed,
 };
 
-export const EmptyTerminal = (defaultDTO: DTO): TerminalImplementation<any> => {
-  return {
-    type: "empty",
-    getOutput: () => defaultDTO,
-    evaluate: (config, problem, output) => {
-      if (defaultDTO.dtoType === DTOType.matrix) {
-        const rows = Object.keys(problem.entities[defaultDTO.fromEntity].refsToIdx).length
-        const columns = Object.keys(problem.entities[defaultDTO.toEntity].refsToIdx).length
+export const EmptyTerminal: TerminalImplementation<any> = {
+  type: "empty",
+  getOutput: () => ({dtoType: DTOType.matrix}),
+  evaluate: (config, problem, output) => {
+    if (output.dtoType === DTOType.matrix) {
+      const rows = Object.keys(problem.entities[output.fromEntity].refsToIdx).length
+      const columns = Object.keys(problem.entities[output.toEntity].refsToIdx).length
 
-        return zeros([rows, columns])
-      } else if (defaultDTO.dtoType === DTOType.vector) {
-        const items = Object.keys(problem.entities[defaultDTO.entity].refsToIdx).length
-        return zeros([items])
-      } else {
-        return 0
-      }
+      return zeros([rows, columns])
+    } else if (output.dtoType === DTOType.vector) {
+      const items = Object.keys(problem.entities[output.entity].refsToIdx).length
+      return zeros([items])
+    } else {
+      return 0
     }
   }
 }
