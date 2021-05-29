@@ -32,11 +32,9 @@ def plot(filename, column, title):
     fitness_best = result[result.type == TYPE_BEST][column]
 
     config_best = result[result.type == TYPE_BEST]
-    config_max = config_best[config_best.f_score == config_best.f_score.max()]
+    config_max = config_best[config_best[column] == config_best[column].max()]
 
     config_str = config_max[COL_CONFIG].iloc[0]
-    print(title + ' - best config:')
-    print(config_str)
 
     x = result_generations[COL_GEN].unique().astype(int)
 
@@ -48,6 +46,9 @@ def plot(filename, column, title):
     result_max_trend = trend(x, result_max)
     result_mean = grouped_by.mean()[column]
     result_mean_trend = trend(x, result_mean)
+
+    print(title + ' - best config:')
+    print(config_str)
 
     result_std = trend(x, grouped_by.std()[column])
 
@@ -113,8 +114,11 @@ files = {
     # 'cf-rework_2021-05-25_Movielens V2_5_0.2_800_30.csv': 'Movielens CF p=0.2 d=5 g=800',
     # 'movielens2-tournament_2021-05-24_Movielens V2_4_0.5_100_30.csv': 'Movielens v2 p=0.5 d=4 g=100',
     # 'movielens2-tournament_2021-05-24_Movielens_6_0.5_100_30.csv': 'Movielens p=0.5 d=6 g=100',
-    'FULL_2021-05-26_Movielens V2_4_1_40_30.csv': 'Movielens v2 d=4 p=1',
-    'FULL_2021-05-26_Movielens V2_5_1_40_30.csv': 'Movielens v2 d=5 p=1'
+    # 'FULL_2021-05-26_Movielens V2_4_1_40_30.csv': 'Movielens v2 d=4 p=1',
+    # 'FULL_2021-05-26_Movielens V2_5_1_40_30.csv': 'Movielens v2 d=5 p=1'
+    '2021-05-29_WITHOUT_PRODUCT_Movielens V2_d4_i1_gs200_m0.1_c0.9_ts4.csv': 'm=0.1, c=0.9, ts=4',
+    # '2021-05-29_WITHOUT_PRODUCT_Movielens V2_d4_i1_gs200_m1_c0_ts4.csv': 'm=1, c=0, ts=4',
+    '2021-05-29_WITHOUT_PRODUCT_Movielens V2_d4_i1_gs200_m1_c1_ts4.csv': 'm=1, c=1, ts=4',
 }
 
 for file, title in files.items():

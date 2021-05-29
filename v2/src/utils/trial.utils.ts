@@ -12,6 +12,7 @@ export const FUNCTIONS = {
   compareArray: () => (input) => fun('compareArray', {}, input),
   compareString: () => (input) => fun('compareString', {}, input),
   transpose: () => (input) => fun('transpose', {}, input),
+  product: () => (input) => fun('productMatrix', {}, input),
 
   // Terminals:
   interaction: (i: string) => fun(`interaction(${i})`, {}, []),

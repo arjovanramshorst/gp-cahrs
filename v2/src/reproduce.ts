@@ -20,12 +20,18 @@ export const produceOffspring = (generation: EvaluatedConfig[], mutate: MutateFn
     const children = crossover(parent1, parent2)
 
     console.log("Children:")
-    children.forEach(it => { printConfig(it); console.log() })
+    children.forEach(it => {
+      printConfig(it);
+      console.log()
+    })
 
     const mutatedChildren = children.map(child => mutateConfigTree(child, mutate))
 
     console.log("Children after mutation:")
-    mutatedChildren.forEach(it => { printConfig(it); console.log() })
+    mutatedChildren.forEach(it => {
+      printConfig(it);
+      console.log()
+    })
     offspring.push(...children);
   }
 
@@ -103,11 +109,22 @@ const crossover = (parent1: ConfigTree, parent2: ConfigTree): ConfigTree[] => {
 }
 
 export const mutateConfigTree = (config: ConfigTree, mutate: MutateFn): ConfigTree => {
+  const items = recursiveConfig(config)
+
+  items.forEach(item => {
+    Object.keys(item.child.config).forEach(configKey => {
+      if (typeof item.child.config[configKey] === 'number') {
+        if (Math.random() < CONFIG.REPRODUCTION.PARAM_MUTATION_RATE) {
+          item.child.config[configKey] = mutateNumber(item.child.config[configKey])
+        }
+      }
+    })
+  })
+
   if (Math.random() > CONFIG.REPRODUCTION.MUTATION_RATE) {
     return config
   }
 
-  const items = recursiveConfig(config)
   const toMutate = selectRandom(items)
 
   if (CONFIG.DEBUG_MODE) {
@@ -135,6 +152,14 @@ export const mutateConfigTree = (config: ConfigTree, mutate: MutateFn): ConfigTr
     }
     return config
   }
+}
+
+export const mutateNumber = (val: number) => {
+  // (1 - max speed) + (random() * 2*max speed)
+  const mutationFactor = (1 - CONFIG.REPRODUCTION.PARAM_MUTATION_SPEED) + (Math.random() * 2 * CONFIG.REPRODUCTION.PARAM_MUTATION_SPEED)
+  const round = mutationFactor > 1 ? Math.ceil : Math.floor
+
+  return round(mutationFactor * val)
 }
 
 export const getMutateFunction = (treeTablesGrowth, terminals, functions) => {

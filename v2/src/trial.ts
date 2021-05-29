@@ -35,7 +35,11 @@ const getConfigs = async (): Promise<[string, ConfigTree][]> => {
     // ['CF + popular', cfPlusPopular],
     // ['Director', director],
     // ['Actors', actors],
-    ['Genres', genres],
+    // ['Genres', genres],
+    // ['Product', f.product()([
+    //   f.fillMatrix('user', 'actor', 0),
+    //   f.fillMatrix('actor', 'movie', 2)
+    // ])]
   ]
 }
 
