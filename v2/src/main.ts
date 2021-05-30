@@ -12,6 +12,7 @@ import {
 } from "./reproduce";
 import { printConfig } from "./utils/display.utils";
 import { csvHeader, produceCsvLine } from "./utils/output.utils";
+import {appendFileSync} from "fs";
 
 const filename =
   [
@@ -195,31 +196,39 @@ const evaluateGeneration = (
       console.log("Using cache..");
       fitness = cache[key];
     } else {
-      const res = calcRecursive(config, problem);
-      fitness = fitnessScore(res, problem, baselineFitness);
-      cache[JSON.stringify(config)] = fitness;
+      try {
+        const res = calcRecursive(config, problem);
+        fitness = fitnessScore(res, problem, baselineFitness);
+        cache[JSON.stringify(config)] = fitness;
+      } catch(e) {
+        console.log(e)
+      }
     }
 
-    const str = produceCsvLine(
-      `${gen}`,
-      "individual",
-      `${idx}`,
-      fitness.raw,
-      fitness.normalized,
-      config
-    );
+    if (fitness) {
+      const str = produceCsvLine(
+        `${gen}`,
+        "individual",
+        `${idx}`,
+        fitness.raw,
+        fitness.normalized,
+        config
+      );
 
-    appendFile(filename, str);
+      appendFile(filename, str);
 
-    const score = CONFIG.NORMALIZE
-      ? fitness.normalized.performance
-      : fitness.raw.performance;
-    console.log(`Evaluating generation #${gen} RS ${idx} - DONE (${score})`);
-    return {
-      config,
-      fitness: score,
-    };
-  });
+      const score = CONFIG.NORMALIZE
+        ? fitness.normalized.performance
+        : fitness.raw.performance;
+      console.log(`Evaluating generation #${gen} RS ${idx} - DONE (${score})`);
+      return {
+        config,
+        fitness: score,
+      };
+    } else {
+      return null
+    }
+  }).filter(it => !!it);
 };
 
 const evaluateBaseline = async () => {
@@ -228,22 +237,26 @@ const evaluateBaseline = async () => {
     CONFIG.INTERLEAVE_SIZE,
     CONFIG.VERIFICATION_SEED
   );
-  const baselineFitness = fitnessScore(
-    calcRecursive(problem.baseline, problem),
-    problem
-  ).raw;
-  const str = produceCsvLine(
-    `-`,
-    "baseline",
-    "-",
-    baselineFitness,
-    baselineFitness,
-    problem.baseline
-  );
-  appendFile(filename, str);
-  console.log(
-    `Evaluating on verification sample - DONE (${baselineFitness.performance})`
-  );
+  try {
+    const baselineFitness = fitnessScore(
+      calcRecursive(problem.baseline, problem),
+      problem
+    ).raw;
+    const str = produceCsvLine(
+      `-`,
+      "baseline",
+      "-",
+      baselineFitness,
+      baselineFitness,
+      problem.baseline
+    );
+    appendFile(filename, str);
+    console.log(
+      `Evaluating on verification sample - DONE (${baselineFitness.performance})`
+    );
+  } catch (e) {
+    console.log(e)
+  }
 };
 
 const bestOfCache: Record<string, FitnessValue> = {};

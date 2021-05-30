@@ -4,6 +4,7 @@ import { calcTerminal } from "./terminals/terminal";
 import {ConfigTree} from "./tree";
 import {printNested} from "./utils/display.utils";
 import {readCache, writeCache} from "./utils/cache.utils";
+import {appendFile} from "./utils/fs.utils";
 
 let COUNT = 0
 
@@ -46,12 +47,19 @@ export const calcRecursive = (
   // Depth first, so first calculate functions
 
   printNested(depth, `Calculating ${configFinger.config.type}, config: ${JSON.stringify(configFinger.config)}`);
-  const res = calc(configFinger, input, problemInstance);
-  printNested(depth, `Finished ${configFinger.config.type}`);
-  writeCache(problemInstance, configFinger, res)
-  return res;
+  try {
+    const res = calc(configFinger, input, problemInstance);
+    printNested(depth, `Finished ${configFinger.config.type}`);
+    writeCache(problemInstance, configFinger, res)
+    return res;
+  } catch (e) {
+    appendFile("errors.csv", [
+      (new Date()).toISOString(),
+      JSON.stringify(configFinger)
+    ].join("\t") + "\n")
+    throw Error("Subtree calculation failed")
+  }
 };
-
 
 const calc = (
   config: ConfigTree,
@@ -64,7 +72,6 @@ const calc = (
     return calcTerminal(config.config, problemInstance, config.output);
   }
 };
-
 
 const isFunction = (config: ConfigTree) => config.input.length > 0
 const isTerminal = (config: ConfigTree) => !isFunction(config)

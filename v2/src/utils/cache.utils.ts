@@ -25,7 +25,7 @@ export const writeCache = (problemInstance: ProblemInstance, config: ConfigTree,
   }
 }
 
-const hash = (problemInstance: ProblemInstance, config: ConfigTree) => {
+export const hash = (problemInstance: ProblemInstance, config: ConfigTree) => {
 
   const toHash = `${problemInstance.problemName}|${problemInstance.interleaveSize}|${problemInstance.interleaveSize === 1 ? "" : problemInstance.interleaveSeed}|${JSON.stringify(config)}`
   return uuidv5(toHash, namespace)
