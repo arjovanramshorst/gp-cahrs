@@ -189,7 +189,7 @@ const evaluateGeneration = (
     const key = JSON.stringify(config);
     console.log(`Evaluating generation #${gen} RS ${idx}:`);
     printConfig(config);
-    writeFile("most_recent.json", JSON.stringify(config));
+    writeFile(`recent/${filename}.json`, JSON.stringify(config));
     let fitness: Score;
     if (cache[key]) {
       console.log("Using cache..");

@@ -27,7 +27,7 @@ const main = async () => {
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
-    // ['recent', await readJson("../src/pretty.json")],
+    ['recent', await readJson("../src/pretty.json")],
     // ['popularity', popularity],
     // ['basic CF', basicCF],
     // ['empty', empty],

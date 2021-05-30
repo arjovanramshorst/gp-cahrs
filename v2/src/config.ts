@@ -28,21 +28,21 @@ const getProblem = (): { read: ReadProblemFunction, name: string } => {
 export const CONFIG = {
   EXPERIMENT_NAME: process.env.CAHRS_EXPERIMENT_NAME ?? null,
   PROBLEM: getProblem(),
-  GENERATION_SIZE: process.env.CAHRS_GENERATION_SIZE ? Number(process.env.CAHRS_GENERATION_SIZE) : 40,
-  GENERATIONS: process.env.CAHRS_GENERATIONS ? Number(process.env.CAHRS_GENERATIONS) : 40,
+  GENERATION_SIZE: process.env.CAHRS_GENERATION_SIZE ? Number(process.env.CAHRS_GENERATION_SIZE) : 100,
+  GENERATIONS: process.env.CAHRS_GENERATIONS ? Number(process.env.CAHRS_GENERATIONS) : 10,
 
   GROWTH_FUNCTION_FRACTION: 0.5,
 
   MAX_DEPTH: process.env.CAHRS_MAX_DEPTH ? Number(process.env.CAHRS_MAX_DEPTH) : 5,
 
-  INTERLEAVE_SIZE: process.env.CAHRS_INTERLEAVE_SIZE ? Number(process.env.CAHRS_INTERLEAVE_SIZE) : 0.1,
+  INTERLEAVE_SIZE: process.env.CAHRS_INTERLEAVE_SIZE ? Number(process.env.CAHRS_INTERLEAVE_SIZE) : 1,
 
   REPRODUCTION: {
     TOURNAMENT_SIZE: process.env.CAHRS_TOURNAMENT_SIZE ? Number(process.env.CAHRS_TOURNAMENT_SIZE) : 4,
-    MUTATION_RATE: process.env.CAHRS_MUTATION_RATE ? Number(process.env.CAHRS_MUTATION_RATE) : 0.1,
-    PARAM_MUTATION_RATE: process.env.CAHRS_PARAM_MUTATION_RATE ? Number(process.env.CAHRS_PARAM_MUTATION_RATE) : 0.5,
+    MUTATION_RATE: process.env.CAHRS_MUTATION_RATE ? Number(process.env.CAHRS_MUTATION_RATE) : 0,
+    PARAM_MUTATION_RATE: process.env.CAHRS_PARAM_MUTATION_RATE ? Number(process.env.CAHRS_PARAM_MUTATION_RATE) : 0.9,
     PARAM_MUTATION_SPEED: process.env.CAHRS_PARAM_MUTATION_SPEED ? Number(process.env.CAHRS_PARAM_MUTATION_SPEED) : 0.5,
-    CROSSOVER_RATE: process.env.CAHRS_CROSSOVER_RATE ? Number(process.env.CAHRS_CROSSOVER_RATE) : 0.9
+    CROSSOVER_RATE: process.env.CAHRS_CROSSOVER_RATE ? Number(process.env.CAHRS_CROSSOVER_RATE) : 1
   },
   VERIFICATION_SEED: 1751426601,
   NORMALIZE: process.env.CAHRS_NORMALIZE === "true", // default false

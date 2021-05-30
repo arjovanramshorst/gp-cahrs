@@ -115,7 +115,8 @@ export const mutateConfigTree = (config: ConfigTree, mutate: MutateFn): ConfigTr
     Object.keys(item.child.config).forEach(configKey => {
       if (typeof item.child.config[configKey] === 'number') {
         if (Math.random() < CONFIG.REPRODUCTION.PARAM_MUTATION_RATE) {
-          item.child.config[configKey] = mutateNumber(item.child.config[configKey])
+          const mutatedValue = mutateNumber(item.child.config[configKey])
+          item.child.config[configKey] = mutatedValue
         }
       }
     })

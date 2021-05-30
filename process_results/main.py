@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import re
 import json
 
 # Column names:
@@ -18,12 +19,17 @@ TYPE_BEST = 'best'
 TYPE_INDIVIDUAL = 'individual'
 TYPE_GEN_BASELINE = 'gen_baseline'
 
+# Colors
 COLOR_MAX = 'xkcd:lightish green'
 COLOR_MEAN = 'xkcd:faded blue'
 COLOR_BASE = 'xkcd:dull red'
 
+# filename split values
+FILENAME_SEPARATOR = '_'
+FILENAME_NUM_PARAMS = 8
 
-def plot(filename, column, title):
+
+def plot(filename, column):
     result = pd.read_csv('data/' + filename, delimiter="\t")
     result_generations = result[result.type == TYPE_INDIVIDUAL]
 
@@ -47,6 +53,7 @@ def plot(filename, column, title):
     result_mean = grouped_by.mean()[column]
     result_mean_trend = trend(x, result_mean)
 
+    title = filename_to_title(filename)
     print(title + ' - best config:')
     print(config_str)
 
@@ -86,41 +93,59 @@ def trend(x, range):
     b, m = np.polynomial.polynomial.polyfit(x, range, 1)
     return b + m * x
 
+def join_param(tuple):
+    return tuple[0] + "=" + tuple[1]
+
+def filename_to_title(filename):
+    params = re.findall('_([a-zA-Z]+)(\d+(\.\d+)?)', filename)
+    return ", ".join(map(join_param, params))
+
+
 
 columns = [
     COL_SCORE
     # COL_F_SCORE_NORMALIZED,
 ]
 
-files = {
-    # 'DEPTH_Fri May 07 2021_Movielens_3_0.2_40_60.csv': 'Movielens depth=3',
-    # 'DEPTH_Fri May 07 2021_Movielens_4_0.2_40_60.csv': 'Movielens depth=4',
-    # 'DEPTH_Fri May 07 2021_Movielens_5_0.2_40_60.csv': 'Movielens depth=5',
-    # 'DEPTH_Sat May 08 2021_Movielens_6_0.2_40_60.csv': 'Movielens depth=6',
-    # 'sobazaarfix_2021-05-10_Sobazaar_3_0.2_40_60.csv': 'Sobazaar depth=3',
-    # 'sobazaarfix_2021-05-10_Sobazaar_4_0.2_40_60.csv': 'Sobazaar depth=4',
-    # 'sobazaarfix_2021-05-10_Sobazaar_5_0.2_40_60.csv': 'Sobazaar depth=5',
-    # 'sobazaarfix_2021-05-10_Sobazaar_6_0.2_40_60.csv':'Sobazaar depth=6',
-    # 'large_2021-05-11_Movielens_3_0.5_300_30.csv': 'Movielens p=0.5 d=3 g=300',
-    # 'large_2021-05-11_Movielens_4_0.5_300_30.csv': 'Movielens p=0.5 d=4 g=300',
-    # 'large_2021-05-11_Sobazaar_3_0.5_300_30.csv': 'Sobazaar p=0.5 d=3 g=300',
-    # 'large_2021-05-11_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300',
-    # 'fix-validation_2021-05-12_Movielens_4_0.5_300_30.csv': 'Movielens p=0.5 d=4 g=300',
-    # 'fix-validation_2021-05-12_Movielens_5_0.5_300_30.csv': 'Movielens p=0.5 d=5 g=300',
-    # 'fix-validation_2021-05-12_Sobazaar_4_0.5_300_30.csv': 'Sobazaar p=0.5 d=4 g=300',
-    # 'fix-validation_2021-05-12_Sobazaar_5_0.5_300_30.csv': 'Sobazaar p=0.5 d=5 g=300'
-    # '2021-05-24_Movielens V2_4_0.1_40_40.csv': 'Movielens v2 p=0.1, d=4',
-    # 'cf-rework_2021-05-25_Movielens V2_4_0.2_800_30.csv': 'Movielens CF p=0.2 d=4 g=800',
-    # 'cf-rework_2021-05-25_Movielens V2_5_0.2_800_30.csv': 'Movielens CF p=0.2 d=5 g=800',
-    # 'movielens2-tournament_2021-05-24_Movielens V2_4_0.5_100_30.csv': 'Movielens v2 p=0.5 d=4 g=100',
-    # 'movielens2-tournament_2021-05-24_Movielens_6_0.5_100_30.csv': 'Movielens p=0.5 d=6 g=100',
-    # 'FULL_2021-05-26_Movielens V2_4_1_40_30.csv': 'Movielens v2 d=4 p=1',
-    # 'FULL_2021-05-26_Movielens V2_5_1_40_30.csv': 'Movielens v2 d=5 p=1'
-    '2021-05-29_WITHOUT_PRODUCT_Movielens V2_d4_i1_gs200_m0.1_c0.9_ts4.csv': 'm=0.1, c=0.9, ts=4',
-    # '2021-05-29_WITHOUT_PRODUCT_Movielens V2_d4_i1_gs200_m1_c0_ts4.csv': 'm=1, c=0, ts=4',
-    '2021-05-29_WITHOUT_PRODUCT_Movielens V2_d4_i1_gs200_m1_c1_ts4.csv': 'm=1, c=1, ts=4',
-}
+files = [
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.1_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.3_ts4.csv',
+    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.3_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.3_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_ts4.csv',
+    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.5_ts4.csv',
+]
 
-for file, title in files.items():
+for file in files:
     for column in columns:
-        plot(file, column, title)
+        plot(file, column)

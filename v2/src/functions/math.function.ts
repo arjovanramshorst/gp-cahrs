@@ -227,7 +227,7 @@ export const MathFunctions = [
   AddVector,
   ScaleMatrix,
   SumMatrix,
-  ProductMatrix
+  // ProductMatrix
   // SumFunction,
   // SubtractFunction
 ];
