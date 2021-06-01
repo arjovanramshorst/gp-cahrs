@@ -20,16 +20,18 @@ const main = async () => {
       problem
     ).raw;
 
-    console.log("MRR: ", baselineFitness.mrr)
+    console.log(`MRR@10: ${roundScore(baselineFitness.mrr)}, P@1: ${roundScore(baselineFitness.precision1)}, P@10: ${roundScore(baselineFitness.precision10)}`)
   })
 }
+const roundScore = (score) => Math.round(score * 10000) / 10000
 // MRR:  0.5531329428201107
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
-    ['recent', await readJson("../src/pretty.json")],
+    // ['recent', await readJson("../src/pretty.json")],
     // ['popularity', popularity],
     // ['basic CF', basicCF],
+    ['transposed CF', transposedCF],
     // ['empty', empty],
     // ['Item CF', itemCF],
     // ['CF + popular', cfPlusPopular],
@@ -50,7 +52,7 @@ const popularity = f.addVector()([
   f.popularity()([
     f.interaction('rating')])])
 
-const basicCF = f.nearestNeighbour(15)([
+const basicCF = f.nearestNeighbour(5)([
   f.pearson()([
     f.interaction('rating')]),
   f.interaction('rating')])
@@ -60,6 +62,14 @@ const itemCF = f.invertedNN(15)([
     f.transpose()([
       f.interaction('rating')])]),
   f.interaction('rating')])
+
+const transposedCF = f.transpose()([
+  f.nearestNeighbour(15)([
+    f.pearson()([
+      f.transpose()([
+        f.interaction('rating')])]),
+    f.transpose()([
+      f.interaction('rating')])])])
 
 const empty = f.fillMatrix('user', 'movie', 0)
 

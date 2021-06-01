@@ -28,6 +28,9 @@ COLOR_BASE = 'xkcd:dull red'
 FILENAME_SEPARATOR = '_'
 FILENAME_NUM_PARAMS = 8
 
+ML_BASELINE = 0.5672
+
+latex_table = ''
 
 def plot(filename, column):
     result = pd.read_csv('data/' + filename, delimiter="\t")
@@ -35,16 +38,21 @@ def plot(filename, column):
 
     fitness_baseline = result[result.type == TYPE_BASELINE][column]
     fitness_generation_baseline = result[result.type == TYPE_GEN_BASELINE][column]
+
     fitness_best = result[result.type == TYPE_BEST][column]
 
     config_best = result[result.type == TYPE_BEST]
     config_max = config_best[config_best[column] == config_best[column].max()]
 
+    global latex_table
+    latex_table += latex_table_string(filename, config_max)
+
     config_str = config_max[COL_CONFIG].iloc[0]
 
     x = result_generations[COL_GEN].unique().astype(int)
-
     grouped_by = result_generations.groupby([COL_GEN])
+
+    ml_baseline = np.full(x.shape, ML_BASELINE)
 
     unique = grouped_by[COL_CONFIG].nunique()
 
@@ -65,8 +73,10 @@ def plot(filename, column):
     axs[0].plot(x, result_max_trend, label='max (trend)', color=COLOR_MAX, linestyle='dotted')
     axs[0].plot(x, result_mean, label='mean', color=COLOR_MEAN)
     axs[0].plot(x, result_mean_trend, label='mean (trend)', color=COLOR_MEAN, linestyle='dotted')
-    axs[0].plot(x, fitness_generation_baseline, label='baseline', color=COLOR_BASE)
-    axs[0].set_ylabel('f score')
+    # axs[0].plot(x, fitness_generation_baseline, label='baseline', color=COLOR_BASE)
+    axs[0].plot(x, ml_baseline, label='baseline', color=COLOR_BASE)
+
+    axs[0].set_ylabel('MRR@10')
     axs[0].legend(),
     axs[0].grid(True)
 
@@ -74,15 +84,16 @@ def plot(filename, column):
     axs[1].plot(x, trend(x, fitness_best), label='Best performance (trend)', color=COLOR_MAX, linestyle='dotted')
     axs[1].plot(x, np.maximum.accumulate(fitness_best), label='Best performance (cumulative)',
                 color='xkcd:pumpkin orange')
-    axs[1].plot(x, np.full(x.shape, fitness_baseline), label='baseline (validation)', color=COLOR_BASE)
+    # axs[1].plot(x, np.full(x.shape, fitness_baseline), label='baseline (validation)', color=COLOR_BASE)
+    axs[1].plot(x, ml_baseline, label='baseline (validation)', color=COLOR_BASE)
     axs[1].legend()
     axs[1].set_xlabel('generation')
-    axs[1].set_ylabel('f score')
+    axs[1].set_ylabel('MRR@10')
     axs[1].grid(True)
 
     plt.title(title)
     plt.savefig('output/' + filename + '.pdf')
-    plt.show()
+    # plt.show()
 
     # plt.plot(x, unique, label='# unique')
     # plt.title(filename + ' # unique configs per gen')
@@ -93,13 +104,35 @@ def trend(x, range):
     b, m = np.polynomial.polynomial.polyfit(x, range, 1)
     return b + m * x
 
+
 def join_param(tuple):
     return tuple[0] + "=" + tuple[1]
+
 
 def filename_to_title(filename):
     params = re.findall('_([a-zA-Z]+)(\d+(\.\d+)?)', filename)
     return ", ".join(map(join_param, params))
 
+
+def filename_to_dict(filename):
+    params = re.findall('_([a-zA-Z]+)(\d+(\.\d+)?)', filename)
+    dict = {}
+    for param in params:
+        dict[param[0]] = param[1]
+    return dict
+
+def latex_table_string(filename, config):
+    dict = filename_to_dict(filename)
+    return " & ".join([
+        dict["Pm"],
+        dict["Pc"],
+        dict["Ppr"],
+        dict["Pps"],
+        str(round(config["mrr10"].max(), 4)),
+        str(round(config["precision1"].max(), 4)),
+        str(round(config["precision10"].max(), 4)),
+        str(config["generation"].min()),
+    ]) + " \\\\ \\midrule\n"
 
 
 columns = [
@@ -108,44 +141,46 @@ columns = [
 ]
 
 files = [
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.1_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.3_ts4.csv',
-    '2021-05-29_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.3_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.3_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_ts4.csv',
-    '2021-05-30_PARAM_MUTATION_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.5_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.3_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.1_ts4.csv',
+    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.3_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.5_ts4.csv',
+    '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',
 ]
 
 for file in files:
     for column in columns:
         plot(file, column)
+
+print(latex_table)

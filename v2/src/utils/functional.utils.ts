@@ -3,16 +3,17 @@ import {InteractionParams} from "../interface/problem.interface";
 
 type EntityId = string;
 
-export const groupBy = <A>(
+export const groupBy = <A, T>(
   interactions: A[],
-  getIdentifier: (c: A) => EntityId
-): Record<EntityId, A[]> => interactions
-  .reduce((agg: Record<EntityId, A[]>, curr: A) => {
+  getIdentifier: (c: A) => EntityId,
+  mapper: (c: A) => T
+): Record<EntityId, T[]> => interactions
+  .reduce((agg: Record<EntityId, T[]>, curr: A) => {
     const id = getIdentifier(curr);
     if (!agg[id]) {
-      agg[id] = [] as A[];
+      agg[id] = [] as T[];
     }
-    agg[id].push(curr);
+    agg[id].push(mapper(curr));
 
     return agg;
   }, {});

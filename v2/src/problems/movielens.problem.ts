@@ -17,7 +17,7 @@ export const readMovieLens: ReadProblemFunction = async (
 
   const PRG = mulberry32(interleaveSeed)
 
-  const ratingsByUser = groupBy(ratings, (it) => it.userId)
+  const ratingsByUser = groupBy(ratings, (it) => it.userId, it => it)
 
   const numberOfUsers = Math.floor(interleaveSize * Object.keys(ratingsByUser).length)
 

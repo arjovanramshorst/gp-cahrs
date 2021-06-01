@@ -5,6 +5,7 @@ import {readCsvFile} from "../utils/fs.utils";
 import {asMatrix, associateWithMany, groupBy, toIdxMap} from "../utils/functional.utils";
 import {DTOMatrix, DTOType} from '../interface/dto.interface';
 import {ConfigTree, fun} from "../tree";
+import {FUNCTIONS} from "../utils/trial.utils";
 
 export const readMovieLensV2: ReadProblemFunction = async (
   interleaveSize: number = 1,
@@ -16,7 +17,7 @@ export const readMovieLensV2: ReadProblemFunction = async (
 
   const PRG = mulberry32(interleaveSeed)
 
-  const ratingsByUser = groupBy(ratings, (it) => it.userId)
+  const ratingsByUser = groupBy(ratings, (it) => it.userId, it => it)
 
   const numberOfUsers = Math.floor(interleaveSize * Object.keys(ratingsByUser).length)
 
@@ -177,7 +178,11 @@ export const readMovieLensV2: ReadProblemFunction = async (
       }
     },
 
-    baseline: baseline2(userRefs.length, movieRefs.length)
+    baseline: FUNCTIONS.invertedNN(15)([
+      FUNCTIONS.pearson()([
+        FUNCTIONS.transpose()([
+          FUNCTIONS.interaction('rating')])]),
+      FUNCTIONS.interaction('rating')])
   }
 };
 

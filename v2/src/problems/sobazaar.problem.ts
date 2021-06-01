@@ -17,8 +17,8 @@ export const readSobazaar: ReadProblemFunction = async (
 
   const PRG = mulberry32(interleaveSeed)
 
-  const interactionsByUser = groupBy(interactions, it => it.UserID)
-  const interactionsByProduct = groupBy(interactions, it => it.ItemID)
+  const interactionsByUser = groupBy(interactions, it => it.UserID, it => it)
+  const interactionsByProduct = groupBy(interactions, it => it.ItemID, it => it)
   // Filter users with less than 50 interactions? TODO: Filter based on recommended action?
   Object.keys(interactionsByUser).forEach(userRef => {
     if (interactionsByUser[userRef].filter(it => it.Action === ACTION_TO_RECOMMEND).length < 5) {
@@ -31,6 +31,7 @@ export const readSobazaar: ReadProblemFunction = async (
       delete interactionsByProduct[productRef]
     }
   })
+
   const filteredInteractions = interactions.filter(it => !!interactionsByUser[it.UserID] && !!interactionsByProduct[it.ItemID])
 
   const userRefs = distinct(filteredInteractions, it => it.UserID)
@@ -43,7 +44,8 @@ export const readSobazaar: ReadProblemFunction = async (
 
   const filteredByAction = groupBy(
     filteredInteractions.filter(it => !!userToIdxMap[it.UserID]),
-    it => it.Action
+    it => it.Action,
+    it => it
   )
 
   const filter: number[][] = []
@@ -59,7 +61,7 @@ export const readSobazaar: ReadProblemFunction = async (
       // Create matrix
       interactionMatrices[action] = zeros([sampledUserRefs.length, productRefs.length]) as number[][]
       if (action === ACTION_TO_RECOMMEND) {
-        const recommendPerUser = groupBy(filteredByAction[action], it => it.UserID)
+        const recommendPerUser = groupBy(filteredByAction[action], it => it.UserID, it => it)
         Object.keys(recommendPerUser)
           .forEach(userRef => {
             const actions = recommendPerUser[userRef]

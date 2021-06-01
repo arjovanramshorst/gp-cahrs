@@ -2,6 +2,7 @@ import {readSobazaar} from "./problems/sobazaar.problem";
 import {readMovieLens} from "./problems/movielens.problem";
 import {ReadProblemFunction} from "./interface/problem.interface";
 import {readMovieLensV2} from "./problems/movielens-auxiliary.problem";
+import {readYelp} from "./problems/yelp.problem";
 
 const getProblem = (): { read: ReadProblemFunction, name: string } => {
   switch(process.env.CAHRS_PROBLEM) {
@@ -14,6 +15,11 @@ const getProblem = (): { read: ReadProblemFunction, name: string } => {
       return {
         read: readMovieLens,
         name: "Movielens"
+      }
+    case "yelp":
+      return {
+        read: readYelp,
+        name: "Yelp"
       }
     case "movielens2":
     default:
