@@ -1,4 +1,5 @@
 import * as csvParser from "csv-parser";
+import {CONFIG} from "../config";
 const v8 = require("v8")
 
 const csv = require("csv-parser");
@@ -33,7 +34,7 @@ export const readJson = (filename: string) => {
 }
 
 export const readJsonCache = (filename: string) => {
-  const path = `./cache/${filename}`
+  const path = `${CONFIG.CACHE_DIRECTORY}${filename}`
   if (fs.existsSync(path)) {
     console.log(`CACHE HIT: ${filename}`)
     return v8.deserialize(fs.readFileSync(path))
@@ -43,7 +44,7 @@ export const readJsonCache = (filename: string) => {
 }
 
 export const writeJsonCache = (filename: string, obj: any) => {
-  const path = `./cache/${filename}`
+  const path = `${CONFIG.CACHE_DIRECTORY}${filename}`
   if (!fs.existsSync(path)) {
     fs.writeFileSync(path, v8.serialize(obj))
   }
