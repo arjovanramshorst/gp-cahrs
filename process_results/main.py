@@ -44,8 +44,6 @@ def plot(filename, column):
     config_best = result[result.type == TYPE_BEST]
     config_max = config_best[config_best[column] == config_best[column].max()]
 
-    global latex_table
-    latex_table += latex_table_string(filename, config_max)
 
     config_str = config_max[COL_CONFIG].iloc[0]
 
@@ -57,9 +55,12 @@ def plot(filename, column):
     unique = grouped_by[COL_CONFIG].nunique()
 
     result_max = grouped_by.max()[column]
-    result_max_trend = trend(x, result_max)
+    result_max_trend, delta_max = trend(x, result_max)
     result_mean = grouped_by.mean()[column]
-    result_mean_trend = trend(x, result_mean)
+    result_mean_trend, delta_mean = trend(x, result_mean)
+
+    global latex_table
+    latex_table += latex_table_string(filename, config_max, delta_max, delta_mean)
 
     title = filename_to_title(filename)
     print(title + ' - best config:')
@@ -81,7 +82,8 @@ def plot(filename, column):
     axs[0].grid(True)
 
     axs[1].plot(x, fitness_best, label='Best performance (validation)', color=COLOR_MAX)
-    axs[1].plot(x, trend(x, fitness_best), label='Best performance (trend)', color=COLOR_MAX, linestyle='dotted')
+    fitness_best_trend, fitness_best_delta = trend(x, fitness_best)
+    axs[1].plot(x, fitness_best_trend, label='Best performance (trend)', color=COLOR_MAX, linestyle='dotted')
     axs[1].plot(x, np.maximum.accumulate(fitness_best), label='Best performance (cumulative)',
                 color='xkcd:pumpkin orange')
     # axs[1].plot(x, np.full(x.shape, fitness_baseline), label='baseline (validation)', color=COLOR_BASE)
@@ -102,7 +104,7 @@ def plot(filename, column):
 
 def trend(x, range):
     b, m = np.polynomial.polynomial.polyfit(x, range, 1)
-    return b + m * x
+    return b + m * x, m
 
 
 def join_param(tuple):
@@ -121,13 +123,15 @@ def filename_to_dict(filename):
         dict[param[0]] = param[1]
     return dict
 
-def latex_table_string(filename, config):
+def latex_table_string(filename, config, delta_max, delta_mean):
     dict = filename_to_dict(filename)
     return " & ".join([
         dict["Pm"],
         dict["Pc"],
         dict["Ppr"],
         dict["Pps"],
+        str(round(delta_mean, 4)),
+        str(round(delta_max, 4)),
         str(round(config["mrr10"].max(), 4)),
         str(round(config["precision1"].max(), 4)),
         str(round(config["precision10"].max(), 4)),
@@ -176,7 +180,11 @@ files = [
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.5_ts4.csv',
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_ts4.csv',
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.5_ts4.csv',
-    '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',
+    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',
+	'2021-06-01_repeatability-1_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+	'2021-06-01_repeatability-2_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+	'2021-06-01_repeatability-3_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+	'2021-06-01_repeatability-4_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
 ]
 
 for file in files:

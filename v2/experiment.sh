@@ -8,6 +8,8 @@ fi
 export CAHRS_EXPERIMENT_NAME=$1
 
 export CAHRS_GENERATION_SIZE=400
+export CAHRS_CACHE_DIRECTORY=/data/cache/
+
 
 export CAHRS_GENERATIONS=15
 

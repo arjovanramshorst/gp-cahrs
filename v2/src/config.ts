@@ -59,5 +59,6 @@ export const CONFIG = {
     }
   },
   ONLY_BASELINE: process.env.CAHRS_ONLY_BASELINE === "true", // default false,
-  ENABLE_CACHE: process.env.CAHRS_ENABLE_CACHE === "true"
+  ENABLE_CACHE: process.env.CAHRS_ENABLE_CACHE === "true",
+  CACHE_DIRECTORY: process.env.CAHRS_CACHE_DIRECTORY ?? "./cache/"
 }
