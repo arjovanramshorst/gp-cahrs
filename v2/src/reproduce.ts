@@ -13,6 +13,15 @@ export type MutateFn = (output: DTO, maxDepth: number) => ConfigTree
 
 export const produceOffspring = (generation: EvaluatedConfig[], mutate: MutateFn): ConfigTree[] => {
   const offspring = [];
+
+  if (CONFIG.REPRODUCTION.ELITISM > 0) {
+    // Handle elitism
+    const nrOfElites = Math.ceil(CONFIG.REPRODUCTION.ELITISM * generation.length)
+    generation.sort((a,b) => b.fitness - a.fitness)
+      .slice(0, nrOfElites)
+      .forEach(it => offspring.push(cloneConfig(it.config)))
+  }
+
   while (offspring.length < generation.length) {
 
     const [parent1, parent2] = tournamentSelection(generation)

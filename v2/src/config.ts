@@ -48,7 +48,8 @@ export const CONFIG = {
     MUTATION_RATE: process.env.CAHRS_MUTATION_RATE ? Number(process.env.CAHRS_MUTATION_RATE) : 0,
     PARAM_MUTATION_RATE: process.env.CAHRS_PARAM_MUTATION_RATE ? Number(process.env.CAHRS_PARAM_MUTATION_RATE) : 0.9,
     PARAM_MUTATION_SPEED: process.env.CAHRS_PARAM_MUTATION_SPEED ? Number(process.env.CAHRS_PARAM_MUTATION_SPEED) : 0.5,
-    CROSSOVER_RATE: process.env.CAHRS_CROSSOVER_RATE ? Number(process.env.CAHRS_CROSSOVER_RATE) : 1
+    CROSSOVER_RATE: process.env.CAHRS_CROSSOVER_RATE ? Number(process.env.CAHRS_CROSSOVER_RATE) : 1,
+    ELITISM: process.env.CAHRS_ELITISM ? Number(process.env.CAHRS_ELITISM) : 0
   },
   VERIFICATION_SEED: 1751426601,
   NORMALIZE: process.env.CAHRS_NORMALIZE === "true", // default false
