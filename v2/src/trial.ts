@@ -28,10 +28,10 @@ const roundScore = (score) => Math.round(score * 10000) / 10000
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
-    // ['recent', await readJson("../src/pretty.json")],
+    ['recent', await readJson("../src/pretty.json")],
     // ['popularity', popularity],
     // ['basic CF', basicCF],
-    ['transposed CF', transposedCF],
+    // ['transposed CF', transposedCF],
     // ['empty', empty],
     // ['Item CF', itemCF],
     // ['CF + popular', cfPlusPopular],
