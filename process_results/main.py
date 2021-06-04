@@ -35,6 +35,7 @@ latex_table = ''
 def plot(filename, column):
     result = pd.read_csv('data/' + filename, delimiter="\t")
     result_generations = result[result.type == TYPE_INDIVIDUAL]
+    result_generations[COL_GEN] = result_generations[COL_GEN].astype(int)
 
     fitness_baseline = result[result.type == TYPE_BASELINE][column]
     fitness_generation_baseline = result[result.type == TYPE_GEN_BASELINE][column]
@@ -48,15 +49,15 @@ def plot(filename, column):
     config_str = config_max[COL_CONFIG].iloc[0]
 
     x = result_generations[COL_GEN].unique().astype(int)
-    grouped_by = result_generations.groupby([COL_GEN])
+    grouped_by = result_generations.groupby([COL_GEN], sort=False)
 
     ml_baseline = np.full(x.shape, ML_BASELINE)
 
     unique = grouped_by[COL_CONFIG].nunique()
 
-    result_max = grouped_by.max()[column]
+    result_max = grouped_by.max().sort_values(COL_GEN)[column]
     result_max_trend, delta_max = trend(x, result_max)
-    result_mean = grouped_by.mean()[column]
+    result_mean = grouped_by.mean().sort_values(COL_GEN)[column]
     result_mean_trend, delta_mean = trend(x, result_mean)
 
     global latex_table
@@ -181,10 +182,18 @@ files = [
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_ts4.csv',
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.5_ts4.csv',
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',
-    '2021-06-02_repeatability-big-1_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-02_repeatability-big-2_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-02_repeatability-big-3_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-02_repeatability-big-4_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_repeatability-big-1_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_repeatability-big-2_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_repeatability-big-3_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_repeatability-big-4_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_elitism-1_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_elitism-2_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_elitism-3_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-02_elitism-4_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-06-03_sobazaar-baseline-1_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-06-03_sobazaar-baseline-2_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-06-03_sobazaar-baseline-3_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-06-03_sobazaar-baseline-4_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
 ]
 
 for file in files:

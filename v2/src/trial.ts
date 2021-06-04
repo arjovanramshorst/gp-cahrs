@@ -4,8 +4,30 @@ import {CONFIG} from "./config";
 import {readMovieLensV2} from "./problems/movielens-auxiliary.problem";
 import {fitnessScore} from "./fitness";
 import {calcRecursive} from "./evaluate";
-import {FUNCTIONS} from "./utils/trial.utils";
+import {FUNCTIONS as f} from "./utils/trial.utils";
 import {ConfigTree, fun} from "./tree";
+import {readSobazaar} from "./problems/sobazaar.problem";
+
+const mainSobazaar = async () => {
+  const configs = await getConfigs()
+
+  const problem = await readSobazaar(1)
+
+  const baselines = [
+    ...configs,
+    ...problem.baselines
+  ]
+  baselines.forEach(([name, it]) => {
+    console.log(`\n===================\n ${name}:\n===================`)
+    printConfig(it)
+    const baselineFitness = fitnessScore(
+      calcRecursive(it, problem),
+      problem
+    ).raw;
+
+    console.log(`MRR@10: ${roundScore(baselineFitness.mrr)}, P@1: ${roundScore(baselineFitness.precision1)}, P@10: ${roundScore(baselineFitness.precision10)}`)
+  })
+}
 
 const main = async () => {
   const configs = await getConfigs()
@@ -29,6 +51,7 @@ const roundScore = (score) => Math.round(score * 10000) / 10000
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
     ['recent', await readJson("../src/pretty.json")],
+
     // ['popularity', popularity],
     // ['basic CF', basicCF],
     // ['transposed CF', transposedCF],
@@ -44,8 +67,6 @@ const getConfigs = async (): Promise<[string, ConfigTree][]> => {
     // ])]
   ]
 }
-
-const f = FUNCTIONS
 
 const popularity = f.addVector()([
   f.fillMatrix('user', 'movie', 0),
@@ -95,4 +116,4 @@ const genres = f.invertedNN(10)([
     f.property('movie', 'genres')]),
   f.interaction('rating')])
 
-main()
+mainSobazaar()

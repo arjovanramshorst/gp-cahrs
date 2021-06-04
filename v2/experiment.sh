@@ -5,6 +5,7 @@ if [[ -z $1 ]]; then
   exit 1
 fi
 
+
 export CAHRS_EXPERIMENT_NAME=$1
 
 export CAHRS_GENERATION_SIZE=400

@@ -23,7 +23,9 @@ export interface ProblemInstance {
 
   interactions: Record<string, Interaction>;
 
-  baseline: ConfigTree
+  baseline: ConfigTree;
+
+  baselines?: [string, ConfigTree][]
 }
 
 export enum PropertyType {

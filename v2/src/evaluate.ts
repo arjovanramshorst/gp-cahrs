@@ -57,6 +57,7 @@ export const calcRecursive = (
       (new Date()).toISOString(),
       JSON.stringify(configFinger)
     ].join("\t") + "\n")
+    console.warn(e)
     throw Error("Subtree calculation failed")
   }
 };

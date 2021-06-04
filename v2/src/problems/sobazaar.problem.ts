@@ -6,6 +6,7 @@ import {DTOMatrix, DTOType} from "../interface/dto.interface";
 import {readCsvFile} from "../utils/fs.utils";
 import {distinct, groupBy, toIdxMap} from "../utils/functional.utils";
 import {ConfigTree, fun} from "../tree";
+import {FUNCTIONS as f} from "../utils/trial.utils";
 
 const ACTION_TO_RECOMMEND = "purchase:buy_clicked"
 
@@ -56,29 +57,33 @@ export const readSobazaar: ReadProblemFunction = async (
   })
 
   const interactionMatrices = {}
+
+  interactionMatrices[ACTION_TO_RECOMMEND] = zeros([sampledUserRefs.length, productRefs.length]) as number[][]
+  const recommendPerUser = groupBy(filteredByAction[ACTION_TO_RECOMMEND], it => it.UserID, it => it)
+  // Handle action to recommend
+  Object.keys(recommendPerUser)
+    .forEach(userRef => {
+      const actions = recommendPerUser[userRef]
+      actions
+        .sort((a, b) => a.Timestamp.localeCompare(b.Timestamp))
+        .forEach((it, idx) => {
+          const userIdx = userToIdxMap[it.UserID]
+          const productIdx = productToIdxMap[it.ItemID]
+
+          if (idx <= 0.8 * actions.length) {
+            interactionMatrices[it.Action][userIdx][productIdx] += 1
+            filter[userIdx].push(productIdx)
+          } else {
+            validate[userIdx].push(productIdx)
+          }
+        })
+    })
+
   Object.keys(filteredByAction)
     .forEach(action => {
-      // Create matrix
-      interactionMatrices[action] = zeros([sampledUserRefs.length, productRefs.length]) as number[][]
-      if (action === ACTION_TO_RECOMMEND) {
-        const recommendPerUser = groupBy(filteredByAction[action], it => it.UserID, it => it)
-        Object.keys(recommendPerUser)
-          .forEach(userRef => {
-            const actions = recommendPerUser[userRef]
-            actions
-              .sort((a, b) => a.Timestamp.localeCompare(b.Timestamp))
-              .forEach((it, idx) => {
-                const userIdx = userToIdxMap[it.UserID]
-                const productIdx = productToIdxMap[it.ItemID]
-                if (idx < actions.length - 1) {
-                  interactionMatrices[it.Action][userIdx][productIdx] += 1
-                  // filter[userIdx].push(productIdx)
-                } else {
-                  validate[userIdx].push(productIdx)
-                }
-              })
-          })
-      } else {
+      // Handle other actions
+      if (action !== ACTION_TO_RECOMMEND) {
+        interactionMatrices[action] = zeros([sampledUserRefs.length, productRefs.length]) as number[][]
         filteredByAction[action].forEach(it => {
           const userIdx = userToIdxMap[it.UserID]
           const productIdx = productToIdxMap[it.ItemID]
@@ -99,8 +104,6 @@ export const readSobazaar: ReadProblemFunction = async (
       dtoType: DTOType.matrix,
       fromEntity: "user",
       toEntity: "product",
-      rows: sampledUserRefs.length,
-      columns: productRefs.length
     } as DTOMatrix,
 
     validate,
@@ -128,7 +131,30 @@ export const readSobazaar: ReadProblemFunction = async (
       }
       return agg
     }, {}),
-    baseline: baseline2(sampledUserRefs.length, productRefs.length)
+    baseline: baseline2(sampledUserRefs.length, productRefs.length),
+
+    baselines: [
+      ['Empty', f.fillMatrix('user', 'product', 0)],
+      ['interaction', f.interaction('content:interact:product_detail_viewed')],
+      ['interaction', f.interaction('product_detail_clicked')],
+      ['interaction', f.interaction('product_wanted')],
+
+      ['Popularity', f.addVector()([
+        f.fillMatrix('user', 'product', 0),
+        f.popularity()([
+          f.interaction('content:interact:product_wanted')])])],
+
+      ['User CF', f.nearestNeighbour(2)([
+        f.pearson()([
+          f.interaction('content:interact:product_clicked')]),
+        f.interaction('purchase:buy_clicked')])],
+
+      ['Item CF', f.invertedNN(15)([
+        f.pearson()([
+          f.transpose()([
+            f.interaction('product_detail_clicked')])]),
+        f.interaction('purchase:buy_clicked')])]
+    ]
   }
 }
 
