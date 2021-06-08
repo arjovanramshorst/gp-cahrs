@@ -33,7 +33,7 @@ export const readJson = (filename: string) => {
   return JSON.parse(fs.readFileSync(`./output/${filename}`).toString())
 }
 
-export const readJsonCache = (filename: string) => {
+export const readFSCache = (filename: string) => {
   const path = `${CONFIG.CACHE_DIRECTORY}${filename}`
   if (fs.existsSync(path)) {
     console.log(`CACHE HIT: ${filename}`)
@@ -43,7 +43,7 @@ export const readJsonCache = (filename: string) => {
   return null
 }
 
-export const writeJsonCache = (filename: string, obj: any) => {
+export const writeFSCache = (filename: string, obj: any) => {
   const path = `${CONFIG.CACHE_DIRECTORY}${filename}`
   if (!fs.existsSync(path)) {
     fs.writeFileSync(path, v8.serialize(obj))

@@ -40,6 +40,8 @@ export const CONFIG = {
   GROWTH_FUNCTION_FRACTION: 0.5,
 
   MAX_DEPTH: process.env.CAHRS_MAX_DEPTH ? Number(process.env.CAHRS_MAX_DEPTH) : 5,
+  INITIAL_DEPTH: process.env.CAHRS_INITIAL_DEPTH ? Number(process.env.CAHRS_INITIAL_DEPTH) : 5,
+
 
   INTERLEAVE_SIZE: process.env.CAHRS_INTERLEAVE_SIZE ? Number(process.env.CAHRS_INTERLEAVE_SIZE) : 1,
 

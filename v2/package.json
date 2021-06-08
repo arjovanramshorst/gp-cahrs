@@ -29,7 +29,8 @@
     "test": "ts-node src/test.ts",
     "test:sobazaar": "ts-node src/test.sobazaar.ts",
     "run:gc": "node -r ts-node/register --inspect-brk --trace-gc src/main.ts",
-    "scribble": "ts-node src/scribble.ts"
+    "scribble": "ts-node src/scribble.ts",
+    "config:display": "ts-node src/display-config.ts"
   },
   "author": "Arjo van Ramshorst",
   "license": "ISC"

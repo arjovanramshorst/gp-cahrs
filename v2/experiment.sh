@@ -5,6 +5,12 @@ if [[ -z $1 ]]; then
   exit 1
 fi
 
+echo "####################################################"
+echo "####################################################"
+echo "# ATTENTION: Make sure results cache is CLEARED if #"
+echo "# something has changed in fitness calculations!   #"
+echo "####################################################"
+echo "####################################################"
 
 export CAHRS_EXPERIMENT_NAME=$1
 

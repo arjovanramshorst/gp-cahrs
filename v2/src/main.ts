@@ -1,25 +1,28 @@
-import { CONFIG } from "./config";
-import { calcRecursive } from "./evaluate";
-import { Functions } from "./functions/function";
-import { getTerminals } from "./terminals/terminal";
-import { ConfigTree, generateTree, generateTreeTables } from "./tree";
-import { fitnessScore, FitnessValue, Score } from "./fitness";
-import { appendFile, writeFile } from "./utils/fs.utils";
+import {CONFIG} from "./config";
+import {calcRecursive} from "./evaluate";
+import {Functions} from "./functions/function";
+import {getTerminals} from "./terminals/terminal";
+import {ConfigTree, generateTree, generateTreeTables} from "./tree";
+import {fitnessScore, FitnessValue, Score} from "./fitness";
+import {appendFile, readFSCache, writeFile, writeFSCache} from "./utils/fs.utils";
 import {
   EvaluatedConfig,
   getMutateFunction,
   produceOffspring,
 } from "./reproduce";
-import { printConfig } from "./utils/display.utils";
-import { csvHeader, produceCsvLine } from "./utils/output.utils";
+import {printConfig} from "./utils/display.utils";
+import {csvHeader, produceCsvLine} from "./utils/output.utils";
 import {appendFileSync} from "fs";
+import {hash, readCache} from "./utils/cache.utils";
+import {ProblemInstance} from "./interface/problem.interface";
 
 const filename =
   [
     new Date().toISOString().substring(0, 10),
     CONFIG.EXPERIMENT_NAME,
     CONFIG.PROBLEM.name,
-    `d${CONFIG.MAX_DEPTH}`,
+    `Di${CONFIG.INITIAL_DEPTH}`,
+    `Dm${CONFIG.MAX_DEPTH}`,
     `i${CONFIG.INTERLEAVE_SIZE}`,
     `gs${CONFIG.GENERATION_SIZE}`,
     `Pm${CONFIG.REPRODUCTION.MUTATION_RATE}`,
@@ -31,12 +34,26 @@ const filename =
     .filter((it) => !!it)
     .join("_") + ".csv";
 
+const scoreCache = {};
+
+const memoize = (problem: ProblemInstance, config: ConfigTree, fn: () => Score) => {
+  const key = `results/${hash(problem, config)}`
+  const cached = readFSCache(key)
+  if (cached) {
+    console.log(`Full program cache hit: ${key}`)
+    return cached
+  }
+
+  const res = fn()
+  writeFSCache(key, res)
+
+  return res
+}
 /*************************************************************************
  *************************************************************************
  *************************************************************************
  * Main loop:
  *
- * TODO: Add CF based baseline evaluation to sobazaar
  *************************************************************************
  *************************************************************************
  *************************************************************************
@@ -58,13 +75,13 @@ const main = async (readProblem = CONFIG.PROBLEM.read) => {
   const treeTablesGrowth = generateTreeTables(
     terminals,
     functions,
-    CONFIG.MAX_DEPTH,
+    CONFIG.INITIAL_DEPTH,
     true
   );
   const treeTablesFull = generateTreeTables(
     terminals,
     functions,
-    CONFIG.MAX_DEPTH,
+    CONFIG.INITIAL_DEPTH,
     false
   );
 
@@ -77,7 +94,7 @@ const main = async (readProblem = CONFIG.PROBLEM.read) => {
         treeTablesGrowth,
         terminals,
         functions,
-        CONFIG.MAX_DEPTH,
+        CONFIG.INITIAL_DEPTH,
         true
       )
     );
@@ -87,7 +104,7 @@ const main = async (readProblem = CONFIG.PROBLEM.read) => {
         treeTablesFull,
         terminals,
         functions,
-        CONFIG.MAX_DEPTH,
+        CONFIG.INITIAL_DEPTH,
         false
       )
     );
@@ -157,7 +174,6 @@ const evaluateGeneration = (
   configs: ConfigTree[],
   problem
 ): EvaluatedConfig[] => {
-  const cache = {};
   console.log(`Evaluating generation #${gen} Baseline`);
   const baselineFitness = fitnessScore(
     calcRecursive(problem.baseline, problem),
@@ -187,22 +203,18 @@ const evaluateGeneration = (
   appendFile(filename, str);
 
   return configs.map((config, idx) => {
-    const key = JSON.stringify(config);
     console.log(`Evaluating generation #${gen} RS ${idx}:`);
     printConfig(config);
     writeFile(`recent/${filename}.json`, JSON.stringify(config));
     let fitness: Score;
-    if (cache[key]) {
-      console.log("Using cache..");
-      fitness = cache[key];
-    } else {
-      try {
+    try {
+      fitness = memoize(problem, config, () => {
         const res = calcRecursive(config, problem);
-        fitness = fitnessScore(res, problem, baselineFitness);
-        cache[JSON.stringify(config)] = fitness;
-      } catch(e) {
-        console.log(e)
-      }
+        return fitnessScore(res, problem, baselineFitness);
+      })
+    } catch (e) {
+      console.log("Evaluating individual went wrong?:")
+      console.log(e)
     }
 
     if (fitness) {
@@ -259,25 +271,18 @@ const evaluateBaseline = async () => {
   }
 };
 
-const bestOfCache: Record<string, FitnessValue> = {};
-const evaluateBestOfGeneration = async (config: ConfigTree) => {
-  const key = JSON.stringify(config);
-  if (bestOfCache[key]) {
-    return bestOfCache[key];
-  }
-  // TODO: Make sure that config does not care about size, so validation can be done on different sizes
+const evaluateBestOfGeneration = async (config: ConfigTree): Promise<FitnessValue> => {
   const problem = await CONFIG.PROBLEM.read(
     CONFIG.INTERLEAVE_SIZE,
     CONFIG.VERIFICATION_SEED
   );
 
-  const validationFitness = fitnessScore(
-    calcRecursive(config, problem),
-    problem
-  ).raw;
-  bestOfCache[key] = validationFitness;
-
-  return validationFitness;
+  return memoize(problem, config, () => {
+    return fitnessScore(
+      calcRecursive(config, problem),
+      problem
+    )
+  }).raw
 };
 
 main();

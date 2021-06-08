@@ -37,16 +37,18 @@ def plot(filename, column):
     result_generations = result[result.type == TYPE_INDIVIDUAL]
     result_generations[COL_GEN] = result_generations[COL_GEN].astype(int)
 
+    config_max = result_generations[result_generations[column] == result_generations[column].max()]
+    config_str = config_max[COL_CONFIG].iloc[0]
+
     fitness_baseline = result[result.type == TYPE_BASELINE][column]
     fitness_generation_baseline = result[result.type == TYPE_GEN_BASELINE][column]
 
     fitness_best = result[result.type == TYPE_BEST][column]
 
     config_best = result[result.type == TYPE_BEST]
-    config_max = config_best[config_best[column] == config_best[column].max()]
+    # config_max = config_best[config_best[column] == config_best[column].max()]
 
-
-    config_str = config_max[COL_CONFIG].iloc[0]
+    # config_str = config_max[COL_CONFIG].iloc[0]
 
     x = result_generations[COL_GEN].unique().astype(int)
     grouped_by = result_generations.groupby([COL_GEN], sort=False)
@@ -75,8 +77,8 @@ def plot(filename, column):
     axs[0].plot(x, result_max_trend, label='max (trend)', color=COLOR_MAX, linestyle='dotted')
     axs[0].plot(x, result_mean, label='mean', color=COLOR_MEAN)
     axs[0].plot(x, result_mean_trend, label='mean (trend)', color=COLOR_MEAN, linestyle='dotted')
-    # axs[0].plot(x, fitness_generation_baseline, label='baseline', color=COLOR_BASE)
-    axs[0].plot(x, ml_baseline, label='baseline', color=COLOR_BASE)
+    axs[0].plot(x, fitness_generation_baseline, label='baseline', color=COLOR_BASE)
+    # axs[0].plot(x, ml_baseline, label='baseline', color=COLOR_BASE)
 
     axs[0].set_ylabel('MRR@10')
     axs[0].legend(),
@@ -87,8 +89,8 @@ def plot(filename, column):
     axs[1].plot(x, fitness_best_trend, label='Best performance (trend)', color=COLOR_MAX, linestyle='dotted')
     axs[1].plot(x, np.maximum.accumulate(fitness_best), label='Best performance (cumulative)',
                 color='xkcd:pumpkin orange')
-    # axs[1].plot(x, np.full(x.shape, fitness_baseline), label='baseline (validation)', color=COLOR_BASE)
-    axs[1].plot(x, ml_baseline, label='baseline (validation)', color=COLOR_BASE)
+    axs[1].plot(x, np.full(x.shape, fitness_baseline), label='baseline (validation)', color=COLOR_BASE)
+    # axs[1].plot(x, ml_baseline, label='baseline (validation)', color=COLOR_BASE)
     axs[1].legend()
     axs[1].set_xlabel('generation')
     axs[1].set_ylabel('MRR@10')
@@ -190,10 +192,14 @@ files = [
     # '2021-06-02_elitism-2_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_elitism-3_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_elitism-4_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-03_sobazaar-baseline-1_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-03_sobazaar-baseline-2_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-03_sobazaar-baseline-3_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-03_sobazaar-baseline-4_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-baseline-1_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-baseline-2_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-baseline-3_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-baseline-4_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-cache-cleared-1_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-cache-cleared-2_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    '2021-06-04_sobazaar-cache-cleared-3_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-cache-cleared-4_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
 ]
 
 for file in files:

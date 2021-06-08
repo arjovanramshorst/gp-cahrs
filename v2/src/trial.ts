@@ -7,6 +7,7 @@ import {calcRecursive} from "./evaluate";
 import {FUNCTIONS as f} from "./utils/trial.utils";
 import {ConfigTree, fun} from "./tree";
 import {readSobazaar} from "./problems/sobazaar.problem";
+import {produceCsvLine} from "./utils/output.utils";
 
 const mainSobazaar = async () => {
   const configs = await getConfigs()

@@ -96,7 +96,6 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
     precision: avgPrecision,
     fScore,
     performance: avgScores.mrr,
-    scores: avgScores,
     ...avgScores
   }
 
