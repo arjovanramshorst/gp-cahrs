@@ -1,4 +1,5 @@
 #!/bin/bash
+cd ..
 
 if [[ -z $1 ]]; then
   echo "Please add an experiment name as argument"

@@ -29,12 +29,12 @@ const filename =
     `Pc${CONFIG.REPRODUCTION.CROSSOVER_RATE}`,
     `Ppr${CONFIG.REPRODUCTION.PARAM_MUTATION_RATE}`,
     `Pps${CONFIG.REPRODUCTION.PARAM_MUTATION_SPEED}`,
+    `Pe${CONFIG.REPRODUCTION.ELITISM}`,
     `ts${CONFIG.REPRODUCTION.TOURNAMENT_SIZE}`
   ]
     .filter((it) => !!it)
     .join("_") + ".csv";
 
-const scoreCache = {};
 
 const memoize = (problem: ProblemInstance, config: ConfigTree, fn: () => Score) => {
   const key = `results/${hash(problem, config)}`
