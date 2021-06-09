@@ -17,8 +17,9 @@ echo "########################################################"
 ############################################################
 export CAHRS_EXPERIMENT_NAME=$1
 export CAHRS_ENABLE_CACHE=true
-export CAHRS_CACHE_DIRECTORY=/data/cache/
+export CAHRS_CACHE_DIRECTORY=${CAHRS_CACHE_DIRECTORY:-/data/cache/}
 
+mkdir -p ${CAHRS_CACHE_DIRECTORY}results
 
 export CAHRS_PROBLEM=movielens2
 
@@ -49,7 +50,7 @@ export CAHRS_MAX_DEPTH=8
 ### Run experiments                                      ###
 ### CHANGE BELOW!                                        ###
 ############################################################
-parallel \
+parallel --ungroup \
   CAHRS_MUTATION_RATE={1} \
   CAHRS_CROSSOVER_RATE={2} \
   CAHRS_PARAM_MUTATION_RATE={3} \
@@ -59,12 +60,12 @@ parallel \
   CAHRS_MAX_DEPTH={7} \
   CAHRS_EXPERIMENT_NAME={8} \
   CAHRS_PROBLEM={9} \
-  npm run config:display \
-  ::: `# MUTATION_RATE       ` 0.1 0.9  \
-  ::: `# CROSSOVER_RATE      ` 0.9 0.1  \
-  ::: `# PARAM_MUTATION_RATE ` 0.1 0.5 0.9  \
-  ::: `# PARAM_MUTATION_SPEED` 0.5 0.1 \
-  ::: `# ELITISM             ` 0.05 0 \
+  npm run run:mem \
+  ::: `# MUTATION_RATE       ` 0.1   \
+  ::: `# CROSSOVER_RATE      ` 0.9   \
+  ::: `# PARAM_MUTATION_RATE ` 0.1   \
+  ::: `# PARAM_MUTATION_SPEED` 0.5  \
+  ::: `# ELITISM             ` 0.05 \
   ::: `# INITIAL_DEPTH       ` 5 \
   ::: `# MAX_DEPTH           ` 8 \
   ::: `# EXPERIMENT_NAME     ` $CAHRS_EXPERIMENT_NAME \

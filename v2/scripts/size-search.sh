@@ -21,6 +21,8 @@ export CAHRS_EXPERIMENT_NAME=$1
 export CAHRS_ENABLE_CACHE=true
 export CAHRS_CACHE_DIRECTORY=/data/cache/
 
+mkdir -p ${CAHRS_CACHE_DIRECTORY}results
+
 
 export CAHRS_PROBLEM=movielens2
 

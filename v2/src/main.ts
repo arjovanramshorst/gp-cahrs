@@ -12,8 +12,7 @@ import {
 } from "./reproduce";
 import {printConfig} from "./utils/display.utils";
 import {csvHeader, produceCsvLine} from "./utils/output.utils";
-import {appendFileSync} from "fs";
-import {hash, readCache} from "./utils/cache.utils";
+import {hash} from "./utils/cache.utils";
 import {ProblemInstance} from "./interface/problem.interface";
 
 const filename =
