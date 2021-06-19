@@ -3,29 +3,30 @@ import {readMovieLens} from "./problems/movielens.problem";
 import {ReadProblemFunction} from "./interface/problem.interface";
 import {readMovieLensV2} from "./problems/movielens-auxiliary.problem";
 import {readYelp} from "./problems/yelp.problem";
+import {readFilmTrust} from "./problems/filmtrust.problem";
 
 const getProblem = (): { read: ReadProblemFunction, name: string } => {
   switch(process.env.CAHRS_PROBLEM) {
     case "sobazaar":
       return {
         read: readSobazaar,
-        name: "Sobazaar",
-      }
-    case "movielens":
-      return {
-        read: readMovieLens,
-        name: "Movielens"
+        name: "sobazaar",
       }
     case "yelp":
       return {
         read: readYelp,
-        name: "Yelp"
+        name: "yelp"
       }
-    case "movielens2":
+    case "filmtrust":
+      return {
+        read: readFilmTrust,
+        name: "filmtrust"
+      }
+    case "movielens":
     default:
       return {
         read: readMovieLensV2,
-        name: "Movielens V2"
+        name: "movielens"
       }
   }
 }

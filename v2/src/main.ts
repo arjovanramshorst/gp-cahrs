@@ -17,7 +17,6 @@ import {ProblemInstance} from "./interface/problem.interface";
 
 const filename =
   [
-    new Date().toISOString().substring(0, 10),
     CONFIG.EXPERIMENT_NAME,
     CONFIG.PROBLEM.name,
     `Di${CONFIG.INITIAL_DEPTH}`,
@@ -58,7 +57,8 @@ const memoize = (problem: ProblemInstance, config: ConfigTree, fn: () => Score) 
  *************************************************************************
  */
 const main = async (readProblem = CONFIG.PROBLEM.read) => {
-  appendFile(filename, csvHeader);
+  // Override existing files, so restarting is not an issue
+  writeFile(filename, csvHeader);
 
   await evaluateBaseline();
 

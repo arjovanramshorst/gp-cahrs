@@ -8,11 +8,33 @@ import {FUNCTIONS as f} from "./utils/trial.utils";
 import {ConfigTree, fun} from "./tree";
 import {readSobazaar} from "./problems/sobazaar.problem";
 import {produceCsvLine} from "./utils/output.utils";
+import {readFilmTrust} from "./problems/filmtrust.problem";
 
 const mainSobazaar = async () => {
   const configs = await getConfigs()
 
   const problem = await readSobazaar(1)
+
+  const baselines = [
+    ...configs,
+    ...problem.baselines
+  ]
+  baselines.forEach(([name, it]) => {
+    console.log(`\n===================\n ${name}:\n===================`)
+    printConfig(it)
+    const baselineFitness = fitnessScore(
+      calcRecursive(it, problem),
+      problem
+    ).raw;
+
+    console.log(`MRR@10: ${roundScore(baselineFitness.mrr)}, P@1: ${roundScore(baselineFitness.precision1)}, P@10: ${roundScore(baselineFitness.precision10)}`)
+  })
+}
+
+const mainFilmtrust = async () => {
+  const configs = await getConfigs()
+
+  const problem = await readFilmTrust(1)
 
   const baselines = [
     ...configs,
@@ -51,7 +73,7 @@ const roundScore = (score) => Math.round(score * 10000) / 10000
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
-    ['recent', await readJson("../src/pretty.json")],
+    // ['recent', await readJson("../src/pretty.json")],
 
     // ['popularity', popularity],
     // ['basic CF', basicCF],
@@ -117,5 +139,6 @@ const genres = f.invertedNN(10)([
     f.property('movie', 'genres')]),
   f.interaction('rating')])
 
-// mainSobazaar()
-main()
+mainSobazaar()
+// mainFilmtrust()
+// main()

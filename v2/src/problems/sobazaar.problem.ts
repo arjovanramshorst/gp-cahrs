@@ -131,18 +131,22 @@ export const readSobazaar: ReadProblemFunction = async (
       }
       return agg
     }, {}),
-    baseline: baseline2(sampledUserRefs.length, productRefs.length),
+    // Popularity, since that is best performing baseline
+    baseline: f.addVector()([
+      f.fillMatrix('user', 'product', 0),
+      f.popularity()([
+        f.interaction('purchase:buy_clicked')])]),
 
     baselines: [
       ['Empty', f.fillMatrix('user', 'product', 0)],
-      ['interaction', f.interaction('content:interact:product_detail_viewed')],
-      ['interaction', f.interaction('product_detail_clicked')],
-      ['interaction', f.interaction('product_wanted')],
+      // ['interaction', f.interaction('content:interact:product_detail_viewed')],
+      // ['interaction', f.interaction('product_detail_clicked')],
+      // ['interaction', f.interaction('product_wanted')],
 
       ['Popularity', f.addVector()([
         f.fillMatrix('user', 'product', 0),
         f.popularity()([
-          f.interaction('content:interact:product_wanted')])])],
+          f.interaction('purchase:buy_clicked')])])],
 
       ['User CF', f.nearestNeighbour(2)([
         f.pearson()([
@@ -157,31 +161,6 @@ export const readSobazaar: ReadProblemFunction = async (
     ]
   }
 }
-
-const baseline = (rows, columns) => {
-  return fun(
-    "addVector",
-    {},
-    [
-      fun("randomMatrix", {seed: 0, output: {dtoType: DTOType.matrix, rows, columns}}),
-      fun("popularity", {}, [fun(
-        "interaction(purchase:buy_clicked)",
-        {},
-        []
-      )])
-    ]
-  )
-}
-const baseline2 = (users: number, movies: number): ConfigTree => fun(
-  "nearestNeighbour",
-  {N: 5},
-  [
-    fun("pearsonSimilarity", {N: 10}, [
-      fun("interaction(product_detail_clicked)", {}, [])
-    ]),
-    fun("interaction(purchase:buy_clicked)", {}, [])
-  ]
-)
 
 const readInteractions = async () => {
   return await readCsvFile<{ Action: string, Timestamp: string, ItemID: string, UserID: string }>(
