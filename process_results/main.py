@@ -32,11 +32,16 @@ ML_BASELINE = 0.5672
 
 latex_table = ''
 
-def plot(filename, column):
-    result = pd.read_csv('data/' + filename, delimiter="\t")
+def plot(filename, column, ylim=None):
+    result = pd.read_csv('data/' + filename, delimiter="\t", dtype={
+        COL_GEN: float
+    }, na_values='-')
     result_generations = result[result.type == TYPE_INDIVIDUAL]
-    result_generations[COL_GEN] = result_generations[COL_GEN].astype(int)
 
+    # result = pd.read_csv('data/' + filename, delimiter="\t", dtype={
+    #     column: float,
+    #     COL_GEN: int
+    # }, na_values=['-'])
     config_max = result_generations[result_generations[column] == result_generations[column].max()]
     config_str = config_max[COL_CONFIG].iloc[0]
 
@@ -72,6 +77,8 @@ def plot(filename, column):
     result_std = trend(x, grouped_by.std()[column])
 
     fig, axs = plt.subplots(2, 1, sharex='all', sharey='all')
+    if ylim:
+        axs[0].set_ylim(ylim)
     # %%
     axs[0].plot(x, result_max, label='max', color=COLOR_MAX)
     axs[0].plot(x, result_max_trend, label='max (trend)', color=COLOR_MAX, linestyle='dotted')
@@ -148,6 +155,7 @@ columns = [
 ]
 
 files = [
+    # Grid search
     # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.1_ts4.csv',
     # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.3_ts4.csv',
     # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
@@ -184,26 +192,30 @@ files = [
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_ts4.csv',
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.5_ts4.csv',
     # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',
+
+    # Repeatability
     # '2021-06-02_repeatability-big-1_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_repeatability-big-2_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_repeatability-big-3_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_repeatability-big-4_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',
+
+    # Elitism
     # '2021-06-02_elitism-1_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_elitism-2_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_elitism-3_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-02_elitism-4_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    # '2021-06-04_sobazaar-baseline-1_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    # '2021-06-04_sobazaar-baseline-2_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    # '2021-06-04_sobazaar-baseline-3_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    # '2021-06-04_sobazaar-baseline-4_Sobazaar_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+
+    # Sobazaar
     # '2021-06-04_sobazaar-cache-cleared-1_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-04_sobazaar-cache-cleared-2_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
-    '2021-06-04_sobazaar-cache-cleared-3_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+    # '2021-06-04_sobazaar-cache-cleared-3_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
     # '2021-06-04_sobazaar-cache-cleared-4_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',
+
+    # Grid search 2
 ]
 
 for file in files:
     for column in columns:
-        plot(file, column)
+        plot(file, column, ylim=[0.1, 0.65])
 
 print(latex_table)

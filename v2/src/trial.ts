@@ -117,4 +117,5 @@ const genres = f.invertedNN(10)([
     f.property('movie', 'genres')]),
   f.interaction('rating')])
 
-mainSobazaar()
+// mainSobazaar()
+main()

@@ -51,7 +51,7 @@ export CAHRS_MAX_DEPTH=8
 ### Run experiments                                      ###
 ### CHANGE BELOW!                                        ###
 ############################################################
-parallel \
+parallel --ungroup \
   CAHRS_MUTATION_RATE={1} \
   CAHRS_CROSSOVER_RATE={2} \
   CAHRS_PARAM_MUTATION_RATE={3} \
