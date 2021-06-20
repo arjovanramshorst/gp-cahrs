@@ -40,8 +40,9 @@ export const readFilmTrust: ReadProblemFunction = async (
 
   Object.keys(ratingsByUser)
     .filter(userId => userToIdxMap[userId] !== undefined)
-    .forEach((userId, userIndex) => {
+    .forEach((userId) => {
       const ratings = ratingsByUser[userId]
+      const userIdx = userToIdxMap[userId]
       filter.push([])
       validate.push([])
       ratings
@@ -53,13 +54,14 @@ export const readFilmTrust: ReadProblemFunction = async (
 
           https://1217da17-9e55-4056-9ed5-cfc740db36eb.filesusr.com/ugd/913b85_7eb4d8b5b92c439d82451e0302733b75.pdf
            */
+          const movieIdx = movieToIdxMap[rating.movieId]
           if (index < 0.8 * ratings.length) {
-            ratingMatrix[userToIdxMap[rating.userId]][movieToIdxMap[rating.movieId]] = rating.rating //Number(rating.rating)
+            ratingMatrix[userIdx][movieIdx] = Number(rating.rating) //Number(rating.rating)
 
-            filter[userIndex].push(movieToIdxMap[rating.movieId])
+            filter[userIdx].push(movieIdx)
           } else {
             if (rating.rating >= 3) {
-              validate[userIndex].push(movieToIdxMap[rating.movieId])
+              validate[userIdx].push(movieToIdxMap[rating.movieId])
             }
           }
         })
@@ -120,17 +122,27 @@ export const readFilmTrust: ReadProblemFunction = async (
     baseline,
 
     baselines: [
-      ['Popularity', f.addVector()([
-        f.fillMatrix('user', 'movie', 0),
-        f.popularity()([
-          f.interaction('rating')])])],
+      // ['Empty', f.fillMatrix('user', 'movie', 0)],
+      // ['Rating', f.interaction('rating')],
+      // ['Popularity', f.addVector()([
+      //   f.fillMatrix('user', 'movie', 0),
+      //   f.popularity()([
+      //     f.interaction('rating')])])],
+      // ['Popularity', f.addVector()([
+      //   f.fillMatrix('user', 'movie', 0),
+      //   f.popularity()([
+      //     f.interaction('rating')])])],
+      // ['Popularity', f.addVector()([
+      //   f.fillMatrix('user', 'movie', 0),
+      //   f.popularity()([
+      //     f.interaction('rating')])])],
 
-      ['User CF', f.nearestNeighbour(15)([
-        f.pearson()([
-          f.interaction('rating')]),
-        f.interaction('rating')])],
-
-      ["Item CF", baseline],
+      // ['User CF', f.nearestNeighbour(15)([
+      //   f.pearson()([
+      //     f.interaction('rating')]),
+      //   f.interaction('rating')])],
+      //
+      // ["Item CF", baseline],
     ]
   }
 }
@@ -142,7 +154,7 @@ const readRatings = async () => {
       headers: ['userId', 'movieId', 'rating'],
       mapValues: ({header, value}) => {
         switch (header) {
-          case 'ratings':
+          case 'rating':
             return Number(value)
           default:
             return value

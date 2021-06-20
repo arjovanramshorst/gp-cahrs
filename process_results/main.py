@@ -75,6 +75,7 @@ def process(filename, column, store=False, plot=False, ylim=None):
         store_results(filename, config_max, delta_max, delta_mean)
     title = filename_to_title(filename)
     print(title + ' - best config:')
+    print("score: " + str(config_max[COL_SCORE].iloc[0]))
     print(config_str)
 
     result_std = trend(x, grouped_by.std()[column])
@@ -122,12 +123,18 @@ def trend(x, range):
 
 
 def join_param(tuple):
-    return tuple[0] + "=" + tuple[1]
+    return "$" + tuple[0][0:1] + "_{" + tuple[0][1:] + "}=" + tuple[1] + "$"
 
 
-def filename_to_title(filename):
+def filename_to_title(filename, with_params=True):
     params = re.findall('_([a-zA-Z]+)(\d+(\.\d+)?)', filename)
-    return ", ".join(map(join_param, params))
+    split = filename.split("_")
+    experiment_string = split[1] + " - " + split[0]
+    param_string = ", ".join(map(join_param, params))
+    if with_params:
+        return experiment_string + "\n" + param_string
+    else:
+        return experiment_string
 
 
 def filename_to_dict(filename):
@@ -191,7 +198,7 @@ columns = [
     # COL_F_SCORE_NORMALIZED,
 ]
 
-files = [
+files_gridsearch = [
     # Grid search
     # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.1_ts4.csv',',
     # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.3_ts4.csv',',
@@ -312,40 +319,67 @@ files = [
     '2021-06-16_grid-search_Movielens V2_Di5_Dm8_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_Pe0_ts2.csv',
 ]
 
-for file in files:
-    for column in columns:
-        process(file, column, store=True, ylim=[0.1, 0.65])
+def experiment_gridsearch():
+    for file in files_gridsearch:
+        for column in columns:
+            process(file, column, store=True, ylim=[0.1, 0.65])
 
-print(latex_table)
+    print(latex_table)
 
-# %%
-df_results = pd.DataFrame.from_dict(results)
-df_results = df_results.sort_values(['mrr'])
+    # %%
+    df_results = pd.DataFrame.from_dict(results)
+    df_results = df_results.sort_values(['mrr'])
 
-re_max = df_results.groupby("Re").max()
-pco_mean = df_results.groupby("Pco").mean()
-pco_max = df_results.groupby("Pco").max()
-psm_mean = df_results.groupby("Psm").mean()
-psm_max = df_results.groupby("Psm").max()
-ppm_mean = df_results.groupby("Ppm").mean()
-ppm_max = df_results.groupby("Ppm").max()
-spm_mean = df_results.groupby("Spm").mean()["mrr"]
-spm_ma = df_results.groupby("Spm").max()
+    re_max = df_results.groupby("Re").max()
+    pco_mean = df_results.groupby("Pco").mean()
+    pco_max = df_results.groupby("Pco").max()
+    psm_mean = df_results.groupby("Psm").mean()
+    psm_max = df_results.groupby("Psm").max()
+    ppm_mean = df_results.groupby("Ppm").mean()
+    ppm_max = df_results.groupby("Ppm").max()
+    spm_mean = df_results.groupby("Spm").mean()["mrr"]
+    spm_ma = df_results.groupby("Spm").max()
 
-df_results.groupby(['Re', 'Pco', 'Psm', 'Ppm', 'Spm']).mean()['mrr'].sort_values(ascending=True).tail(5).plot(
-    kind='barh', xlim=[0.55, 0.62], title='Grid search: Best 5 MRR@10 - ($R_e, P_{co}, P_{sm}, P_{pm}, S_{pm}$)')
-plt.show()
-df_results.groupby(['Re', 'Pco', 'Psm', 'Ppm', 'Spm']).mean()['mrr'].sort_values(ascending=False).tail(5).plot(
-    kind='barh', xlim=[0.55, 0.62], title='Grid search: Worst 5 MRR@10 - ($R_e, P_{co}, P_{sm}, P_{pm}, S_{pm}$)', )
-plt.show()
-re_mean = df_results.groupby("Re").mean()['mrr'].plot(kind='barh', xlim=[0.55, 0.62],
-                                                      title='Grid search: MRR@10 mean - ($R_e$)')
-plt.show()
-ppm_spm_mean = df_results.groupby(["Ppm", "Spm"]).mean()['mrr'].sort_values().plot(kind='barh', xlim=[0.55, 0.62],
-                                                                                   title='Grid search: MRR@10 mean - ($P_{pm}, S_{pm}$)')
-plt.show()
-pco_psm_mean = df_results.groupby(["Pco", "Psm"]).mean()['mrr'].sort_values().plot(kind='barh', xlim=[0.55, 0.62],
-                                                                                   title='Grid search: MRR@10 mean - ($P_{co}, P_{sm}$)')
-plt.show()
+    df_results.groupby(['Re', 'Pco', 'Psm', 'Ppm', 'Spm']).mean()['mrr'].sort_values(ascending=True).tail(5).plot(
+        kind='barh', xlim=[0.55, 0.62], title='Grid search: Best 5 MRR@10 - ($R_e, P_{co}, P_{sm}, P_{pm}, S_{pm}$)')
+    plt.show()
+    df_results.groupby(['Re', 'Pco', 'Psm', 'Ppm', 'Spm']).mean()['mrr'].sort_values(ascending=False).tail(5).plot(
+        kind='barh', xlim=[0.55, 0.62], title='Grid search: Worst 5 MRR@10 - ($R_e, P_{co}, P_{sm}, P_{pm}, S_{pm}$)', )
+    plt.show()
+    re_mean = df_results.groupby("Re").mean()['mrr'].plot(kind='barh', xlim=[0.55, 0.62],
+                                                          title='Grid search: MRR@10 mean - ($R_e$)')
+    plt.show()
+    ppm_spm_mean = df_results.groupby(["Ppm", "Spm"]).mean()['mrr'].sort_values().plot(kind='barh', xlim=[0.55, 0.62],
+                                                                                       title='Grid search: MRR@10 mean - ($P_{pm}, S_{pm}$)')
+    plt.show()
+    pco_psm_mean = df_results.groupby(["Pco", "Psm"]).mean()['mrr'].sort_values().plot(kind='barh', xlim=[0.55, 0.62],
+                                                                                       title='Grid search: MRR@10 mean - ($P_{co}, P_{sm}$)')
+    plt.show()
 
 # sns.pairplot(df_results)
+
+# %%
+
+files_main = [
+    'main-run-1_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-2_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-3_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-4_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-1_movielens_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-2_movielens_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-3_movielens_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-4_movielens_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-1_sobazaar_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-2_sobazaar_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-3_sobazaar_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    'main-run-4_sobazaar_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+]
+
+
+def experiment_main():
+    for file in files_main:
+        for column in columns:
+            process(file, column, plot=True)
+
+
+experiment_main()

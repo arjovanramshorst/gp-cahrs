@@ -19,9 +19,9 @@ mkdir -p ${CAHRS_CACHE_DIRECTORY}results
 ############################################################
 ### Search hyperparameters                               ###
 ############################################################
-export CAHRS_GENERATION_SIZE=${CAHRS_GENERATION_SIZE:-100}
-export CAHRS_GENERATIONS=${CAHRS_GENERATIONS:-50}
-export CAHRS_TOURNAMENT_SIZE=${CAHRS_TOURNAMENT_SIZE:-2}
+export CAHRS_GENERATION_SIZE=${CAHRS_GENERATION_SIZE:-200}
+export CAHRS_GENERATIONS=${CAHRS_GENERATIONS:-100}
+export CAHRS_TOURNAMENT_SIZE=${CAHRS_TOURNAMENT_SIZE:-4}
 
 export CAHRS_INTERLEAVE_SIZE=1
 
@@ -37,7 +37,7 @@ parallel --ungroup \
   CAHRS_ELITISM={5} \
   CAHRS_INITIAL_DEPTH={6} \
   CAHRS_MAX_DEPTH={7} \
-  CAHRS_EXPERIMENT_NAME=main-run-{8} \
+  CAHRS_EXPERIMENT_NAME=main-run-big-{8} \
   CAHRS_PROBLEM={9} \
   npm run run:mem \
   ::: `# MUTATION_RATE       ` 0.1   \
@@ -46,7 +46,7 @@ parallel --ungroup \
   ::: `# PARAM_MUTATION_SPEED` 0.1  \
   ::: `# ELITISM             ` 0.05 \
   ::: `# INITIAL_DEPTH       ` 5 \
-  ::: `# MAX_DEPTH           ` 6 \
+  ::: `# MAX_DEPTH           ` 8 \
   ::: `# EXPERIMENT_NAME     ` 1 2 3 4 \
-  ::: `# PROBLEM             ` filmtrust sobazaar movielens
+  ::: `# PROBLEM             ` sobazaar movielens
 
