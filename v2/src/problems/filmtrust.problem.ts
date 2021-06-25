@@ -11,6 +11,7 @@ const MIN_RATINGS = 10
 export const readFilmTrust: ReadProblemFunction = async (
   interleaveSize: number = 1,
   interleaveSeed: number = generateMulberrySeed(),
+  actionToRecommend
 ) => {
   const ratings = await readRatings()
   const trusts = await readTrust()
@@ -132,17 +133,17 @@ export const readFilmTrust: ReadProblemFunction = async (
       //   f.fillMatrix('user', 'movie', 0),
       //   f.popularity()([
       //     f.interaction('rating')])])],
-      // ['Popularity', f.addVector()([
-      //   f.fillMatrix('user', 'movie', 0),
-      //   f.popularity()([
-      //     f.interaction('rating')])])],
+      ['Popularity', f.addVector()([
+        f.fillMatrix('user', 'movie', 0),
+        f.popularity()([
+          f.interaction('rating')])])],
 
-      // ['User CF', f.nearestNeighbour(15)([
-      //   f.pearson()([
-      //     f.interaction('rating')]),
-      //   f.interaction('rating')])],
-      //
-      // ["Item CF", baseline],
+      ['User CF', f.nearestNeighbour(15)([
+        f.pearson()([
+          f.interaction('rating')]),
+        f.interaction('rating')])],
+
+      ["Item CF", baseline],
     ]
   }
 }

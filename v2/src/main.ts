@@ -19,6 +19,7 @@ const filename =
   [
     CONFIG.EXPERIMENT_NAME,
     CONFIG.PROBLEM.name,
+    CONFIG.RECOMMEND_INTERACTION,
     `Di${CONFIG.INITIAL_DEPTH}`,
     `Dm${CONFIG.MAX_DEPTH}`,
     `i${CONFIG.INTERLEAVE_SIZE}`,
@@ -65,8 +66,9 @@ const main = async (readProblem = CONFIG.PROBLEM.read) => {
   if (CONFIG.ONLY_BASELINE) {
     return
   }
+  const readProblemWithInteraction = (size?: number, seed?: number) => readProblem(size, seed, CONFIG.RECOMMEND_INTERACTION)
 
-  const problem = await readProblem(CONFIG.INTERLEAVE_SIZE);
+  const problem = await readProblemWithInteraction(CONFIG.INTERLEAVE_SIZE);
 
   const functions = Functions;
   const terminals = getTerminals(problem);
@@ -113,7 +115,7 @@ const main = async (readProblem = CONFIG.PROBLEM.read) => {
   console.log("Generating initial population - DONE");
   for (let gen = 0; gen < CONFIG.GENERATIONS; gen++) {
     console.log(`Sampling dataset for generation #${gen}`);
-    const sampledProblem = await readProblem(CONFIG.INTERLEAVE_SIZE);
+    const sampledProblem = await readProblemWithInteraction(CONFIG.INTERLEAVE_SIZE);
     console.log(`Sampling dataset for generation #${gen} - DONE`);
 
     const treeTablesGrowth = generateTreeTables(
@@ -228,9 +230,8 @@ const evaluateGeneration = (
 
       appendFile(filename, str);
 
-      const score = CONFIG.NORMALIZE
-        ? fitness.normalized.performance
-        : fitness.raw.performance;
+      const score = fitness.raw[CONFIG.REPRODUCTION.EVALUATION]
+
       console.log(`Evaluating generation #${gen} RS ${idx} - DONE (${score})`);
       return {
         config,
@@ -246,8 +247,9 @@ const evaluateBaseline = async () => {
   console.log(`Evaluating baseline on verification sample`);
   const problem = await CONFIG.PROBLEM.read(
     CONFIG.INTERLEAVE_SIZE,
-    CONFIG.VERIFICATION_SEED
-  );
+    CONFIG.VERIFICATION_SEED,
+    CONFIG.RECOMMEND_INTERACTION
+);
   try {
     const baselineFitness = fitnessScore(
       calcRecursive(problem.baseline, problem),
@@ -273,7 +275,8 @@ const evaluateBaseline = async () => {
 const evaluateBestOfGeneration = async (config: ConfigTree): Promise<FitnessValue> => {
   const problem = await CONFIG.PROBLEM.read(
     CONFIG.INTERLEAVE_SIZE,
-    CONFIG.VERIFICATION_SEED
+    CONFIG.VERIFICATION_SEED,
+    CONFIG.RECOMMEND_INTERACTION
   );
 
   return memoize(problem, config, () => {
@@ -284,4 +287,15 @@ const evaluateBestOfGeneration = async (config: ConfigTree): Promise<FitnessValu
   }).raw
 };
 
-main();
+const validateConfig = (): boolean => {
+  if (!['mrr', 'precision1', 'precision5', 'precision10', 'recall', 'fScore'].includes(CONFIG.REPRODUCTION.EVALUATION)) {
+    console.error("Invalid value for $CAHRS_EVALUATION: ", CONFIG.REPRODUCTION.EVALUATION)
+    return false
+  }
+
+  return true
+}
+
+if (validateConfig()) {
+  main();
+}

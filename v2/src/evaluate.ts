@@ -26,7 +26,7 @@ export const calcRecursive = (
   if (cache) {
     return cache
   }
-  printNested(depth, `Entered ${configFinger.config.type}, config: ${configFinger.config}`);
+  // printNested(depth, `Entered ${configFinger.config.type}, config: ${configFinger.config}`);
   let input;
   if (isFunction(configFinger)) {
     input = [];
@@ -46,10 +46,10 @@ export const calcRecursive = (
   }
   // Depth first, so first calculate functions
 
-  printNested(depth, `Calculating ${configFinger.config.type}, config: ${JSON.stringify(configFinger.config)}`);
+  // printNested(depth, `Calculating ${configFinger.config.type}, config: ${JSON.stringify(configFinger.config)}`);
   try {
     const res = calc(configFinger, input, problemInstance);
-    printNested(depth, `Finished ${configFinger.config.type}`);
+    // printNested(depth, `Finished ${configFinger.config.type}`);
     writeCache(problemInstance, configFinger, res)
     return res;
   } catch (e) {

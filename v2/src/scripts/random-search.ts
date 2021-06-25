@@ -1,12 +1,11 @@
-import {generateTree, generateTreeTables} from "./tree";
-import {CONFIG} from "./config";
-import {readMovieLensV2} from "./problems/movielens-auxiliary.problem";
-import {printConfig} from "./utils/display.utils";
-import {fitnessScore, FitnessValue} from "./fitness";
-import {calcRecursive} from "./evaluate";
-import {Functions} from "./functions/function";
-import {getTerminals} from "./terminals/terminal";
-import {DTOType} from "./interface/dto.interface";
+import {CONFIG} from "../config";
+import {fitnessScore, FitnessValue} from "../fitness";
+import {printConfig} from "../utils/display.utils";
+import {readMovieLensV2} from "../problems/movielens-auxiliary.problem";
+import {calcRecursive} from "../evaluate";
+import {getTerminals} from "../terminals/terminal";
+import {Functions} from "../functions/function";
+import {generateTree, generateTreeTables} from "../tree";
 
 const main = async () => {
 

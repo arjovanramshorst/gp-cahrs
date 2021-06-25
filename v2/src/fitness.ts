@@ -1,5 +1,6 @@
 import { ProblemInstance } from "./interface/problem.interface";
 import {sortIdx} from "./utils/sort.utils";
+import {toIdxMap} from "./utils/functional.utils";
 
 export interface FitnessValue {
   recall: number;
@@ -35,7 +36,9 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
     const topIdx = sortIdx(output[userIdx])
     const topScores = topIdx.map(idx => output[userIdx][idx])
     const toFilter = problem.filter[userIdx]
+    const toFilterMap = toFilter.reduce((agg, curr) => {agg[curr] = true; return agg}, {})
     const toFind = problem.validate[userIdx]
+    const toFindMap = toFind.reduce((agg, curr) => {agg[curr] = true; return agg}, {})
     let total = 0;
     let found = 0;
 
@@ -50,10 +53,10 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
       debugger
     }
     for (let i = 0; i < topIdx.length; i++) {
-      if (toFilter.indexOf(topIdx[i]) === -1) {
+      if (toFilterMap[topIdx[i]]) {
         // Recommendation is not filtered
         total++
-        if (toFind.indexOf(topIdx[i]) >= 0) {
+        if (toFindMap[topIdx[i]]) {
         // Recommendation is "correct"
           found++
           scores.mrr += (1 / total)

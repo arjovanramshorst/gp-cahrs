@@ -87,7 +87,7 @@ export const  generateTree = (
     type: selected.type,
     ...(selected.createConfig ? selected.createConfig(outputDTO) : {}),
   };
-  printNested(CONFIG.MAX_DEPTH - maxDepth, `Picked: ${selected.type}, with input: ${input.map(it => dtoToString(it)).join(", ")}`)
+  // printNested(CONFIG.MAX_DEPTH - maxDepth, `Picked: ${selected.type}, with input: ${input.map(it => dtoToString(it)).join(", ")}`)
 
 
   return {

@@ -25,7 +25,15 @@ export const writeCache = <T>(problemInstance: ProblemInstance, config: ConfigTr
 }
 
 export const hash = (problemInstance: ProblemInstance, config: ConfigTree) => {
-  // TODO: Add similarity optimization
-  const toHash = `${problemInstance.problemName}|${problemInstance.interleaveSize}|${problemInstance.interleaveSize === 1 ? "" : problemInstance.interleaveSeed}|${JSON.stringify(config)}`
+  // TODO: Make generic
+  const toHash = [
+    problemInstance.problemName,
+    problemInstance.interleaveSize,
+    problemInstance.interleaveSize === 1 ? "" : problemInstance.interleaveSeed,
+    problemInstance.problemName === "sobazaar" ? CONFIG.RECOMMEND_INTERACTION : null,
+    JSON.stringify(config)
+  ].filter( it => it !== null)
+    .join("|")
+  // const toHash = `${problemInstance.problemName}|${problemInstance.interleaveSize}|${problemInstance.interleaveSize === 1 ? "" : problemInstance.interleaveSeed}|${JSON.stringify(config)}`
   return uuidv5(toHash, namespace)
 }

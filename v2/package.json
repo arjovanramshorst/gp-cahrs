@@ -17,20 +17,19 @@
     "@types/uuid": "^8.3.0"
   },
   "scripts": {
-    "run": "ts-node src/main.ts",
+    "run": "CAHRS_CACHE_DIRECTORY=./cache/ ts-node src/main.ts",
     "run:mem": "node -r ts-node/register --max-old-space-size=32768 src/main.ts",
     "run:yelp": "CAHRS_PROBLEM=yelp node -r ts-node/register --max-old-space-size=16784 src/main.ts",
-    "run:movielens": "CAHRS_PROBLEM=movielens node -r ts-node/register --max-old-space-size=16784 src/main.ts",
-    "run:movielens2": "CAHRS_ENABLE_CACHE=true CAHRS_PROBLEM=movielens2 node -r ts-node/register src/main.ts",
+    "run:movielens": "CAHRS_PROBLEM=movielens node -r ts-node/register src/main.ts",
+    "run:filmtrust": "CAHRS_PROBLEM=filmtrust node -r ts-node/register src/main.ts",
     "run:sobazaar": "CAHRS_PROBLEM=sobazaar CAHRS_INTERLEAVE_SIZE=0.2 node -r ts-node/register --max-old-space-size=16784 src/main.ts",
-    "pretty": "ts-node src/pretty.ts",
-    "trial": "ts-node src/trial.ts",
-    "random": "CAHRS_ENABLE_CACHE=true ts-node src/random-search.ts",
-    "test": "ts-node src/test.ts",
-    "test:sobazaar": "ts-node src/test.sobazaar.ts",
-    "run:gc": "node -r ts-node/register --inspect-brk --trace-gc src/main.ts",
-    "scribble": "ts-node src/scribble.ts",
-    "config:display": "ts-node src/display-config.ts"
+    "info": "ts-node src/scripts/info.ts",
+    "pretty": "ts-node src/scripts/pretty.ts",
+    "trial": "ts-node src/scripts/trial.ts",
+    "random": "CAHRS_ENABLE_CACHE=true ts-node src/scripts/random-search.ts",
+    "test": "ts-node src/scripts/test.ts",
+    "test:sobazaar": "CAHRS_PROBLEM=sobazaar CAHRS_RECOMMEND_INTERACTION=product_detail_clicked npm run run",
+    "run:gc": "node -r ts-node/register --inspect-brk --trace-gc src/main.ts"
   },
   "author": "Arjo van Ramshorst",
   "license": "ISC"

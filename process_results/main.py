@@ -40,10 +40,6 @@ def process(filename, column, store=False, plot=False, ylim=None):
     }, na_values='-')
     result_generations = result[result.type == TYPE_INDIVIDUAL]
 
-    # result = pd.read_csv('data/' + filename, delimiter="\t", dtype={
-    #     column: float,
-    #     COL_GEN: int
-    # }, na_values=['-'])
     config_max = result_generations[result_generations[column] == result_generations[column].max()]
     config_str = config_max[COL_CONFIG].iloc[0]
 
@@ -199,64 +195,6 @@ columns = [
 ]
 
 files_gridsearch = [
-    # Grid search
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.3_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.1_ts4.csv',',
-    # '2021-05-30_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.3_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.5_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0.1_Pc0.9_Ppr0.9_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.5_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm0_Pc1_Ppr0.9_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.5_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.5_Pps0.5_ts4.csv',',
-    # '2021-05-31_param-mutation-fix_Movielens V2_d5_i1_gs100_Pm1_Pc1_Ppr0.9_Pps0.5_ts4.csv',',
-
-    # Repeatability
-    # '2021-06-02_repeatability-big-1_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-02_repeatability-big-2_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-02_repeatability-big-3_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-02_repeatability-big-4_Movielens V2_d5_i1_gs400_Pm1_Pc0_Ppr0.1_Pps0.5_ts4.csv',',
-
-    # Elitism
-    # '2021-06-02_elitism-1_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-02_elitism-2_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-02_elitism-3_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-02_elitism-4_Movielens V2_d5_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-
-    # Sobazaar
-    # '2021-06-04_sobazaar-cache-cleared-1_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-04_sobazaar-cache-cleared-2_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-04_sobazaar-cache-cleared-3_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-    # '2021-06-04_sobazaar-cache-cleared-4_Sobazaar_d8_i1_gs400_Pm0.1_Pc0.9_Ppr0.1_Pps0.5_ts4.csv',',
-
-    # Grid search 2
-
     '2021-06-09_grid-search_Movielens V2_Di5_Dm8_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.1_Pe0.05_ts2.csv',
     '2021-06-09_grid-search_Movielens V2_Di5_Dm8_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.1_Pe0_ts2.csv',
     '2021-06-09_grid-search_Movielens V2_Di5_Dm8_i1_gs100_Pm1_Pc1_Ppr0.1_Pps0.5_Pe0.05_ts2.csv',
@@ -319,6 +257,7 @@ files_gridsearch = [
     '2021-06-16_grid-search_Movielens V2_Di5_Dm8_i1_gs100_Pm1_Pc0_Ppr0.9_Pps0.5_Pe0_ts2.csv',
 ]
 
+
 def experiment_gridsearch():
     for file in files_gridsearch:
         for column in columns:
@@ -328,39 +267,87 @@ def experiment_gridsearch():
 
     # %%
     df_results = pd.DataFrame.from_dict(results)
-    df_results = df_results.sort_values(['mrr'])
 
-    re_max = df_results.groupby("Re").max()
-    pco_mean = df_results.groupby("Pco").mean()
-    pco_max = df_results.groupby("Pco").max()
-    psm_mean = df_results.groupby("Psm").mean()
-    psm_max = df_results.groupby("Psm").max()
-    ppm_mean = df_results.groupby("Ppm").mean()
-    ppm_max = df_results.groupby("Ppm").max()
-    spm_mean = df_results.groupby("Spm").mean()["mrr"]
-    spm_ma = df_results.groupby("Spm").max()
+    # df_results = df_results.sort_values(['mrr'])
 
-    df_results.groupby(['Re', 'Pco', 'Psm', 'Ppm', 'Spm']).mean()['mrr'].sort_values(ascending=True).tail(5).plot(
-        kind='barh', xlim=[0.55, 0.62], title='Grid search: Best 5 MRR@10 - ($R_e, P_{co}, P_{sm}, P_{pm}, S_{pm}$)')
-    plt.show()
-    df_results.groupby(['Re', 'Pco', 'Psm', 'Ppm', 'Spm']).mean()['mrr'].sort_values(ascending=False).tail(5).plot(
-        kind='barh', xlim=[0.55, 0.62], title='Grid search: Worst 5 MRR@10 - ($R_e, P_{co}, P_{sm}, P_{pm}, S_{pm}$)', )
-    plt.show()
-    re_mean = df_results.groupby("Re").mean()['mrr'].plot(kind='barh', xlim=[0.55, 0.62],
-                                                          title='Grid search: MRR@10 mean - ($R_e$)')
-    plt.show()
-    ppm_spm_mean = df_results.groupby(["Ppm", "Spm"]).mean()['mrr'].sort_values().plot(kind='barh', xlim=[0.55, 0.62],
-                                                                                       title='Grid search: MRR@10 mean - ($P_{pm}, S_{pm}$)')
-    plt.show()
-    pco_psm_mean = df_results.groupby(["Pco", "Psm"]).mean()['mrr'].sort_values().plot(kind='barh', xlim=[0.55, 0.62],
-                                                                                       title='Grid search: MRR@10 mean - ($P_{co}, P_{sm}$)')
-    plt.show()
+    # re_max = df_results.groupby("Re").max()
+    # pco_mean = df_results.groupby("Pco").mean()
+    # pco_max = df_results.groupby("Pco").max()
+    # psm_mean = df_results.groupby("Psm").mean()
+    # psm_max = df_results.groupby("Psm").max()
+    # ppm_mean = df_results.groupby("Ppm").mean()
+    # ppm_max = df_results.groupby("Ppm").max()
+    # spm_mean = df_results.groupby("Spm").mean()["mrr"]
+    # spm_ma = df_results.groupby("Spm").max()
 
-# sns.pairplot(df_results)
+    def plot(cols=[]):
+        BAR_SIZE = .3
+        calc_figsize = lambda cols: (6.4, len(cols) * BAR_SIZE + 1)
 
-# %%
+        # Best and worst
+        all_mean = df_results.groupby(['Re', 'Pco', 'Psm', 'Ppm', 'Spm']).mean()
+        for idx, c in enumerate(cols):
+            fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True)
+            fig.suptitle('Grid search, best and worst ($R_e, P_{co}, P_{sm}, P_{pm}, S_{pm}$)')
+            p = all_mean[c['col']].sort_values(ascending=True).tail(5).plot(
+                ax=axs[0],
+                kind='barh', xlim=c['xlim'],
+                title='Best 5 ' + c['title'])
+            p.set(ylabel=None)
+            p = all_mean[c['col']].sort_values(ascending=False).tail(5).plot(
+                ax=axs[1],
+                kind='barh', xlim=c['xlim'],
+                title='Worst 5 ' + c['title'])
+            p.set(ylabel=None)
+            plt.tight_layout()
+            plt.savefig('report/4-grid-search-best-worst-' + c['col'] + '.pdf')
+            plt.show()
+
+        # Elitism
+        re_mean = df_results.groupby("Re").mean()
+        fig, axs = plt.subplots(nrows=1, ncols=len(cols), sharey=True)
+        fig.suptitle('Grid search, mean ($R_e$)')
+        for idx, c in enumerate(cols):
+            p = re_mean[c['col']].plot(kind='barh', ax=axs[idx], xlim=c['xlim'], title=c['title'],
+                                       figsize=calc_figsize(re_mean))
+            p.set(ylabel=None)
+        plt.tight_layout()
+        plt.savefig('report/4-grid-search-elitism.pdf')
+        plt.show()
+
+        # Parameter mutation
+        ppm_spm_mean = df_results.groupby(["Ppm", "Spm"]).mean()
+        fig, axs = plt.subplots(nrows=1, ncols=len(cols), sharey=True)
+        fig.suptitle('Grid search, mean ($P_{pm}, S_{pm}$)')
+        for idx, c in enumerate(cols):
+            p = ppm_spm_mean[c['col']].plot(kind='barh', ax=axs[idx], xlim=c['xlim'], title=c['title'],
+                                            figsize=calc_figsize(ppm_spm_mean))
+            p.set(ylabel=None)
+        plt.tight_layout()
+        plt.savefig('report/4-grid-search-param-mutation.pdf')
+        plt.show()
+
+        # Crossover/subtree mutation
+        pco_psm_mean = df_results.groupby(["Pco", "Psm"]).mean()
+        fig, axs = plt.subplots(nrows=1, ncols=len(cols), sharey=True)
+        fig.suptitle('Grid search, mean ($P_{co}, S_{sm}$)')
+        for idx, c in enumerate(cols):
+            p = pco_psm_mean[c['col']].plot(kind='barh', ax=axs[idx], xlim=c['xlim'], title=c['title'],
+                                            figsize=calc_figsize(pco_psm_mean))
+            p.set(ylabel=None)
+        plt.tight_layout()
+        plt.savefig('report/4-grid-search-crossover-mutation.pdf')
+        plt.show()
+
+    plot([
+        {"col": "mrr", "title": "MRR@10", "xlim": [0.55, 0.62]},
+        {"col": "dmean", "title": "$\Delta$Mean", "xlim": None},
+        {"col": "dmax", "title": "$\Delta$Max", "xlim": None},
+    ])
+
 
 files_main = [
+
     'main-run-1_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
     'main-run-2_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
     'main-run-3_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
@@ -375,11 +362,62 @@ files_main = [
     'main-run-4_sobazaar_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
 ]
 
+files_main_big = {
+    "Movielens": [
+        'main-run-big-1_movielens_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+        'main-run-big-2_movielens_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+        'main-run-big-3_movielens_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+        'main-run-big-4_movielens_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv'
+    ],
+    "Sobazaar": [
+        'main-run-big-1_sobazaar_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+        'main-run-big-2_sobazaar_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+        'main-run-big-3_sobazaar_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+        'main-run-big-4_sobazaar_Di5_Dm8_i1_gs200_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+    ],
+    "Filmtrust":[
+        'main-run-1_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+        'main-run-2_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+        'main-run-3_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+        'main-run-4_filmtrust_Di5_Dm6_i1_gs100_Pm0.1_Pc1_Ppr0.9_Pps0.1_Pe0.05_ts2.csv',
+    ]
+}
+
 
 def experiment_main():
-    for file in files_main:
-        for column in columns:
-            process(file, column, plot=True)
+    for name, files in files_main_big.items():
+        for idx, file in enumerate(files):
+            result = pd.read_csv('data/' + file, delimiter="\t", dtype={
+                COL_GEN: float
+            }, na_values='-')
+            result_generations = result[result.type == TYPE_INDIVIDUAL]
+            x = result_generations[COL_GEN].unique().astype(int)
+            grouped_by = result_generations.groupby([COL_GEN], sort=False)
+            result_mean = grouped_by.mean().sort_values(COL_GEN)[COL_SCORE]
+            result_mean_trend, delta_max = trend(x, result_mean)
+            result_max = grouped_by.max().sort_values(COL_GEN)[COL_SCORE]
+            result_max_trend, delta_max = trend(x, result_max)
 
+            plt.plot(x, result_max, label=('max' if idx == 0 else None), color=COLOR_MAX)
+            plt.plot(x, result_max_trend, label=('max (trend)' if idx == 0 else None), color=COLOR_MAX,
+                     linestyle='dotted')
+            plt.plot(x, result_mean, label=('mean' if idx == 0 else None), color=COLOR_MEAN)
+            plt.plot(x, result_mean_trend, label='mean (trend)' if idx == 0 else None, color=COLOR_MEAN,
+                     linestyle='dotted')
+
+            if idx == 0:
+                baseline = result[result.type == 'baseline']
+                plt.plot(x, np.full(x.shape, baseline[COL_SCORE]), label='Baseline', color=COLOR_BASE)
+        plt.legend(),
+        plt.grid(True)
+        plt.title(name + " - MRR@10")
+        plt.tight_layout()
+        plt.savefig('report/4-main-'+name.lower()+'.pdf')
+        plt.xlabel('Generation')
+        plt.ylabel('MRR@10')
+        plt.show()
+
+
+# experiment_gridsearch()
 
 experiment_main()

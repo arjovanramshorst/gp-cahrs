@@ -3,7 +3,9 @@ import {ConfigTree} from "../tree";
 
 export type ReadProblemFunction = (
   interleaveSize?: number,
-  interleaveSeed?: number
+  interleaveSeed?: number,
+  actionToRecommend?: string,
+  type?: 'dense' | 'sparse'| undefined
 ) => Promise<ProblemInstance>;
 
 export interface ProblemInstance {

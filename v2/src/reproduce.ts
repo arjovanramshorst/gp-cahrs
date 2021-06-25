@@ -11,6 +11,7 @@ export interface EvaluatedConfig {
 
 export type MutateFn = (output: DTO, maxDepth: number) => ConfigTree
 
+
 export const produceOffspring = (generation: EvaluatedConfig[], mutate: MutateFn): ConfigTree[] => {
   const offspring = [];
 

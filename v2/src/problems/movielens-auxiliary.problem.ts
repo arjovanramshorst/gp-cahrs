@@ -5,11 +5,12 @@ import {readCsvFile} from "../utils/fs.utils";
 import {asMatrix, associateWithMany, groupBy, toIdxMap} from "../utils/functional.utils";
 import {DTOMatrix, DTOType} from '../interface/dto.interface';
 import {ConfigTree, fun} from "../tree";
-import {FUNCTIONS} from "../utils/trial.utils";
+import {FUNCTIONS as f, FUNCTIONS} from "../utils/trial.utils";
 
 export const readMovieLensV2: ReadProblemFunction = async (
   interleaveSize: number = 1,
   interleaveSeed: number = generateMulberrySeed(),
+  actionToRecommend
 ) => {
   const movies = await readMovies();
   const ratings = await readRatings();
@@ -182,7 +183,23 @@ export const readMovieLensV2: ReadProblemFunction = async (
       FUNCTIONS.pearson()([
         FUNCTIONS.transpose()([
           FUNCTIONS.interaction('rating')])]),
-      FUNCTIONS.interaction('rating')])
+      FUNCTIONS.interaction('rating')]),
+
+    baselines: [
+      ["Popularity", f.addVector()([
+        f.fillMatrix('user', 'movie', 0),
+        f.popularity()([
+          f.interaction('rating')])])],
+      ["User-based CF", f.nearestNeighbour(15)([
+        f.pearson()([
+          f.interaction('rating')]),
+        f.interaction('rating')])],
+      ["Item-based CF", f.invertedNN(15)([
+        f.pearson()([
+          f.transpose()([
+            f.interaction('rating')])]),
+        f.interaction('rating')])]
+    ]
   }
 };
 

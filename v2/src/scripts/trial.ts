@@ -1,14 +1,12 @@
-import {readJson} from "./utils/fs.utils";
-import {printConfig} from "./utils/display.utils";
-import {CONFIG} from "./config";
-import {readMovieLensV2} from "./problems/movielens-auxiliary.problem";
-import {fitnessScore} from "./fitness";
-import {calcRecursive} from "./evaluate";
-import {FUNCTIONS as f} from "./utils/trial.utils";
-import {ConfigTree, fun} from "./tree";
-import {readSobazaar} from "./problems/sobazaar.problem";
-import {produceCsvLine} from "./utils/output.utils";
-import {readFilmTrust} from "./problems/filmtrust.problem";
+import {readFilmTrust} from "../problems/filmtrust.problem";
+import {ConfigTree} from "../tree";
+import {printConfig} from "../utils/display.utils";
+import {readMovieLensV2} from "../problems/movielens-auxiliary.problem";
+import {calcRecursive} from "../evaluate";
+import {readJson} from "../utils/fs.utils";
+import {readSobazaar} from "../problems/sobazaar.problem";
+import {fitnessScore} from "../fitness";
+import {FUNCTIONS as f} from "../utils/trial.utils";
 
 const mainSobazaar = async () => {
   const configs = await getConfigs()
@@ -20,7 +18,7 @@ const mainSobazaar = async () => {
     ...problem.baselines
   ]
   baselines.forEach(([name, it]) => {
-    console.log(`\n===================\n ${name}:\n===================`)
+    console.log(`### ${name}: ###`)
     printConfig(it)
     const baselineFitness = fitnessScore(
       calcRecursive(it, problem),
@@ -41,7 +39,7 @@ const mainFilmtrust = async () => {
     ...problem.baselines
   ]
   baselines.forEach(([name, it]) => {
-    console.log(`\n===================\n ${name}:\n===================`)
+    console.log(`### ${name}: ###`)
     printConfig(it)
     const baselineFitness = fitnessScore(
       calcRecursive(it, problem),
@@ -57,8 +55,12 @@ const main = async () => {
 
   const problem = await readMovieLensV2(1)
 
-  configs.forEach(([name, it]) => {
-    console.log(`\n===================\n ${name}:\n===================`)
+  const baselines = [
+    ...configs,
+    ...problem.baselines
+  ]
+  baselines.forEach(([name, it]) => {
+    console.log(`### ${name}: ###`)
     printConfig(it)
     const baselineFitness = fitnessScore(
       calcRecursive(it, problem),
@@ -73,7 +75,7 @@ const roundScore = (score) => Math.round(score * 10000) / 10000
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
-    ['recent', await readJson("../src/pretty.json")],
+    // ['recent', await readJson("../src/pretty.json")],
 
     // ['popularity', popularity],
     // ['basic CF', basicCF],

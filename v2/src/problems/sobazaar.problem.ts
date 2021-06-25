@@ -1,37 +1,67 @@
 import {zeros} from 'mathjs'
-import {PropertyType, ReadProblemFunction} from "../interface/problem.interface";
+import {ReadProblemFunction} from "../interface/problem.interface";
 
 import {generateMulberrySeed, mulberry32, sample} from "../utils/random.utils";
 import {DTOMatrix, DTOType} from "../interface/dto.interface";
 import {readCsvFile} from "../utils/fs.utils";
 import {distinct, groupBy, toIdxMap} from "../utils/functional.utils";
-import {ConfigTree, fun} from "../tree";
 import {FUNCTIONS as f} from "../utils/trial.utils";
 
-const ACTION_TO_RECOMMEND = "purchase:buy_clicked"
+const GOAL_SIZE_USERS = 1000
+const GOAL_SIZE_PRODUCTS = 1000
+const SPARSE_START = 0.2
 
 export const readSobazaar: ReadProblemFunction = async (
   interleaveSize: number = 1,
   interleaveSeed: number = generateMulberrySeed(),
+  actionToRecommend: string = "purchase:buy_clicked",
+  type: 'dense' | 'sparse'| undefined = undefined
 ) => {
   const interactions = await readInteractions();
 
   const PRG = mulberry32(interleaveSeed)
 
   const interactionsByUser = groupBy(interactions, it => it.UserID, it => it)
-  const interactionsByProduct = groupBy(interactions, it => it.ItemID, it => it)
-  // Filter users with less than 50 interactions? TODO: Filter based on recommended action?
+  // FILTER Items with no interactions to recommend, otherwise validation will never work
   Object.keys(interactionsByUser).forEach(userRef => {
-    if (interactionsByUser[userRef].filter(it => it.Action === ACTION_TO_RECOMMEND).length < 5) {
+    if (interactionsByUser[userRef].filter(it => it.Action === actionToRecommend).length === 0) {
       delete interactionsByUser[userRef]
     }
   })
 
-  Object.keys(interactionsByProduct).forEach(productRef => {
-    if (interactionsByProduct[productRef].filter(it => it.Action === ACTION_TO_RECOMMEND).length < 5) {
-      delete interactionsByProduct[productRef]
-    }
-  })
+  const interactionsByProduct = groupBy(interactions, it => it.ItemID, it => it)
+  if (type === 'sparse') {
+    const users = Object.keys(interactionsByUser).length
+    // DELETE interactions for users
+    Object.keys(interactionsByUser).sort((a,b) => interactionsByUser[a].length - interactionsByUser[b].length)
+      .forEach((ref, idx) => {
+        if (idx < SPARSE_START * users) {
+          delete interactionsByUser[ref]
+        } else if (idx > SPARSE_START * users + GOAL_SIZE_USERS) {
+          delete interactionsByUser[ref]
+        }
+      })
+    // Only keep the products with the most interactions
+    Object.keys(interactionsByProduct).sort((a,b) => interactionsByProduct[b].length - interactionsByProduct[a].length)
+      .slice(GOAL_SIZE_PRODUCTS).forEach(ref => { delete interactionsByProduct[ref]})
+    // Object.keys(interactionsByUser).sort((a,b) => interactionsByUser[b].length - interactionsByUser[a].length)
+    //   .slice(GOAL_SIZE_USERS).forEach(ref => { delete interactionsByUser[ref]})
+    // Object.keys(interactionsByProduct).sort((a,b) => interactionsByProduct[a].length - interactionsByProduct[b].length)
+    //   .slice(GOAL_SIZE_USERS).forEach(ref => { delete interactionsByProduct[ref]})
+  } else if (type === 'dense') {
+    Object.keys(interactionsByUser).sort((a,b) => interactionsByUser[b].length - interactionsByUser[a].length)
+      .slice(GOAL_SIZE_USERS).forEach(ref => { delete interactionsByUser[ref]})
+    Object.keys(interactionsByProduct).sort((a,b) => interactionsByProduct[b].length - interactionsByProduct[a].length)
+      .slice(GOAL_SIZE_PRODUCTS).forEach(ref => { delete interactionsByProduct[ref]})
+
+  } else {
+    Object.keys(interactionsByProduct).forEach(productRef => {
+      if (interactionsByProduct[productRef].filter(it => it.Action === actionToRecommend).length < 5) {
+        delete interactionsByProduct[productRef]
+      }
+    })
+  }
+
 
   const filteredInteractions = interactions.filter(it => !!interactionsByUser[it.UserID] && !!interactionsByProduct[it.ItemID])
 
@@ -58,8 +88,8 @@ export const readSobazaar: ReadProblemFunction = async (
 
   const interactionMatrices = {}
 
-  interactionMatrices[ACTION_TO_RECOMMEND] = zeros([sampledUserRefs.length, productRefs.length]) as number[][]
-  const recommendPerUser = groupBy(filteredByAction[ACTION_TO_RECOMMEND], it => it.UserID, it => it)
+  interactionMatrices[actionToRecommend] = zeros([sampledUserRefs.length, productRefs.length]) as number[][]
+  const recommendPerUser = groupBy(filteredByAction[actionToRecommend], it => it.UserID, it => it)
   // Handle action to recommend
   Object.keys(recommendPerUser)
     .forEach(userRef => {
@@ -70,7 +100,8 @@ export const readSobazaar: ReadProblemFunction = async (
           const userIdx = userToIdxMap[it.UserID]
           const productIdx = productToIdxMap[it.ItemID]
 
-          if (idx <= 0.8 * actions.length) {
+          // If only 1 item, it must be pushed to validate
+          if (idx < Math.floor(0.8 * actions.length)) {
             interactionMatrices[it.Action][userIdx][productIdx] += 1
             filter[userIdx].push(productIdx)
           } else {
@@ -82,7 +113,7 @@ export const readSobazaar: ReadProblemFunction = async (
   Object.keys(filteredByAction)
     .forEach(action => {
       // Handle other actions
-      if (action !== ACTION_TO_RECOMMEND) {
+      if (action !== actionToRecommend) {
         interactionMatrices[action] = zeros([sampledUserRefs.length, productRefs.length]) as number[][]
         filteredByAction[action].forEach(it => {
           const userIdx = userToIdxMap[it.UserID]
@@ -138,7 +169,7 @@ export const readSobazaar: ReadProblemFunction = async (
         f.interaction('purchase:buy_clicked')])]),
 
     baselines: [
-      ['Empty', f.fillMatrix('user', 'product', 0)],
+      // ['Empty', f.fillMatrix('user', 'product', 0)],
       // ['interaction', f.interaction('content:interact:product_detail_viewed')],
       // ['interaction', f.interaction('product_detail_clicked')],
       // ['interaction', f.interaction('product_wanted')],
@@ -148,9 +179,9 @@ export const readSobazaar: ReadProblemFunction = async (
         f.popularity()([
           f.interaction('purchase:buy_clicked')])])],
 
-      ['User CF', f.nearestNeighbour(2)([
+      ['User CF', f.nearestNeighbour(15)([
         f.pearson()([
-          f.interaction('content:interact:product_clicked')]),
+          f.interaction('product_detail_clicked')]),
         f.interaction('purchase:buy_clicked')])],
 
       ['Item CF', f.invertedNN(15)([

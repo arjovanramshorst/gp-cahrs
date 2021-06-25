@@ -1,10 +1,10 @@
-import {readSobazaar} from "./problems/sobazaar.problem";
-import {Functions} from "./functions/function";
-import {getTerminals} from "./terminals/terminal";
-import {generateTree, generateTreeTables} from "./tree";
-import {CONFIG} from "./config";
-import {calcRecursive} from "./evaluate";
-import {fitnessScore} from "./fitness";
+import {CONFIG} from "../config";
+import {calcRecursive} from "../evaluate";
+import {getTerminals} from "../terminals/terminal";
+import {Functions} from "../functions/function";
+import {generateTree, generateTreeTables} from "../tree";
+import {readSobazaar} from "../problems/sobazaar.problem";
+import {fitnessScore} from "../fitness";
 
 const test = async () => {
   const problem = await readSobazaar(0.1)
