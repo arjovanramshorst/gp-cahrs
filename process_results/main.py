@@ -408,6 +408,11 @@ def experiment_main():
             if idx == 0:
                 baseline = result[result.type == 'baseline']
                 plt.plot(x, np.full(x.shape, baseline[COL_SCORE]), label='Baseline', color=COLOR_BASE)
+
+            config_max = result_generations[result_generations[COL_SCORE] == result_generations[COL_SCORE].max()]
+            config_str = config_max[COL_CONFIG].iloc[0]
+            config_score = config_max[COL_SCORE].iloc[0]
+            print('[`'+name+'-'+str(idx)+'`, `'+config_str+"`, `MRR@10="+str(round(config_score, 4))+"`],")
         plt.legend(),
         plt.grid(True)
         plt.title(name + " - MRR@10")
@@ -418,6 +423,20 @@ def experiment_main():
         plt.show()
 
 
-# experiment_gridsearch()
+files_evaluation = {
+    'MRR@10': 'evaluation_movielens_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+    'Precision@1': 'evaluation_movielens_precision1_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+    'Recall@10': 'evaluation_movielens_recall_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
+}
 
-experiment_main()
+def experiment_evaluation():
+    for evaluation, file in files_evaluation.items():
+        result = pd.read_csv('data/' + file, delimiter="\t", dtype={
+                COL_GEN: float
+            }, na_values='-')
+
+
+
+# experiment_gridsearch()
+# experiment_main()
+experiment_evaluation()

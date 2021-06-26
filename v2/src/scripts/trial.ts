@@ -75,7 +75,7 @@ const roundScore = (score) => Math.round(score * 10000) / 10000
 
 const getConfigs = async (): Promise<[string, ConfigTree][]> => {
   return [
-    // ['recent', await readJson("../src/pretty.json")],
+    ['recent', await readJson("../src/scripts/pretty.json")],
 
     // ['popularity', popularity],
     // ['basic CF', basicCF],
@@ -142,5 +142,5 @@ const genres = f.invertedNN(10)([
   f.interaction('rating')])
 
 // mainSobazaar()
-mainFilmtrust()
-// main()
+// mainFilmtrust()
+main()

@@ -6,6 +6,10 @@ import {asMatrix, associateWithMany, groupBy, toIdxMap} from "../utils/functiona
 import {DTOMatrix, DTOType} from '../interface/dto.interface';
 import {FUNCTIONS} from "../utils/trial.utils";
 
+
+const GOAL_SIZE_USERS = 1000
+const GOAL_SIZE_PRODUCTS = 1000
+
 export const readYelp: ReadProblemFunction = async (
   interleaveSize: number = 1,
   interleaveSeed: number = generateMulberrySeed(),
@@ -30,6 +34,15 @@ export const readYelp: ReadProblemFunction = async (
   const PRG = mulberry32(interleaveSeed)
 
   const reviewsByUser = groupBy(trainReviews, (it) => it.userId, it => it)
+  const reviewsByLocation = groupBy(trainReviews, (it) => it.locationId, it => it)
+
+  // TODO: Add dense version of YELP dataset
+  // if (false) {
+  //   Object.keys(reviewsByUser).sort((a,b) => reviewsByUser[b].length - reviewsByUser[a].length)
+  //     .slice(GOAL_SIZE_USERS).forEach(ref => { delete reviewsByUser[ref]})
+  //   Object.keys(reviewsByLocation).sort((a,b) => reviewsByLocation[b].length - reviewsByLocation[a].length)
+  //     .slice(GOAL_SIZE_PRODUCTS).forEach(ref => { delete reviewsByLocation[ref]})
+  // }
 
   const numberOfUsers = Math.floor(interleaveSize * Object.keys(reviewsByUser).length)
 
@@ -90,7 +103,7 @@ export const readYelp: ReadProblemFunction = async (
 
 
   return {
-    problemName: "movielens2",
+    problemName: "yelp",
     interleaveSize,
     interleaveSeed,
 

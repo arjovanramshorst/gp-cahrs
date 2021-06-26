@@ -53,7 +53,7 @@ export const fitnessScore = (output: number[][], problem: ProblemInstance, basel
       debugger
     }
     for (let i = 0; i < topIdx.length; i++) {
-      if (toFilterMap[topIdx[i]]) {
+      if (!toFilterMap[topIdx[i]]) {
         // Recommendation is not filtered
         total++
         if (toFindMap[topIdx[i]]) {
