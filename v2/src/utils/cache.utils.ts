@@ -30,7 +30,7 @@ export const hash = (problemInstance: ProblemInstance, config: ConfigTree) => {
     problemInstance.problemName,
     problemInstance.interleaveSize,
     problemInstance.interleaveSize === 1 ? "" : problemInstance.interleaveSeed,
-    problemInstance.problemName === "sobazaar" ? CONFIG.RECOMMEND_INTERACTION : null,
+    problemInstance.problemName.startsWith("sobazaar") ? CONFIG.RECOMMEND_INTERACTION : null,
     JSON.stringify(config)
   ].filter( it => it !== null)
     .join("|")

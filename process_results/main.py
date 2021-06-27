@@ -430,13 +430,48 @@ files_evaluation = {
 }
 
 def experiment_evaluation():
+    width = .275
+    fig, axs = plt.subplots(nrows=1, ncols=3, sharex=True)
+    fig.suptitle("Evaluation function experiment")
+    axs[0].set_title("MRR@10")
+    axs[1].set_title("Precision@1")
+    axs[2].set_title("Recall@10")
+    plt.setp(axs, xticks=[0, width, 2* width], xticklabels=['MRR@10', 'P@1', 'R@10'])
+    axs[0].tick_params(labelrotation=45)
+    axs[1].tick_params(labelrotation=45)
+    axs[2].tick_params(labelrotation=45)
+    # plt.xticks(rotation = 25)
+    axs[0].set_ylim(0.5, 0.6)
+    axs[1].set_ylim(0.2, 0.25)
+    axs[2].set_ylim(0.1, 0.12)
+    xidx = 0
     for evaluation, file in files_evaluation.items():
         result = pd.read_csv('data/' + file, delimiter="\t", dtype={
                 COL_GEN: float
             }, na_values='-')
+        result_generations = result[result.type == TYPE_INDIVIDUAL]
+        config_max = result_generations[result_generations[COL_SCORE] == result_generations[COL_SCORE].max()]
+        mrr = config_max["mrr10"].iloc[0]
+        p1 = config_max["precision1"].iloc[0]
+        recall = config_max["recall"].iloc[0]
+        axs[0].bar(width * xidx, mrr, width = width)
+        axs[1].bar(width * xidx,p1, width = width)
+        axs[2].bar(width * xidx,recall, width = width)
+
+        config_str = config_max[COL_CONFIG].iloc[0]
+        config_score = config_max[COL_SCORE].iloc[0]
+        print('[`'+evaluation+'`, `'+config_str+"`, `MRR@10="+str(round(config_score, 4))+"`],")
+        xidx += 1
+    plt.savefig('report/4-evaluation.pdf')
+    plt.show()
+
+
+def experiment_interactions():
+    return
 
 
 
 # experiment_gridsearch()
 # experiment_main()
+# %%
 experiment_evaluation()

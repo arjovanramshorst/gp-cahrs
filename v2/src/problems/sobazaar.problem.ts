@@ -127,7 +127,7 @@ export const readSobazaar: ReadProblemFunction = async (
 
 
   return {
-    problemName: "sobazaar",
+    problemName: ["sobazaar", type].filter(it => !!it).join("-"),
     interleaveSize,
     interleaveSeed,
 

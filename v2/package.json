@@ -28,7 +28,7 @@
     "trial": "ts-node src/scripts/trial.ts",
     "random": "CAHRS_ENABLE_CACHE=true ts-node src/scripts/random-search.ts",
     "test": "ts-node src/scripts/test.ts",
-    "test:sobazaar": "CAHRS_PROBLEM=sobazaar CAHRS_RECOMMEND_INTERACTION=product_detail_clicked npm run run",
+    "test:sobazaar": "CAHRS_PROBLEM=sobazaar-sparse npm run run",
     "run:gc": "node -r ts-node/register --inspect-brk --trace-gc src/main.ts"
   },
   "author": "Arjo van Ramshorst",
