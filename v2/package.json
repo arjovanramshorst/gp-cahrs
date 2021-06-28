@@ -25,6 +25,7 @@
     "run:sobazaar": "CAHRS_PROBLEM=sobazaar CAHRS_INTERLEAVE_SIZE=0.2 node -r ts-node/register --max-old-space-size=16784 src/main.ts",
     "info": "ts-node src/scripts/info.ts",
     "pretty": "ts-node src/scripts/pretty.ts",
+    "exp:density": "ts-node src/scripts/density.ts",
     "trial": "ts-node src/scripts/trial.ts",
     "random": "CAHRS_ENABLE_CACHE=true ts-node src/scripts/random-search.ts",
     "test": "ts-node src/scripts/test.ts",
