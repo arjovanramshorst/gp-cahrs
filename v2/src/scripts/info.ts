@@ -22,6 +22,7 @@ const print = (problem: ProblemInstance) => {
 const main = async () => {
   // print(await readMovieLensV2(1))
   // print(await readFilmTrust(1))
+  print(await readSobazaar())
   print(await readSobazaar(undefined, undefined, undefined, "sparse"))
   print(await readSobazaar(undefined, undefined, 'product_detail_clicked', "dense"))
 }

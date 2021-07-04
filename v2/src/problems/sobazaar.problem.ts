@@ -55,6 +55,11 @@ export const readSobazaar: ReadProblemFunction = async (
       .slice(GOAL_SIZE_PRODUCTS).forEach(ref => { delete interactionsByProduct[ref]})
 
   } else {
+    Object.keys(interactionsByUser).forEach(userRef => {
+      if (interactionsByUser[userRef].filter(it => it.Action === actionToRecommend).length < 5) {
+        delete interactionsByUser[userRef]
+      }
+    })
     Object.keys(interactionsByProduct).forEach(productRef => {
       if (interactionsByProduct[productRef].filter(it => it.Action === actionToRecommend).length < 5) {
         delete interactionsByProduct[productRef]
