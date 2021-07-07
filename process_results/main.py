@@ -268,18 +268,6 @@ def experiment_gridsearch():
     # %%
     df_results = pd.DataFrame.from_dict(results)
 
-    # df_results = df_results.sort_values(['mrr'])
-
-    # re_max = df_results.groupby("Re").max()
-    # pco_mean = df_results.groupby("Pco").mean()
-    # pco_max = df_results.groupby("Pco").max()
-    # psm_mean = df_results.groupby("Psm").mean()
-    # psm_max = df_results.groupby("Psm").max()
-    # ppm_mean = df_results.groupby("Ppm").mean()
-    # ppm_max = df_results.groupby("Ppm").max()
-    # spm_mean = df_results.groupby("Spm").mean()["mrr"]
-    # spm_ma = df_results.groupby("Spm").max()
-
     def plot(cols=[]):
         BAR_SIZE = .3
         calc_figsize = lambda cols: (6.4, len(cols) * BAR_SIZE + 1)
@@ -330,7 +318,7 @@ def experiment_gridsearch():
         # Crossover/subtree mutation
         pco_psm_mean = df_results.groupby(["Pco", "Psm"]).mean()
         fig, axs = plt.subplots(nrows=1, ncols=len(cols), sharey=True)
-        fig.suptitle('Grid search, mean ($P_{co}, S_{sm}$)')
+        fig.suptitle('Grid search, mean ($P_{co}, P_{sm}$)')
         for idx, c in enumerate(cols):
             p = pco_psm_mean[c['col']].plot(kind='barh', ax=axs[idx], xlim=c['xlim'], title=c['title'],
                                             figsize=calc_figsize(pco_psm_mean))
@@ -446,13 +434,6 @@ def experiment_evaluation():
     axs[1].set_title("Precision@1")
     axs[2].set_title("Recall@10")
     plt.setp(axs, xticks=[0, width, 2 * width], xticklabels=['MRR@10', 'P@1', 'R@10'])
-    # axs[0].tick_params(labelrotation=45)
-    # axs[1].tick_params(labelrotation=45)
-    # axs[2].tick_params(labelrotation=45)
-    # plt.xticks(rotation = 25)
-    # axs[0].set_ylim(0.5, 0.6)
-    # axs[1].set_ylim(0.2, 0.25)
-    # axs[2].set_ylim(0.1, 0.12)
     xidx = 0
     for evaluation, file in files_evaluation.items():
         result = pd.read_csv('data/' + file, delimiter="\t", dtype={
@@ -479,14 +460,10 @@ def experiment_evaluation():
 files_density = {
     'dense': [
         'density-1_sobazaar-dense_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
-        # 'density-2_sobazaar-dense_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
         'density-3_sobazaar-dense_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
-        # 'density-4_sobazaar-dense_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
     ],
     'sparse': [
         'density-1_sobazaar-sparse_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
-        # 'density-2_sobazaar-sparse_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
-        # 'density-3_sobazaar-sparse_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
         'density-4_sobazaar-sparse_purchase:buy_clicked_mrr_Di5_Dm6_i1_gs200_Pm0.1_Pc0.9_Ppr0.9_Pps0.1_Pe0.05_ts4.csv',
     ]
 }
@@ -531,9 +508,13 @@ def plot_density():
         print(result['dataset']+' MRR@10: '+str(round(result['mrr'], 4)))
     df_density = pd.DataFrame.from_records(results_density)
 
-    df_groupby = df_density.groupby(['dataset', 'training'], sort=False).sum().unstack().plot.bar(
+    ax = df_density.groupby(['dataset', 'training'], sort=False).sum().unstack().plot.bar(
         title='Results using datasets with different levels of sparsity for training',
         figsize=(8, 4)
+    )
+    ax.legend(
+        ['dense-0', 'dense-1', 'sparse-0', 'sparse-1'],
+        title="Recommender system",
     )
     plt.ylabel('MRR@10')
     plt.tick_params(labelrotation=0)
@@ -587,9 +568,13 @@ def plot_results_interaction():
         print('sobazaar-' + item['dataset'] + ' MRR@10: ' + str(round(item['mrr'], 4)))
     df_interactions = pd.DataFrame.from_records(results_interaction)
 
-    df_groupby = df_interactions.groupby(['dataset', 'training'], sort=False).sum().unstack().plot.bar(
+    ax = df_interactions.groupby(['dataset', 'training'], sort=False).sum().unstack().plot.bar(
         title='Results using different interactions for training',
         figsize=(8, 4)
+    )
+    ax.legend(
+        ['product_detail_viewed', 'product_detail_clicked', 'product_wanted', 'buy_clicked'],
+        title="Recommender system",
     )
     plt.ylabel('MRR@10')
     plt.tick_params(labelrotation=0)
@@ -598,16 +583,16 @@ def plot_results_interaction():
     plt.show()
 
 
-# experiment_gridsearch()
+experiment_gridsearch()
 
 experiment_main()
 
-# experiment_evaluation()
+experiment_evaluation()
 
-# experiment_density()
+experiment_density()
 
-# plot_density()
+plot_density()
 
-# experiment_interaction()
+experiment_interaction()
 
-# plot_results_interaction()
+plot_results_interaction()
